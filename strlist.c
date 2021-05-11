@@ -1,3 +1,7 @@
+/*
+ * A linked list of strings.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,6 +9,7 @@
 #include <stdlib.h>
 
 #include "strlist.h"
+
 
 string *new_string() {
     string *str = malloc(sizeof(string));
@@ -30,10 +35,10 @@ void append_string(string *str, char *val)
 
     for (curr_item = str; curr_item->next != NULL; curr_item = curr_item->next)
         ;
+
     curr_item->next = new_string();
     curr_item->next->val = val;
     curr_item->next->len = strlen(val);
-    curr_item->next->next = NULL;
     str->len++;
 }
 
