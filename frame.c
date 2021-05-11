@@ -69,6 +69,38 @@ void write_text(char *text, rect_t *r)
     }
 }
 
+void write_strlist(string *bank, rect_t *r, int start_index, int end_index)
+{
+
+    const int end_x = r->x + r->width_p * max_x;
+    int x = r->x + 1, y = r->y0 + 1;
+    if (r->from_bottom)
+        y += max_y;
+
+    string *curr;
+    int counter = start_index;
+
+    move(y, x);
+    for (curr = get_string(bank, start_index); curr->val != NULL; curr = curr->next) {
+        getyx(stdscr, y, x);
+
+        if (curr->len + 1 >= end_x - x) {
+            x = r->x + 1;
+            y++;
+            move(y, x);
+            
+            if (y == r->y1)
+                break;
+        }
+
+        addstr(curr->val);
+        addch(' ');
+        if (counter++ == end_index)
+            break;
+    }
+
+}
+
 /**
  * Draw a rectangle to the screen.
  *

@@ -5,7 +5,7 @@ BIN=typingtest
 
 all: clean $(BIN)
 
-typingtest: typingtest.c frame.o linkedlist.o
+typingtest: typingtest.c frame.o strlist.o
 	$(CC) $^ -o $@ $(CFLAGS)
 
 .PHONY: clean

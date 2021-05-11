@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "linkedlist.h"
+#include "strlist.h"
 
 string *new_string() {
     string *str = malloc(sizeof(string));
