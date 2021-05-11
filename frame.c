@@ -54,6 +54,13 @@ void write_text(char *text, rect_t *r)
         y += max_y;
 
     const int end_x = r->x + r->width_p * max_x;
+
+    for (int y0 = y; y0 < r->y1 + max_y ? r->from_bottom : 0; y0++) {
+        move(y0, x);
+        for (int i = x; i < end_x-1; i++)
+            addch(' ');
+    }
+
     move(y, x);
     while ((c = *w++)) {
         addch(c);
@@ -69,7 +76,7 @@ void write_text(char *text, rect_t *r)
     }
 }
 
-void write_strlist(string *bank, rect_t *r, int start_index, int end_index)
+int write_strlist(string *bank, rect_t *r, int start_index, int end_index)
 {
 
     const int end_x = r->x + r->width_p * max_x;
@@ -77,28 +84,52 @@ void write_strlist(string *bank, rect_t *r, int start_index, int end_index)
     if (r->from_bottom)
         y += max_y;
 
+    // Clear box
+    for (int y0 = y; y0 < r->y1; y0++) {
+        move(y0, x);
+        for (int i = x; i < end_x-1; i++)
+            addch(' ');
+    }
+
     string *curr;
     int counter = start_index;
 
+    // Write characters
     move(y, x);
+    int wc = 0;  // word count at first line
     for (curr = get_string(bank, start_index); curr->val != NULL; curr = curr->next) {
         getyx(stdscr, y, x);
 
         if (curr->len + 1 >= end_x - x) {
             x = r->x + 1;
             y++;
+
+
             move(y, x);
             
             if (y == r->y1)
                 break;
         }
 
+        if (y - r->y0 - 1 == 0)
+            wc++;
+
+        attron(curr->style);
         addstr(curr->val);
+        attroff(curr->style);
+
         addch(' ');
         if (counter++ == end_index)
             break;
     }
 
+    return wc;
+}
+
+void set_color(int y, int x, int code)
+{
+    chtype curr = mvinch(y, x);
+    mvaddch(y, x, curr | COLOR_PAIR(code));
 }
 
 /**
@@ -158,6 +189,10 @@ void init_frame()
     start_color();
     use_default_colors();
     curs_set(0);
+
+    // create colors
+    init_pair(1, COLOR_GREEN, -1);
+    init_pair(2, COLOR_WHITE, COLOR_RED);
 
     // have the bounds update in the background
     getmaxyx(stdscr, max_y, max_x);

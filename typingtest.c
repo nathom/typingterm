@@ -22,8 +22,6 @@ int main()
     for (string *curr = word_bank->next; curr->next != NULL; curr = curr->next)
         word_bank_size += curr->len;
 
-    char *text = malloc(word_bank_size);
-
     /* 
      * full width
      * height: 0->6
@@ -32,20 +30,78 @@ int main()
     rect_t main_box = {1.0, 0, 0, 6, 0};
     /*
      * full width
-     * height max_y"hello" - 3 -> max_y -1
+     * height max_y - 3 -> max_y -1
      * from bottom
      */
-    /* rect_t text_box = {1.0, 0, -3, -1, 1}; */
+    rect_t text_box = {1.0, 0, -3, -1, 1};
 
+    // draw boxes
     init_frame();
     draw_rect(&main_box);
+    draw_rect(&text_box);
 
-    write_strlist(word_bank, &main_box, 0, 40);
+    // shuffle and draw words
+    shuffle_strlist(word_bank);
 
-    write_text(text, &main_box);
-    refresh();
-    getch();
+
+    int c;
+    int word_count = 0, words_in_first_line, offset = 0;
+    char typed_word[20];
+    int cp = 0;  // cursor position
+
+    words_in_first_line = write_strlist(word_bank, &main_box, offset, -1);
+
+    string *curr_word = word_bank->next;
+    curr_word->style = A_BOLD;
+    // 27 == ESC
+    while ((c = getch()) != 27) {
+        switch (c) {
+            case 127:  // backspace
+                if (cp > 0) {
+                    typed_word[cp] = '\0';
+                    typed_word[--cp] = '\0';
+                }
+                break;
+
+            case ' ':  // space
+                if (strcmp(curr_word->val, typed_word) == 0)
+                    curr_word->style = COLOR_PAIR(1);
+                else
+                    curr_word->style = COLOR_PAIR(2);
+
+                cp = 0;
+                typed_word[cp] = '\0';
+
+                curr_word = curr_word->next;
+                curr_word->style = A_BOLD;
+
+                word_count++;
+                break;
+
+            case '\n':
+                // this messes up the boxes
+                break;
+
+            default:
+                typed_word[cp++] = c;
+                typed_word[cp] = '\0';
+        }
+
+        write_text(typed_word, &text_box);
+        words_in_first_line = write_strlist(word_bank, &main_box, offset, -1);
+        /* printf("%d\n", words_in_first_line); */
+        if (word_count == words_in_first_line) {
+            offset += word_count;
+            word_count = 0;
+        }
+    }
+
+    // exit
     del_frame();
+    free_strlist(word_bank);
+    // XXX: FREE TEXT BOX
+
+    return 0;
 }
 
 /**
