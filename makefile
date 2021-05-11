@@ -1,6 +1,14 @@
-CC = gcc
-CFLAGS = -D_XOPEN_SOURCE_EXTENDED -lncurses
-NCURSESW = /usr/local/Cellar/ncurses/6.2/lib/libncursesw.a
+CC=gcc
+CFLAGS=-lncurses
 
-frame: frame.c
-	$(CC) -o $@ $< $(NCURSESW)
+BIN=typingtest
+
+all: clean $(BIN)
+
+typingtest: typingtest.c frame.o linkedlist.o
+	$(CC) $^ -o $@ $(CFLAGS)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o $(BIN)

@@ -1,119 +1,140 @@
+/* Plan:
+ *
+ * global rect structs - one for the main screen, the other for
+ * the text box to type in.
+ *
+ * array of rect structs
+ * function that draws the rects, according to the screensize (no refresh)
+ * open a thread that runs the function every 1/60th of a second
+ */
+
 #define _XOPEN_SOURCE_EXTENDED
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <pthread.h>
-
-#include <wchar.h>
-#include <locale.h>
+#include <unistd.h>
 
 #include <ncurses.h>
 
-int max_x, max_y;
+#include <pthread.h>
+#include <wchar.h>
+#include <locale.h>
 
+#include "frame.h"
+
+#define NUM_THREADS 1
+
+// constants
 const wchar_t HORIZONTAL = 0x2501;
 const wchar_t VERTICAL = 0x2503;
 const wchar_t CORNERS[] = {0x250f, 0x2513, 0x251b, 0x2517};
 
-typedef struct {
-    int x0;
-    int y0;
-    int x1;
-    int y1;
-} rectangle;
+void *update_bounds();
 
-void wstrcpy(wchar_t *target, wchar_t *source);
-int draw_rect(rectangle *rect);
-void offset_draw_rect(rectangle *rect, int *offsets);
+// globals
+int max_y, max_x;
+
+pthread_t threads[NUM_THREADS];
 
 
-int main(int argc, char *argv[])
+/**
+ * Write text to the given rectangle. If the text is too long, it will return.
+ *
+ * @param text The text to write
+ * @param r The rectangle in which to write the text. Must have height >= 3
+ * to work properly.
+ * @return void
+ */
+void write_text(char *text, rect_t *r) 
 {
-    // initialization
+    int c;
+    char *w = text;
+    int x = r->x + 1, y = r->y0 + 1;
+    if (r->from_bottom)
+        y += max_y;
+
+    const int end_x = r->x + r->width_p * max_x;
+    move(y, x);
+    while ((c = *w++)) {
+        addch(c);
+        getyx(stdscr, y, x);
+        if (x == end_x - 1) {
+            x = r->x + 1;
+            y++;
+            move(y, x);
+
+            if (y == r->y1)
+                return;
+        }
+    }
+}
+
+/**
+ * Draw a rectangle to the screen.
+ *
+ * @param r The rect_t struct to draw
+ */
+void draw_rect(rect_t *r)
+{
+    const int width = r->width_p * max_x;
+    int y0, y1;
+    wchar_t hor_line[width+1];
+
+    if (r->from_bottom) {
+        y0 = max_y + r->y0;
+        y1 = max_y + r->y1;
+    } else {
+        y0 = r->y0;
+        y1 = r->y1;
+    }
+
+    // make horizontal lines for top and bottom
+    hor_line[0] = CORNERS[0];
+    for (int i = 1; i < width-1; i++)
+        hor_line[i] = HORIZONTAL;
+    hor_line[width-1] = CORNERS[1];
+    hor_line[width] = L'\0';
+
+    mvaddwstr(y0, r->x, hor_line);
+
+    hor_line[0] = CORNERS[3];
+    hor_line[width-1] = CORNERS[2];
+    mvaddwstr(y1, r->x, hor_line);
+
+    cchar_t vertical_bar;
+    setcchar(&vertical_bar, &VERTICAL, 0, 0, NULL);
+    for (int y = y0+1; y < y1; y++) {
+        mvadd_wch(y, r->x, &vertical_bar);
+        mvadd_wch(y, r->x + width-1, &vertical_bar);
+    }
+
+}
+
+void *update_bounds()
+{
+    for (;;) {
+        getmaxyx(stdscr, max_y, max_x);
+        usleep(100000);
+    }
+}
+
+void init_frame()
+{
     setlocale(LC_ALL, "");
     initscr();
     noecho();
     start_color();
     use_default_colors();
     curs_set(0);
+
+    // have the bounds update in the background
     getmaxyx(stdscr, max_y, max_x);
-    rectangle word_bank = {0, 0, max_x, max_y};
+    pthread_create(&threads[0], NULL, update_bounds, NULL);
+}
 
-    // main program
-    draw_rect(&word_bank);
-
-    refresh();
-    getch();
-
+void del_frame()
+{
     endwin();
-    return 0;
-}
-
-
-/**
- * Draws a rectangle with the top left corner
- * at (x0, y0) and the bottom right corner at
- * (x1, y1).
- */
-int draw_rect(rectangle *rect)
-{
-    int hor_line_len = rect->x1 - rect->x0;
-    wchar_t hor_line[hor_line_len+1];
-    int i;
-    hor_line[0] = CORNERS[0];
-    for (i = 1; i < hor_line_len - 1; i++)
-        hor_line[i] = HORIZONTAL;
-
-    hor_line[hor_line_len - 1] = CORNERS[1];
-    hor_line[hor_line_len] = '\0';
-
-    mvaddwstr(rect->y0, rect->x0, hor_line);
-
-    hor_line[0] = CORNERS[3];
-    hor_line[hor_line_len - 1] = CORNERS[2];
-    mvaddwstr(rect->y1, rect->x0, hor_line);
-
-    cchar_t vertical_bar;
-    setcchar(&vertical_bar, &VERTICAL, 0, 0, NULL);
-    for (i = rect->y0 + 1; i < rect->y1; i++) {
-        mvadd_wch(i, rect->x0, &vertical_bar);
-        mvadd_wch(i, rect->x1-1, &vertical_bar);
-    }
-
-    return 0;
-}
-
-void update_border(rectangle *rect, int *offsets)
-{
-    int y, x;
-    int prev_y, prev_x;
-    prev_y = prev_x = 0;
-
-    for (;;) {
-        getmaxyx(stdscr, y, x);
-        if (y != prev_y || x != prev_x) {
-            offset_draw_rect(rect, offsets);
-            prev_y = y;
-            prev_x = x;
-        }
-    }
-    usleep(0.1);
-}
-
-void offset_draw_rect(rectangle *rect, int *offsets)
-{
-    rectangle new_rect = {
-        rect->x0 + offsets[0],
-        rect->y0 + offsets[1],
-        rect->x1 + offsets[2],
-        rect->y1 + offsets[2],
-    };
-    draw_rect(&new_rect);
-}
-
-void wstrcpy(wchar_t *target, wchar_t *source)
-{
-    while ((*target++ = *source++))
-        ;
+    for (int i = 0; i < NUM_THREADS; i++)
+        pthread_cancel(threads[i]);
 }
