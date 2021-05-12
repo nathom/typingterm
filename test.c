@@ -1,14 +1,11 @@
-#define _XOPEN_SOURCE_EXTENDED
-
 #include <stdio.h>
-#include <ncurses.h>
-#include <stdlib.h>
-
-#define NUM_THREADS 1
+#include <time.h>
 
 // create colors
 
 
 int main()
 {
+    int i = 4;
+    printf("%02d\n", i);
 }
