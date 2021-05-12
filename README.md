@@ -2,7 +2,7 @@
 
 A typingtest for terminal power users.
 
-
+![screenshot](demo/demo1.png)
 
 ## Usage
 
