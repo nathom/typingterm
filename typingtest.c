@@ -34,7 +34,7 @@ void load_text_from_bank(char *text, string *word_bank, int start_index, int end
 void *update_window_size(void *maxsize);
 void *update_time(void *now);
 
-void timef(char *str, long diff);
+void timef(char *str, struct timespec *start, struct timespec *now);
 void update_main_box(rect_t *r, windowsize *size);
 void update_text_box(rect_t *r, windowsize *size);
 void update_time_box(rect_t *r, windowsize *size);
@@ -111,15 +111,15 @@ int main(int argc, char **argv)
     int c, words_in_first_line, num_errors, word_count, offset;
     char typed_word[MAX_WORD_LEN];
     int cp = 0;  // cursor position
-    char timestr[6];  // dd:dd\0
-    time_t start, now;
+    char timestr[9];  // dd:dd.dd\0
+    /* time_t start, now; */
+    struct timespec start, now;
 
     num_errors = 0;
     word_count = 0;
     offset = 0;
 
 
-    time(&now);
 
     pthread_t pids[NUM_THREADS];
     // update time in the background
@@ -132,15 +132,16 @@ int main(int argc, char **argv)
     curr_word->style = A_BOLD;
     // 27 == ESC
     c = getch();
-    time(&start);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     if (c == 27)
         goto EXIT;
 
     do {
-        timef(timestr, now - start);
+        timef(timestr, &start, &now);
         write_text(timestr, &time_box);
-        if (now - start >= TIMER_LEN) {
-            final_screen(now - start, word_bank, curr_word, num_errors, &curr_size);
+        if (now.tv_sec - start.tv_sec >= TIMER_LEN) {
+            final_screen(now.tv_sec - start.tv_sec, word_bank, curr_word,
+                    num_errors, &curr_size);
             goto EXIT;
         }
 
@@ -243,18 +244,19 @@ void load_word_bank(string *bank, FILE *bank_file, char word_delimiter)
 void *update_time(void *now)
 {
     while (1) {
-        time((time_t *) now);
+        clock_gettime(CLOCK_MONOTONIC_RAW, (struct timespec *) now);
         usleep(100000);
     }
 
     return NULL;
 }
 
-void timef(char *str, long diff)
+void timef(char *str, struct timespec *start, struct timespec *now)
 {
-    int sec = diff % 60;
-    int min = diff / 60;
-    sprintf(str, "%02d:%02d", min, sec);
+    double diff = now->tv_sec - start->tv_sec + ((double) now->tv_nsec - 
+            start->tv_nsec) / 10e8;
+    int mins = (int) diff / 60;
+    sprintf(str, "%02d:%.2f", mins, diff);
 }
 
 void *update_window_size(void *maxsize)
@@ -335,7 +337,7 @@ void show_results(typingtest_results *results, windowsize *size)
     sprintf(result_text,
             "WPM: %.1f\n"
             "Adjusted WPM: %.1f\n"
-            "Time elapsed: %.1f\n"
+            "Time elapsed: %.1fs\n"
             "Words typed: %d\n"
             "Accuracy: %.1f%%\n"
             "Chars per second: %.1f",
