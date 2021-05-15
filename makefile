@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-lncurses
 
-BIN=typingtest
+BIN=typingterm
 
 all: clean $(BIN)
 
