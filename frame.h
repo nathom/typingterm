@@ -1,11 +1,10 @@
 #include "strlist.h"
 
 typedef struct {
-    double width_p;   // width = width_p * max_x
-    int x;
+    int x0;
     int y0;
+    int x1;
     int y1;
-    int from_bottom;  // if 1, bounds are {max_y + y0, max_y + y1}
 } rect_t;
 
 // prototypes

@@ -49,24 +49,22 @@ void write_text(char *text, rect_t *r)
 {
     int c;
     char *w = text;
-    int x = r->x + 1, y = r->y0 + 1;
-    if (r->from_bottom)
-        y += max_y;
 
-    const int end_x = r->x + r->width_p * max_x;
+    int y, x;
+    for (y = r->y0 + 1; y < r->y1; y++)
+        for (x = r->x0 + 1; x < r->x1; x++)
+            mvaddch(y, x, ' ');
 
-    for (int y0 = y; y0 < r->y1 + max_y ? r->from_bottom : 0; y0++) {
-        move(y0, x);
-        for (int i = x; i < end_x-1; i++)
-            addch(' ');
-    }
-
+    y = r->y0 + 1, x = r->x0 + 1;
     move(y, x);
     while ((c = *w++)) {
-        addch(c);
+        if (c == '\n')
+            move(y+1, r->x0 + 1);
+        else
+            addch(c);
         getyx(stdscr, y, x);
-        if (x == end_x - 1) {
-            x = r->x + 1;
+        if (x == r->x1) {
+            x = r->x0 + 1;
             y++;
             move(y, x);
 
@@ -78,16 +76,11 @@ void write_text(char *text, rect_t *r)
 
 int write_strlist(string *bank, rect_t *r, int start_index, int end_index)
 {
-
-    const int end_x = r->x + r->width_p * max_x;
-    int x = r->x + 1, y = r->y0 + 1;
-    if (r->from_bottom)
-        y += max_y;
-
+    /* printf("%d, %d, %d, %d\n", r->x0, r->y0, r->x1, r->y1); */
     // Clear box
-    for (int y0 = y; y0 < r->y1; y0++) {
-        move(y0, x);
-        for (int i = x; i < end_x-1; i++)
+    for (int y0 = r->y0 + 1; y0 < r->y1; y0++) {
+        move(y0, r->x0 + 1);
+        for (int i = r->x0 + 1; i < r->x1-1; i++)
             addch(' ');
     }
 
@@ -95,18 +88,16 @@ int write_strlist(string *bank, rect_t *r, int start_index, int end_index)
     int counter = start_index;
 
     // Write characters
-    move(y, x);
-    int wc = 0;  // word count at first line
-    for (curr = get_string(bank, start_index); curr->val != NULL; curr = curr->next) {
+    move(r->y0 + 1, r->x0 + 1);
+    int wc = 0, y, x;  // word count at first line
+    for (curr = get_string(bank, start_index); curr->next != NULL; curr = curr->next) {
         getyx(stdscr, y, x);
+        /* printf("%d, %d\n", y, x); */
 
-        if (curr->len + 1 >= end_x - x) {
-            x = r->x + 1;
+        if (curr->len + 1 >= r->x1 - x) {
+            x = r->x0 + 1;
             y++;
-
-
             move(y, x);
-            
             if (y == r->y1)
                 break;
         }
@@ -139,17 +130,8 @@ void set_color(int y, int x, int code)
  */
 void draw_rect(rect_t *r)
 {
-    const int width = r->width_p * max_x;
-    int y0, y1;
+    int width = r->x1 - r->x0 + 1;
     wchar_t hor_line[width+1];
-
-    if (r->from_bottom) {
-        y0 = max_y + r->y0;
-        y1 = max_y + r->y1;
-    } else {
-        y0 = r->y0;
-        y1 = r->y1;
-    }
 
     // make horizontal lines for top and bottom
     hor_line[0] = CORNERS[0];
@@ -158,19 +140,18 @@ void draw_rect(rect_t *r)
     hor_line[width-1] = CORNERS[1];
     hor_line[width] = L'\0';
 
-    mvaddwstr(y0, r->x, hor_line);
+    mvaddwstr(r->y0, r->x0, hor_line);
 
     hor_line[0] = CORNERS[3];
     hor_line[width-1] = CORNERS[2];
-    mvaddwstr(y1, r->x, hor_line);
+    mvaddwstr(r->y1, r->x0, hor_line);
 
     cchar_t vertical_bar;
     setcchar(&vertical_bar, &VERTICAL, 0, 0, NULL);
-    for (int y = y0+1; y < y1; y++) {
-        mvadd_wch(y, r->x, &vertical_bar);
-        mvadd_wch(y, r->x + width-1, &vertical_bar);
+    for (int y = r->y0 + 1; y < r->y1; y++) {
+        mvadd_wch(y, r->x0, &vertical_bar);
+        mvadd_wch(y, r->x1, &vertical_bar);
     }
-
 }
 
 void *update_bounds()
@@ -196,7 +177,7 @@ void init_frame()
 
     // have the bounds update in the background
     getmaxyx(stdscr, max_y, max_x);
-    pthread_create(&threads[0], NULL, update_bounds, NULL);
+    /* pthread_create(&threads[0], NULL, update_bounds, NULL); */
 }
 
 void del_frame()
