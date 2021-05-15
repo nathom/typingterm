@@ -1,4 +1,4 @@
-CC=clang
+CC=gcc
 CFLAGS=-lncurses
 
 BIN=typingtest
@@ -12,3 +12,7 @@ typingtest: typingtest.c frame.o strlist.o
 
 clean:
 	rm -f *.o $(BIN)
+
+install: typingtest
+	rm -f /usr/local/bin/typingtest
+	ln ./typingtest /usr/local/bin/typingtest
