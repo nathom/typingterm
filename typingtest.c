@@ -34,7 +34,7 @@ void load_text_from_bank(char *text, string *word_bank, int start_index, int end
 void *update_window_size(void *maxsize);
 void *update_time(void *now);
 
-void timef(char *str, struct timespec *start, struct timespec *now);
+void timef(char *str, struct timespec *start, struct timespec *now, int test_len);
 void update_main_box(rect_t *r, windowsize *size);
 void update_text_box(rect_t *r, windowsize *size);
 void update_time_box(rect_t *r, windowsize *size);
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
         goto EXIT;
 
     do {
-        timef(timestr, &start, &now);
+        timef(timestr, &start, &now, TIMER_LEN);
         write_text(timestr, &time_box);
         if (now.tv_sec - start.tv_sec >= TIMER_LEN) {
             final_screen(now.tv_sec - start.tv_sec, word_bank, curr_word,
@@ -251,10 +251,10 @@ void *update_time(void *now)
     return NULL;
 }
 
-void timef(char *str, struct timespec *start, struct timespec *now)
+void timef(char *str, struct timespec *start, struct timespec *now, int test_len)
 {
-    double diff = now->tv_sec - start->tv_sec + ((double) now->tv_nsec - 
-            start->tv_nsec) / 10e8;
+    double diff = test_len - (now->tv_sec - start->tv_sec 
+        + ((double) now->tv_nsec - start->tv_nsec) / 10e8);
     int mins = (int) diff / 60;
     sprintf(str, "%02d:%.2f", mins, diff);
 }
@@ -354,6 +354,7 @@ void show_results(typingtest_results *results, windowsize *size)
 
     draw_rect(&result_box);
     write_text(result_text, &result_box);
+    mvaddstr(result_box.y1 + 2, result_box.x0 + 2, "Press ESC to exit.");
 }
 
 void final_screen(int timediff, string *word_bank, string *curr_word,

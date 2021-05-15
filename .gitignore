@@ -1,3 +1,5 @@
 *.o
 typingtest
 /test
+/typingterm
+/test.c

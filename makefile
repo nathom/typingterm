@@ -5,7 +5,7 @@ BIN=typingtest
 
 all: clean $(BIN)
 
-typingtest: typingtest.c frame.o strlist.o
+typingterm: typingtest.c frame.o strlist.o
 	$(CC) $^ -o $@ $(CFLAGS)
 
 .PHONY: clean
@@ -13,6 +13,9 @@ typingtest: typingtest.c frame.o strlist.o
 clean:
 	rm -f *.o $(BIN)
 
-install: typingtest
-	rm -f /usr/local/bin/typingtest
-	ln ./typingtest /usr/local/bin/typingtest
+install: typingterm
+	echo "Linking binaries\n"
+	rm -f /usr/local/bin/typingterm
+	ln ./typingterm /usr/local/bin/typingterm
+	rm -f /usr/local/bin/tterm
+	ln ./typingterm /usr/local/bin/tterm
