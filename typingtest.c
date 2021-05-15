@@ -87,7 +87,15 @@ int main(int argc, char **argv)
     }
 
     string *word_bank = new_string();
-    FILE *word_bank_file = fopen(word_bank_file_path, "r");
+    char *abs_word_bank_path = strcat(
+            strcat(getenv("HOME"), "/typingterm/word_banks/"),
+            word_bank_file_path
+            );
+    FILE *word_bank_file = fopen(abs_word_bank_path, "r");
+    if (word_bank_file == NULL) {
+        printf("Error: Cannot find word bank at \"%s\".\n", abs_word_bank_path);
+        return 1;
+    }
     load_word_bank(word_bank, word_bank_file, word_delimiter);
     // shuffle and draw words
     shuffle_strlist(word_bank);
