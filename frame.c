@@ -10,32 +10,29 @@
 
 #define _XOPEN_SOURCE_EXTENDED
 
+#include "frame.h"
+
+#include <locale.h>
+#include <ncurses.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#include <ncurses.h>
-
-#include <pthread.h>
 #include <wchar.h>
-#include <locale.h>
-
-#include "frame.h"
 
 #define NUM_THREADS 1
 
 // constants
 const wchar_t HORIZONTAL = 0x2501;
 const wchar_t VERTICAL = 0x2503;
-const wchar_t CORNERS[] = {0x250f, 0x2513, 0x251b, 0x2517};
+const wchar_t CORNERS[] = { 0x250f, 0x2513, 0x251b, 0x2517 };
 
-void *update_bounds();
+void* update_bounds();
 
 // globals
 int max_y, max_x;
 
 pthread_t threads[NUM_THREADS];
-
 
 /**
  * Write text to the given rectangle. If the text is too long, it will return.
@@ -45,10 +42,10 @@ pthread_t threads[NUM_THREADS];
  * to work properly.
  * @return void
  */
-void write_text(char *text, rect_t *r) 
+void write_text(char* text, rect_t* r)
 {
     int c;
-    char *w = text;
+    char* w = text;
 
     int y, x;
     for (y = r->y0 + 1; y < r->y1; y++)
@@ -59,7 +56,7 @@ void write_text(char *text, rect_t *r)
     move(y, x);
     while ((c = *w++)) {
         if (c == '\n')
-            move(y+1, r->x0 + 1);
+            move(y + 1, r->x0 + 1);
         else
             addch(c);
         getyx(stdscr, y, x);
@@ -74,23 +71,24 @@ void write_text(char *text, rect_t *r)
     }
 }
 
-int write_strlist(string *bank, rect_t *r, int start_index, int end_index)
+int write_strlist(string* bank, rect_t* r, int start_index, int end_index)
 {
-    /* printf("%d, %d, %d, %d\n", r->x0, r->y0, r->x1, r->y1); */
+    printf("%d, %d, %d, %d\n", r->x0, r->y0, r->x1, r->y1);
     // Clear box
     for (int y0 = r->y0 + 1; y0 < r->y1; y0++) {
         move(y0, r->x0 + 1);
-        for (int i = r->x0 + 1; i < r->x1-1; i++)
+        for (int i = r->x0 + 1; i < r->x1 - 1; i++)
             addch(' ');
     }
 
-    string *curr;
+    string* curr;
     int counter = start_index;
 
     // Write characters
     move(r->y0 + 1, r->x0 + 1);
-    int wc = 0, y, x;  // word count at first line
-    for (curr = get_string(bank, start_index); curr->next != NULL; curr = curr->next) {
+    int wc = 0, y, x; // word count at first line
+    for (curr = get_string(bank, start_index); curr->next != NULL;
+         curr = curr->next) {
         getyx(stdscr, y, x);
         /* printf("%d, %d\n", y, x); */
 
@@ -128,22 +126,22 @@ void set_color(int y, int x, int code)
  *
  * @param r The rect_t struct to draw
  */
-void draw_rect(rect_t *r)
+void draw_rect(rect_t* r)
 {
     int width = r->x1 - r->x0 + 1;
-    wchar_t hor_line[width+1];
+    wchar_t hor_line[width + 1];
 
     // make horizontal lines for top and bottom
     hor_line[0] = CORNERS[0];
-    for (int i = 1; i < width-1; i++)
+    for (int i = 1; i < width - 1; i++)
         hor_line[i] = HORIZONTAL;
-    hor_line[width-1] = CORNERS[1];
+    hor_line[width - 1] = CORNERS[1];
     hor_line[width] = L'\0';
 
     mvaddwstr(r->y0, r->x0, hor_line);
 
     hor_line[0] = CORNERS[3];
-    hor_line[width-1] = CORNERS[2];
+    hor_line[width - 1] = CORNERS[2];
     mvaddwstr(r->y1, r->x0, hor_line);
 
     cchar_t vertical_bar;
@@ -154,7 +152,7 @@ void draw_rect(rect_t *r)
     }
 }
 
-void *update_bounds()
+void* update_bounds()
 {
     for (;;) {
         getmaxyx(stdscr, max_y, max_x);
