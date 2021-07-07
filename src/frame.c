@@ -73,8 +73,6 @@ void write_text(char* text, rect_t* r)
 
 int write_strlist(string* bank, rect_t* r, int start_index, int end_index)
 {
-    printf("%d, %d, %d, %d\n", r->x0, r->y0, r->x1, r->y1);
-    // Clear box
     for (int y0 = r->y0 + 1; y0 < r->y1; y0++) {
         move(y0, r->x0 + 1);
         for (int i = r->x0 + 1; i < r->x1 - 1; i++)

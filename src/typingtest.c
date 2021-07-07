@@ -20,7 +20,7 @@ typedef struct _typingtest_results {
     double cps; // chars per sec
 } typingtest_results;
 
-typedef struct windowsize {
+typedef struct _windowsize {
     int x;
     int y;
 } windowsize;
@@ -50,9 +50,9 @@ void print_help();
 int is_option(char* str, int pos);
 
 const int num_options = 4;
-char* options[] = { "-t", "--time", "-f", "--file",
+const char* options[] = { "-t", "--time", "-f", "--file",
     "-d", "--delimeter", "-h", "--help" };
-char* options_help[] = {
+const char* options_help[] = {
     "Test duration, in seconds. Default 15.",
     "The file containing the word bank. Default 200_top_words.txt.",
     "The character separating words in the file. Default '\\n'.",
