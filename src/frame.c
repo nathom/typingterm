@@ -27,7 +27,7 @@ const wchar_t HORIZONTAL = 0x2501;
 const wchar_t VERTICAL = 0x2503;
 const wchar_t CORNERS[] = { 0x250f, 0x2513, 0x251b, 0x2517 };
 
-void* update_bounds();
+void *update_bounds();
 
 // globals
 int max_y, max_x;
@@ -42,10 +42,9 @@ pthread_t threads[NUM_THREADS];
  * to work properly.
  * @return void
  */
-void write_text(char* text, rect_t* r)
-{
+void write_text(char *text, rect_t *r) {
     int c;
-    char* w = text;
+    char *w = text;
 
     int y, x;
     for (y = r->y0 + 1; y < r->y1; y++)
@@ -71,15 +70,14 @@ void write_text(char* text, rect_t* r)
     }
 }
 
-int write_strlist(string* bank, rect_t* r, int start_index, int end_index)
-{
+int write_strlist(string *bank, rect_t *r, int start_index, int end_index) {
     for (int y0 = r->y0 + 1; y0 < r->y1; y0++) {
         move(y0, r->x0 + 1);
         for (int i = r->x0 + 1; i < r->x1 - 1; i++)
             addch(' ');
     }
 
-    string* curr;
+    string *curr;
     int counter = start_index;
 
     // Write characters
@@ -113,8 +111,7 @@ int write_strlist(string* bank, rect_t* r, int start_index, int end_index)
     return wc;
 }
 
-void set_color(int y, int x, int code)
-{
+void set_color(int y, int x, int code) {
     chtype curr = mvinch(y, x);
     mvaddch(y, x, curr | COLOR_PAIR(code));
 }
@@ -124,8 +121,7 @@ void set_color(int y, int x, int code)
  *
  * @param r The rect_t struct to draw
  */
-void draw_rect(rect_t* r)
-{
+void draw_rect(rect_t *r) {
     int width = r->x1 - r->x0 + 1;
     wchar_t hor_line[width + 1];
 
@@ -150,16 +146,14 @@ void draw_rect(rect_t* r)
     }
 }
 
-void* update_bounds()
-{
+void *update_bounds() {
     for (;;) {
         getmaxyx(stdscr, max_y, max_x);
         usleep(100000);
     }
 }
 
-void init_frame()
-{
+void init_frame() {
     setlocale(LC_ALL, "");
     initscr();
     noecho();
@@ -176,8 +170,7 @@ void init_frame()
     /* pthread_create(&threads[0], NULL, update_bounds, NULL); */
 }
 
-void del_frame()
-{
+void del_frame() {
     endwin();
     for (int i = 0; i < NUM_THREADS; i++)
         pthread_cancel(threads[i]);

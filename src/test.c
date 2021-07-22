@@ -4,10 +4,9 @@
 
 // create colors
 
-void timef(char* str, struct timespec* start, struct timespec* now);
+void timef(char *str, struct timespec *start, struct timespec *now);
 
-int main()
-{
+int main() {
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     sleep(1);
@@ -19,8 +18,7 @@ int main()
     printf("%s\n", stuff);
 }
 
-void timef(char* str, struct timespec* start, struct timespec* now)
-{
+void timef(char *str, struct timespec *start, struct timespec *now) {
     double diff = now->tv_sec - start->tv_sec + ((double)now->tv_nsec - start->tv_nsec) / 10e8;
     int mins = (int)diff / 60;
     sprintf(str, "%02d:%.2f", mins, diff);

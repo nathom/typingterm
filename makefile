@@ -1,11 +1,11 @@
-CC=gcc
+CC=clang
 CFLAGS=-lncurses -Ofast
 
 BIN=typingterm
 
 all: clean $(BIN)
 
-typingterm: typingtest.c frame.o strlist.o
+typingterm: src/typingtest.c src/frame.o src/strlist.o
 	$(CC) $^ -o $@ $(CFLAGS)
 
 .PHONY: clean
