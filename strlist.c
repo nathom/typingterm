@@ -26,15 +26,14 @@ strlist strlist_new(uintptr_t size) {
 
 void strlist_delete(strlist *s) {
     free(s->vec);
-    free(s);
 }
 
-string strlist_get(strlist *s, uintptr_t index) {
+string *strlist_get(strlist *s, uintptr_t index) {
     if (index >= s->len) {
         fprintf(stderr, "index out of bounds: %lu >= len %lu\n", index, s->len);
         exit(EXIT_FAILURE);
     }
-    return s->vec[index];
+    return &s->vec[index];
 }
 
 uintptr_t strlist_append(strlist *l, string s) {
@@ -76,10 +75,11 @@ static void strlist_resize(strlist *s, uintptr_t size) {
 
 void strlist_shuffle(strlist *s) {
     srand(getpid());
-    for (int i = 0; i < s->len; i++) {
+    const int len = s->len;
+    for (int i = 0; i < len; i++) {
         int rand_pos = (double)s->len * rand() / RAND_MAX;
-        string curr = strlist_get(s, i);
-        string r = strlist_get(s, rand_pos);
+        string curr = *strlist_get(s, i);
+        string r = *strlist_get(s, rand_pos);
         // swap
         string tmp = curr;
         strlist_set(s, i, r);

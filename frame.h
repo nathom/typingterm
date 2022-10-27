@@ -1,3 +1,6 @@
+#ifndef FRAME_H
+#define FRAME_H
+
 #include "strlist.h"
 
 typedef struct {
@@ -11,6 +14,8 @@ typedef struct {
 void init_frame();
 void draw_rect(rect_t *);
 void write_text(char *, rect_t *);
-int write_strlist(string *bank, rect_t *r, int start_index, int end_index);
+int write_strlist(strlist *bank, rect_t *r, int start_index, int end_index);
 void refresh_frame();
 void del_frame();
+
+#endif

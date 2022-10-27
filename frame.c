@@ -21,10 +21,11 @@
 #include <wchar.h>
 
 #define NUM_THREADS 1
+#define VERTICAL L"┃"
+#define HORIZONTAL L"━"
 
 // constants
-const wchar_t HORIZONTAL = 0x2501;
-const wchar_t VERTICAL = 0x2503;
+// const wchar_t HORIZONTAL = 0x2501;
 const wchar_t CORNERS[] = { 0x250f, 0x2513, 0x251b, 0x2517 };
 
 void *update_bounds();
@@ -70,24 +71,26 @@ void write_text(char *text, rect_t *r) {
     }
 }
 
-int write_strlist(string *bank, rect_t *r, int start_index, int end_index) {
+int write_strlist(strlist *bank, rect_t *r, int start_index, int end_index) {
     for (int y0 = r->y0 + 1; y0 < r->y1; y0++) {
         move(y0, r->x0 + 1);
         for (int i = r->x0 + 1; i < r->x1 - 1; i++)
             addch(' ');
     }
 
-    string *curr;
     int counter = start_index;
 
     // Write characters
     move(r->y0 + 1, r->x0 + 1);
     int wc = 0, y, x; // word count at first line
-    for (curr = get_string(bank, start_index); curr->next != NULL;
-         curr = curr->next) {
-        getyx(stdscr, y, x);
-        /* printf("%d, %d\n", y, x); */
+    string *curr;
 
+    for (int i = 0; i < (int)bank->len; i++) {
+        curr = strlist_get(bank, i);
+        // fprintf(stderr, "%s\n", curr->val);
+        getyx(stdscr, y, x);
+
+        // Move to next line if word goes past end of screen
         if (curr->len + 1 >= r->x1 - x) {
             x = r->x0 + 1;
             y++;
@@ -128,7 +131,7 @@ void draw_rect(rect_t *r) {
     // make horizontal lines for top and bottom
     hor_line[0] = CORNERS[0];
     for (int i = 1; i < width - 1; i++)
-        hor_line[i] = HORIZONTAL;
+        hor_line[i] = HORIZONTAL[0];
     hor_line[width - 1] = CORNERS[1];
     hor_line[width] = L'\0';
 
@@ -139,7 +142,7 @@ void draw_rect(rect_t *r) {
     mvaddwstr(r->y1, r->x0, hor_line);
 
     cchar_t vertical_bar;
-    setcchar(&vertical_bar, &VERTICAL, 0, 0, NULL);
+    setcchar(&vertical_bar, L"┃", 0, 0, NULL);
     for (int y = r->y0 + 1; y < r->y1; y++) {
         mvadd_wch(y, r->x0, &vertical_bar);
         mvadd_wch(y, r->x1, &vertical_bar);

@@ -4,7 +4,7 @@ all:    $(PROG)
 
 # Tell make about the file dependencies
 HEAD	= strlist.h frame.h
-OBJ     = strlist.o frame.o strlist_test.o typingtest.o
+OBJ     = strlist.o frame.o main.o
 
 # special libraries This can be blank
 LIB     = -lncurses
@@ -14,7 +14,7 @@ LIB     = -lncurses
 CC      = clang
 DEBUG	= -g -fsanitize=address
 CSTD	=
-WARN	= -Wall -Wextra -Werror
+WARN	= -Wall -Wextra #-Werror
 CDEFS	=
 CFLAGS	= -I. $(DEBUG) $(WARN) $(CSTD) $(CDEFS)
 
@@ -25,7 +25,7 @@ $(PROG):	$(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) $(LIB) -o $@
 
 
-.PHONY: clean test_strlist install
+.PHONY: clean test install
 
 clean:
 	rm -f $(OBJ) $(BIN)
@@ -37,5 +37,8 @@ install: $(PROG)
 	rm -f /usr/local/bin/tterm
 	ln ./typingterm /usr/local/bin/tterm
 
-strlist_test: $(OBJ)
+strlist_test: strlist.o strlist_test.o
 	$(CC) $^ -o $@ $(CFLAGS)
+
+test: strlist_test
+	./strlist_test

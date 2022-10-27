@@ -1,3 +1,6 @@
+#ifndef STRLIST_H
+#define STRLIST_H
+
 #include <stdint.h>
 
 typedef struct _string {
@@ -16,7 +19,7 @@ typedef struct _strlist {
 strlist strlist_new(uintptr_t size);
 void strlist_delete(strlist *);
 
-string strlist_get(strlist *s, uintptr_t index);
+string *strlist_get(strlist *s, uintptr_t index);
 uintptr_t strlist_set(strlist *l, uintptr_t index, string s);
 uintptr_t strlist_append(strlist *l, string s);
 void strlist_shuffle(strlist *s);
@@ -34,3 +37,4 @@ void strlist_shuffle(strlist *s);
 // void free_string(string *);
 // void free_strlist(string *);
 // void free_string(string *str);
+#endif

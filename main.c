@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <ncurses.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -9,7 +10,7 @@
 
 #include "frame.h"
 
-#define MAX_WORD_LEN 20
+#define MAX_WORD_LEN 100
 #define NUM_THREADS 2
 #define STRLIST_SIZE 200
 
@@ -28,7 +29,7 @@ typedef struct _windowsize {
 } windowsize;
 
 static strlist load_word_bank(FILE *bank_file, char word_delimiter);
-void load_text_from_bank(char *text, string *word_bank, int start_index,
+void load_text_from_bank(char *text, strlist *word_bank, int start_index,
                          int end_index);
 
 // threads
@@ -43,10 +44,10 @@ void update_time_box(rect_t *r, windowsize *size);
 
 void print_rect(rect_t *r);
 
-void calculate_stats(typingtest_results *results, long time, string *word_bank,
+void calculate_stats(typingtest_results *results, long time, strlist *word_bank,
                      string *last_word, int errors);
 void show_results(typingtest_results *results, windowsize *);
-void final_screen(int timediff, string *word_bank, string *curr_word,
+void final_screen(int timediff, strlist *word_bank, string *curr_word,
                   int num_errors, windowsize *curr_size);
 void print_help();
 int is_option(char *str, int pos);
@@ -122,10 +123,11 @@ int main(int argc, char **argv) {
     // update time in the background
     pthread_create(&pids[0], NULL, update_time, &now);
 
-    words_in_first_line = write_strlist(word_bank, &main_box, offset, -1);
+    words_in_first_line = write_strlist(&word_bank, &main_box, offset, -1);
     /* return 1; */
 
-    string *curr_word = word_bank->next;
+    int word_index = 0;
+    string *curr_word = strlist_get(&word_bank, word_index++);
     curr_word->style = A_BOLD;
     // 27 == ESC
     c = getch();
@@ -137,7 +139,7 @@ int main(int argc, char **argv) {
         timef(timestr, &start, &now, TIMER_LEN);
         write_text(timestr, &time_box);
         if (now.tv_sec - start.tv_sec >= TIMER_LEN) {
-            final_screen(now.tv_sec - start.tv_sec, word_bank, curr_word, num_errors,
+            final_screen(now.tv_sec - start.tv_sec, &word_bank, curr_word, num_errors,
                          &curr_size);
             goto EXIT;
         }
@@ -161,7 +163,8 @@ int main(int argc, char **argv) {
                 cp = 0;
                 typed_word[cp] = '\0';
 
-                curr_word = curr_word->next;
+                assert(word_index < word_bank.len);
+                curr_word = strlist_get(&word_bank, word_index++);
                 curr_word->style = A_BOLD;
 
                 word_count++;
@@ -177,7 +180,7 @@ int main(int argc, char **argv) {
         }
 
         write_text(typed_word, &text_box);
-        words_in_first_line = write_strlist(word_bank, &main_box, offset, -1);
+        words_in_first_line = write_strlist(&word_bank, &main_box, offset, -1);
         /* printf("%d\n", words_in_first_line); */
         if (word_count == words_in_first_line) {
             offset += word_count;
@@ -188,7 +191,7 @@ int main(int argc, char **argv) {
 
 EXIT : {
     del_frame();
-    free_strlist(word_bank);
+    strlist_delete(&word_bank);
     for (int i = 0; i < NUM_THREADS; i++)
         pthread_cancel(pids[i]);
 }
@@ -202,21 +205,21 @@ EXIT : {
  * @param start_index The index to start at
  * @param end_index The index to end at. Use -1 for None.
  */
-void load_text_from_bank(char *text, string *word_bank, int start_index,
-                         int end_index) {
-    int i = 0, counter = start_index;
-    string *curr;
-    for (curr = get_string(word_bank, start_index); curr->next != NULL;
-         curr = curr->next) {
-        strcpy(text + i, curr->val);
-        i += curr->len;
-        text[i++] = ' ';
-
-        if (counter++ == end_index)
-            break;
-    }
-    text[i] = '\0';
-}
+// void load_text_from_bank(char *text, strlist *word_bank, int start_index,
+//                          int end_index) {
+//     int i = 0, counter = start_index;
+//     string *curr;
+//     for (curr = get_string(word_bank, start_index); curr->next != NULL;
+//          curr = curr->next) {
+//         strcpy(text + i, curr->val);
+//         i += curr->len;
+//         text[i++] = ' ';
+//
+//         if (counter++ == end_index)
+//             break;
+//     }
+//     text[i] = '\0';
+// }
 
 static strlist load_word_bank(FILE *bank_file, char word_delimiter) {
     // TODO optimize size
@@ -224,19 +227,21 @@ static strlist load_word_bank(FILE *bank_file, char word_delimiter) {
     // int len = lseek(bank_file, 0, SEEK_END);
     // void *data = mmap(0, len, PROT_READ, MAP_PRIVATE, bank_file, 0);
 
+    // TODO Move outside function
     fseek(bank_file, 0, SEEK_END);
     long fsize = ftell(bank_file);
     fseek(bank_file, 0, SEEK_SET); /* same as rewind(f); */
     char *buf = malloc(fsize + 1);
     fread(buf, fsize, 1, bank_file);
-    buf[fsize] = 0;
+    buf[fsize] = '\0';
 
     char *b = buf;
     int len = 0;
     while (*b != '\0') {
         if (*b == word_delimiter) {
             *b = '\0';
-            strlist_append(&bank, (string){ b - len, 0, 0 });
+            // Add 1 because it includes the delimeter
+            strlist_append(&bank, (string){ .val = b - len + 1, .len = len - 1, .style = 0 });
             len = 0;
         }
         len++;
@@ -292,7 +297,7 @@ void print_rect(rect_t *r) {
     printf("Rectangle(%d, %d, %d, %d)\n", r->x0, r->y0, r->x1, r->y1);
 }
 
-void calculate_stats(typingtest_results *results, long time, string *word_bank,
+void calculate_stats(typingtest_results *results, long time, strlist *word_bank,
                      string *last_word, int errors) {
     /*
    * double wpm;
@@ -304,13 +309,14 @@ void calculate_stats(typingtest_results *results, long time, string *word_bank,
 
     int words_typed = 0;
     int chars_typed = 0;
-    for (string *w = word_bank->next;
-         w->next != NULL && strcmp(w->val, last_word->val) != 0; w = w->next) {
+    int i = 0;
+    for (string *s = strlist_get(word_bank, i);
+         i < (int)word_bank->len && strcmp(s->val, last_word->val) != 0; i++) {
         words_typed++;
-        chars_typed += w->len;
+        chars_typed += s->len;
     }
 
-    printf("last: %s\n", get_string(word_bank, words_typed)->val);
+    printf("last: %s\n", strlist_get(word_bank, words_typed)->val);
 
     results->wpm = 60.0 * words_typed / time;
     results->cps = (double)chars_typed / time;
@@ -348,7 +354,7 @@ void show_results(typingtest_results *results, windowsize *size) {
     mvaddstr(result_box.y1 + 2, result_box.x0 + 2, "Press ESC to exit.");
 }
 
-void final_screen(int timediff, string *word_bank, string *curr_word,
+void final_screen(int timediff, strlist *word_bank, string *curr_word,
                   int num_errors, windowsize *curr_size) {
     int c;
     typingtest_results results;
