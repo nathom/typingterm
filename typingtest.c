@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -10,6 +11,7 @@
 
 #define MAX_WORD_LEN 20
 #define NUM_THREADS 2
+#define STRLIST_SIZE 200
 
 typedef struct _typingtest_results {
     double wpm;
@@ -25,7 +27,7 @@ typedef struct _windowsize {
     int y;
 } windowsize;
 
-void load_word_bank(string *bank, FILE *bank_file, char word_delimiter);
+static strlist load_word_bank(FILE *bank_file, char word_delimiter);
 void load_text_from_bank(char *text, string *word_bank, int start_index,
                          int end_index);
 
@@ -80,7 +82,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    string *word_bank = new_string();
     char *abs_word_bank_path = strcat(
         strcat(getenv("HOME"), "/typingterm/word_banks/"), word_bank_file_path);
     FILE *word_bank_file = fopen(abs_word_bank_path, "r");
@@ -88,9 +89,9 @@ int main(int argc, char **argv) {
         printf("Error: Cannot find word bank at \"%s\".\n", abs_word_bank_path);
         return 1;
     }
-    load_word_bank(word_bank, word_bank_file, word_delimiter);
+    strlist word_bank = load_word_bank(word_bank_file, word_delimiter);
     // shuffle and draw words
-    shuffle_strlist(word_bank);
+    strlist_shuffle(&word_bank);
 
     init_frame();
     windowsize curr_size;
@@ -217,19 +218,31 @@ void load_text_from_bank(char *text, string *word_bank, int start_index,
     text[i] = '\0';
 }
 
-void load_word_bank(string *bank, FILE *bank_file, char word_delimiter) {
-    int c, i = 0;
-    char *word = malloc(MAX_WORD_LEN);
+static strlist load_word_bank(FILE *bank_file, char word_delimiter) {
+    // TODO optimize size
+    strlist bank = strlist_new(STRLIST_SIZE);
+    // int len = lseek(bank_file, 0, SEEK_END);
+    // void *data = mmap(0, len, PROT_READ, MAP_PRIVATE, bank_file, 0);
 
-    while ((c = fgetc(bank_file)) != EOF) {
-        if (c == word_delimiter) {
-            word[i] = '\0';
-            i = 0;
-            append_string(bank, word);
-            word = malloc(MAX_WORD_LEN);
-        } else
-            word[i++] = c;
+    fseek(bank_file, 0, SEEK_END);
+    long fsize = ftell(bank_file);
+    fseek(bank_file, 0, SEEK_SET); /* same as rewind(f); */
+    char *buf = malloc(fsize + 1);
+    fread(buf, fsize, 1, bank_file);
+    buf[fsize] = 0;
+
+    char *b = buf;
+    int len = 0;
+    while (*b != '\0') {
+        if (*b == word_delimiter) {
+            *b = '\0';
+            strlist_append(&bank, (string){ b - len, 0, 0 });
+            len = 0;
+        }
+        len++;
+        b++;
     }
+    return bank;
 }
 
 void *update_time(void *now) {

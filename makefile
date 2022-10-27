@@ -1,21 +1,41 @@
-CC=clang
-CFLAGS=-lncurses -Ofast
+# if you type 'make' without arguments, this is the default
+PROG    = tterm
+all:    $(PROG)
 
-BIN=typingterm
+# Tell make about the file dependencies
+HEAD	= strlist.h frame.h
+OBJ     = strlist.o frame.o strlist_test.o typingtest.o
 
-all: clean $(BIN)
+# special libraries This can be blank
+LIB     = -lncurses
 
-typingterm: src/typingtest.c src/frame.o src/strlist.o
-	$(CC) $^ -o $@ $(CFLAGS)
+# select the compiler and flags
+# you can over-ride these on the command line e.g. make DEBUG= 
+CC      = clang
+DEBUG	= -g -fsanitize=address
+CSTD	=
+WARN	= -Wall -Wextra -Werror
+CDEFS	=
+CFLAGS	= -I. $(DEBUG) $(WARN) $(CSTD) $(CDEFS)
 
-.PHONY: clean
+$(OBJ):	$(HEAD)
+
+# specify how to compile the target
+$(PROG):	$(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $(LIB) -o $@
+
+
+.PHONY: clean test_strlist install
 
 clean:
-	rm -f *.o $(BIN)
+	rm -f $(OBJ) $(BIN)
 
-install: typingterm
+install: $(PROG)
 	echo "Linking binaries\n"
 	rm -f /usr/local/bin/typingterm
 	ln ./typingterm /usr/local/bin/typingterm
 	rm -f /usr/local/bin/tterm
 	ln ./typingterm /usr/local/bin/tterm
+
+strlist_test: $(OBJ)
+	$(CC) $^ -o $@ $(CFLAGS)
