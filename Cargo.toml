@@ -3,6 +3,10 @@ name = "typingterm"
 version = "0.1.0"
 edition = "2021"
 description = "A monkeytype-inspired terminal typing test"
+license = "MIT"
+repository = "https://github.com/nathom/typingterm"
+keywords = ["typing", "terminal", "tui", "monkeytype"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 ratatui = "0.29"
