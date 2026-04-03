@@ -1,0 +1,568 @@
+roman =        "MDCLXVmdclxvi"; # UPPERCASE for thousands #
+adjust_roman = "CCXXmmccxxii";
+arabic =       (1000000, 500000, 100000, 50000, 10000, 5000, 1000, 500, 100, 50, 10, 5, 1);
+adjust_arabic = (100000, 100000,  10000, 10000,  1000, 1000,  100, 100,  10, 10,  1, 1, 0);
+
+def arabic_to_roman(dclxvi):
+  org = dclxvi; # 666 #
+  out = "";
+  for scale,arabic_scale  in enumerate(arabic):
+    if org == 0: break
+    multiples = org / arabic_scale;
+    org -= arabic_scale * multiples;
+    out += roman[scale] * multiples;
+    if org >= -adjust_arabic[scale] + arabic_scale:
+      org -= -adjust_arabic[scale] + arabic_scale;
+      out +=  adjust_roman[scale] +  roman[scale]
+  return out
+
+if __name__ == "__main__":
+  test = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,40,50,60,69,70,
+     80,90,99,100,200,300,400,500,600,666,700,800,900,1000,1009,1444,1666,1945,1997,1999,
+     2000,2008,2500,3000,4000,4999,5000,6666,10000,50000,100000,500000,1000000);
+  for val in test:
+    print '%d - %s'%(val, arabic_to_roman(val))
+---
+>>> with open('/dev/tape', 'w') as t: t.write('Hi Tape!\n')
+...
+>>>
+---
+from collections import defaultdict
+
+def hashJoin(table1, index1, table2, index2):
+    h = defaultdict(list)
+    # hash phase
+    for s in table1:
+        h[s[index1]].append(s)
+    # join phase
+    return [(s, r) for r in table2 for s in h[r[index2]]]
+
+table1 = [(27, "Jonah"),
+          (18, "Alan"),
+          (28, "Glory"),
+          (18, "Popeye"),
+          (28, "Alan")]
+table2 = [("Jonah", "Whales"),
+          ("Jonah", "Spiders"),
+          ("Alan", "Ghosts"),
+          ("Alan", "Zombies"),
+          ("Glory", "Buffy")]
+
+for row in hashJoin(table1, 1, table2, 0):
+    print(row)
+---
+# deficientPerfectAbundantCountsUpTo :: Int -> (Int, Int, Int)
+def deficientPerfectAbundantCountsUpTo(n):
+    '''Counts of deficient, perfect, and abundant
+       integers in the range [1..n].
+    '''
+    def go(dpa, x):
+        divisorSum = sum(properDivisors(x))
+        return nthArrow(succ)(dpa)(
+            1 if x > divisorSum else (
+                3 if x < divisorSum else 2
+            )
+        )
+    return reduce(go, range(1, 1 + n), (0, 0, 0))
+---
+>>> # Oct(leading 0), Dec, Hex(leading 0x or 0X), in order:
+>>> 01327 == 727 == 0x2d7
+True
+>>>
+---
+import curses
+import time
+
+stdscr = curses.initscr()
+curses.curs_set(1)  # visible
+time.sleep(2)
+curses.curs_set(0)  # invisible
+time.sleep(2)
+curses.curs_set(1)  # visible
+time.sleep(2)
+curses.endwin()
+---
+print(
+'\n'.join(
+    ''.join(
+        ' *'[(z:=0, c:=x/50+y/50j, [z:=z*z+c for _ in range(99)], abs(z))[-1]<2]
+        for x in range(-100,25)
+    )
+    for y in range(-50,50)
+))
+---
+a, b = 1, 0
+
+if (c1 := a == 1) and (c2 := b == 3):
+  print('a = 1 and b = 3')
+elif c1:
+  print('a = 1 and b <> 3')
+elif c2:
+  print('a <> 1 and b = 3')
+else:
+  print('a <> 1 and b <> 3')
+---
+class empty(object):
+    pass
+e = empty()
+---
+def countingSort(a, min, max):
+    cnt = [0] * (max - min + 1)
+    for x in a:
+        cnt[x - min] += 1
+
+    return [x for x, n in enumerate(cnt, start=min)
+              for i in xrange(n)]
+---
+data = [["[1;5,2] + 1/2",      [2,1,0,2], [13,11]],
+        ["[3;7] + 1/2",        [2,1,0,2], [22, 7]],
+        ["[3;7] divided by 4", [1,0,0,4], [22, 7]]]
+
+for string, ng, r in data:
+  print( "%-20s->" % string, end='' )
+  op = NG(*ng)
+  for n in r2cf(*r):
+    if not op.needterm: print( " %r" % op.egress, end='' )
+    op.ingress(n)
+  while True:
+    print( " %r" % op.egress_done, end='' )
+    if op.done: break
+  print()
+---
+from bisect import bisect_left
+
+def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for hi
+    hi = hi if hi is not None else len(a) # hi defaults to len(a)
+    pos = bisect_left(a,x,lo,hi)          # find insertion position
+    return (pos if pos != hi and a[pos] == x else -1) # don't walk off the end
+---
+txt = """Given$a$txt$file$of$many$lines,$where$fields$within$a$line$
+are$delineated$by$a$single$'dollar'$character,$write$a$program
+that$aligns$each$column$of$fields$by$ensuring$that$words$in$each$
+column$are$separated$by$at$least$one$space.
+Further,$allow$for$each$word$in$a$column$to$be$either$left$
+justified,$right$justified,$or$center$justified$within$its$column."""
+
+parts = [line.rstrip("$").split("$") for line in txt.splitlines()]
+
+max_widths = {}
+for line in parts:
+    for i, word in enumerate(line):
+        max_widths[i] = max(max_widths.get(i, 0), len(word))
+
+for i, justify in enumerate([str.ljust, str.center, str.rjust]):
+    print(["Left", "Center", "Right"][i], " column-aligned output:\n")
+    for line in parts:
+        for j, word in enumerate(line):
+            print(justify(word, max_widths[j]), end=' ')
+        print()
+    print("- " * 52)
+---
+def iprimes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in xrange(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n * n, limit + 1, n): # start at ``n`` squared
+                is_prime[i] = False
+    for i in xrange(limit + 1):
+        if is_prime[i]: yield i
+---
+lp = open("/dev/lp0","w")
+lp.write("Hello World!\n")
+lp.close()
+---
+import random
+t,g=random.randint(1,10),0
+g=int(input("Guess a number that's between 1 and 10: "))
+while t!=g:g=int(input("Guess again! "))
+print("That's right!")
+---
+def eqindexMultiPass(s):
+    return [i for i in xrange(len(s)) if sum(s[:i]) == sum(s[i+1:])]
+
+print eqindexMultiPass([-7, 1, 5, 2, -4, 3, 0])
+---
+$ cat reproducing.py
+  File "reproducing.py", line 1
+    File "reproducing.py", line 1
+    ^
+IndentationError: unexpected indent
+
+$ python reproducing.py
+  File "reproducing.py", line 1
+    File "reproducing.py", line 1
+    ^
+IndentationError: unexpected indent
+---
+import os
+exit_code = os.system('ls')       # Just execute the command, return a success/fail code
+output    = os.popen('ls').read() # If you want to get the output data. Deprecated.
+---
+def unrank(n):
+        return map(len, bin(n)[3:].split("0")) if n else []
+
+def rank(x):
+        return int('1' + '0'.join('1'*a for a in x), 2) if x else 0
+
+for x in range(11):
+        print x, unrank(x), rank(unrank(x))
+
+print
+x = [1, 2, 3, 5, 8];
+print x, rank(x), unrank(rank(x))
+---
+>>> from collections import Counter
+>>> def modes(values):
+	count = Counter(values)
+	best = max(count.values())
+	return [k for k,v in count.items() if v == best]
+
+>>> modes([1,3,6,6,6,6,7,7,12,12,17])
+[6]
+>>> modes((1,1,2,4,4))
+[1, 4]
+---
+#!/bin/python
+from __future__ import print_function
+from scipy import signal
+import matplotlib.pyplot as plt
+
+if __name__=="__main__":
+	sig = [-0.917843918645,0.141984778794,1.20536903482,0.190286794412,-0.662370894973,-1.00700480494,
+		-0.404707073677,0.800482325044,0.743500089861,1.01090520172,0.741527555207,
+		0.277841675195,0.400833448236,-0.2085993586,-0.172842103641,-0.134316096293,
+		0.0259303398477,0.490105989562,0.549391221511,0.9047198589]
+
+	#Create an order 3 lowpass butterworth filter
+	#Generated using b, a = signal.butter(3, 0.5)
+	a = [1.00000000, -2.77555756e-16, 3.33333333e-01, -1.85037171e-17]
+	b = [0.16666667, 0.5, 0.5, 0.16666667]
+
+	#Apply the filter to signal
+	filt = signal.lfilter(b, a, sig)
+	print (filt)
+
+	plt.plot(sig, 'b')
+	plt.plot(filt, 'r--')
+	plt.show()
+---
+import os
+
+os.path.isfile("input.txt")
+os.path.isfile("/input.txt")
+os.path.isdir("docs")
+os.path.isdir("/docs")
+---
+for i in xrange(2, 9, 2):
+    print "%d," % i,
+print "who do we appreciate?"
+---
+def truncate_file(name, length):
+    if not os.path.isfile(name):
+        return False
+    if length >= os.path.getsize(name):
+        return False
+    with open(name, 'ab') as f:
+        f.truncate(length)
+    return True
+---
+>>> import numpy
+>>> numpy.polynomial.polynomial.polyval(3, (-19, 7, -4, 6))
+128.0
+---
+>>> from sys import stdout
+>>> write = stdout.write
+>>> n, i = 10, 1
+>>> while True:
+    write(i)
+    i += 1
+    if i > n:
+        break
+    write(', ')
+
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+>>>
+---
+>>> import os
+>>> os.path.commonprefix(['/home/user1/tmp/coverage/test',
+                          '/home/user1/tmp/covert/operator', '/home/user1/tmp/coven/members'])
+'/home/user1/tmp/cove'
+---
+from collections import defaultdict
+from itertools import product
+from pprint import pprint as pp
+
+cube2n = {x**3:x for x in range(1, 1201)}
+sum2cubes = defaultdict(set)
+for c1, c2 in product(cube2n, cube2n):
+	if c1 >= c2: sum2cubes[c1 + c2].add((cube2n[c1], cube2n[c2]))
+	
+taxied = sorted((k, v) for k,v in sum2cubes.items() if len(v) >= 2)
+
+#pp(len(taxied))  # 2068
+for t in enumerate(taxied[:25], 1):
+    pp(t)
+print('...')
+for t in enumerate(taxied[2000-1:2000+6], 2000):
+    pp(t)
+---
+from xml.dom.minidom import getDOMImplementation
+
+dom = getDOMImplementation()
+document = dom.createDocument(None, "root", None)
+
+topElement = document.documentElement
+firstElement = document.createElement("element")
+topElement.appendChild(firstElement)
+textNode = document.createTextNode("Some text here")
+firstElement.appendChild(textNode)
+
+xmlString = document.toprettyxml(" " * 4)
+---
+out, max_out, max_times = 0, -1, []
+for job in open('mlijobs.txt'):
+    out += 1 if "OUT" in job else -1
+    if out > max_out:
+        max_out, max_times = out, []
+    if out == max_out:
+        max_times.append(job.split()[3])
+
+print("Maximum simultaneous license use is %i at the following times:" % max_out)
+print('  ' + '\n  '.join(max_times))
+---
+if __name__ == '__main__':
+    import random
+
+    tutor = True
+    data = list('123456789')
+    while data == sorted(data):
+        random.shuffle(data)
+    print('Original List: %r' % ' '.join(data))
+    pancakesort(data)
+    print('Pancake Sorted List: %r' % ' '.join(data))
+---
+import gmpy2 as mp
+
+def lucas_lehmer(n):
+    if n == 2:
+        return True
+    if not mp.is_prime(n):
+        return False
+    two = mp.mpz(2)
+    m = two**n - 1
+    s = two*two
+    for i in range(2, n):
+        sqr = s*s
+        s = (sqr & m) + (sqr >> n)
+        if s >= m:
+            s -= m
+        s -= two
+    return mp.is_zero(s)
+---
+import pyaudio
+
+chunk = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+
+p = pyaudio.PyAudio()
+
+stream = p.open(format = FORMAT,
+                channels = CHANNELS,
+                rate = RATE,
+                input = True,
+                frames_per_buffer = chunk)
+
+data = stream.read(chunk)
+print [ord(i) for i in data]
+---
+The original is: A simple example.
+Encoding it with the key: dV1>r7:TLlJa�uY o]MjH\hI^X	cPN#!fmv[
+<e=04|O'~{y$bAq@}U.WtF*)x/K?
+Q%S(�RB;25&s6Z9C3+D-_8kn,`Egiwzp"G
+Gives:
+iPMhX\YiYmJhX\Y5
+Decoding it by the same key gives: A simple example.
+---
+from itertools import islice
+
+
+def hailstone(n):
+    yield n
+    while n > 1:
+        n = 3 * n + 1 if n & 1 else n // 2
+        yield n
+
+
+if __name__ == '__main__':
+    h = hailstone(27)
+    assert list(islice(h, 4)) == [27, 82, 41, 124]
+    for _ in range(112 - 4 * 2):
+        next(h)
+    assert list(islice(h, 4)) == [8, 4, 2, 1]
+    max_length, n = max((sum(1 for _ in hailstone(i)), i)
+                        for i in range(1, 100_000))
+    print(f"Maximum length {max_length} was found for hailstone({n}) "
+          f"for numbers <100,000")
+---
+def square(n):
+    return n * n
+
+numbers = [1, 3, 5, 7]
+
+squares1 = [square(n) for n in numbers]     # list comprehension
+
+squares2a = map(square, numbers)            # functional form
+
+squares2b = map(lambda x: x*x, numbers)     # functional form with `lambda`
+
+squares3 = [n * n for n in numbers]         # no need for a function,
+                                            # anonymous or otherwise
+
+isquares1 = (n * n for n in numbers)        # iterator, lazy
+
+import itertools
+isquares2 = itertools.imap(square, numbers) # iterator, lazy
+---
+def aks(p):
+    if p==2:return True
+    c=1
+    for i in range(p//2+1):
+        c=c*(p-i)//(i+1)
+        if c%p:return False
+    return True
+---
+print_all(4, 3, 5, 6, 4, 3)
+print_all(4, 3, 5)
+print_all("Rosetta", "Code", "Is", "Awesome!")
+---
+import sys
+import calendar
+
+year = 2013
+if len(sys.argv) > 1:
+    try:
+        year = int(sys.argv[-1])
+    except ValueError:
+        pass
+
+for month in range(1, 13):
+    last_sunday = max(week[-1] for week in calendar.monthcalendar(year, month))
+    print('{}-{}-{:2}'.format(year, calendar.month_abbr[month], last_sunday))
+---
+def maxnum(x):
+    maxlen = len(str(max(x)))
+    return ''.join(sorted((str(v) for v in x), reverse=True,
+                          key=lambda i: i*(maxlen * 2 // len(i))))
+
+for numbers in [(212, 21221), (1, 34, 3, 98, 9, 76, 45, 4), (54, 546, 548, 60)]:
+    print('Numbers: %r\n  Largest integer: %15s' % (numbers, maxnum(numbers)))
+---
+# nAryCartProd :: [[a], [b], [c] ...] -> [(a, b, c ...)]
+def nAryCartProd(xxs):
+    return foldl1(cartesianProduct)(
+        xxs
+    )
+---
+import operator
+import random
+from itertools import dropwhile, imap, islice, izip, repeat, starmap
+
+def shuffled(x):
+    x = x[:]
+    random.shuffle(x)
+    return x
+
+bogosort = lambda l: next(dropwhile(
+    lambda l: not all(starmap(operator.le, izip(l, islice(l, 1, None)))),
+    imap(shuffled, repeat(l))))
+---
+import random
+
+nquads = 5
+maxgenerations = 10
+fmt = '%%0%ix'%nquads
+nbits = 4*nquads
+a = random.getrandbits(nbits)  << 1
+#a = int('01110110101010100100', 2) << 1
+endmask = (2<<nbits)-2;
+endvals = 0<<(nbits+1) | 0
+tr = ('____', '___#', '__#_', '__##', '_#__', '_#_#', '_##_', '_###',
+      '#___', '#__#', '#_#_', '#_##', '##__', '##_#', '###_', '####' )
+for i in range(maxgenerations):
+   print "Generation %3i:  %s" % (i,(''.join(tr[int(t,16)] for t in (fmt%(a>>1)))))
+   a |= endvals
+   a = ((a&((a<<1) | (a>>1))) ^ ((a<<1)&(a>>1))) & endmask
+---
+import pyttsx
+
+engine = pyttsx.init()
+engine.say("It was all a dream.")
+engine.runAndWait()
+---
+for i in range(16):
+    for j in range(32+i, 127+1, 16):
+        if j == 32:
+            k = 'Spc'
+        elif j == 127:
+            k = 'Del'
+        else:
+            k = chr(j)
+        print("%3d : %-3s" % (j,k), end="")
+    print()
+---
+Before:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+After:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 1 2 1 0 0 0 0
+0 0 2 2 2 2 2 0 0 0
+0 1 2 2 2 2 2 1 0 0
+0 2 2 2 0 2 2 2 0 0
+0 1 2 2 2 2 2 1 0 0
+0 0 2 2 2 2 2 0 0 0
+0 0 0 1 2 1 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+---
+def consolidate(sets):
+    setlist = [s for s in sets if s]
+    for i, s1 in enumerate(setlist):
+        if s1:
+            for s2 in setlist[i+1:]:
+                intersection = s1.intersection(s2)
+                if intersection:
+                    s2.update(s1)
+                    s1.clear()
+                    s1 = s2
+    return [s for s in setlist if s]
+---
+from functools import (reduce)
+from math import (sqrt)
+
+
+# rootMeanSquare :: [Num] -> Float
+def rootMeanSquare(xs):
+    return sqrt(reduce(lambda a, x: a + x * x, xs, 0) / len(xs))
+
+
+print(
+    rootMeanSquare([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+)
+---
+def repeat(s, times):
+    return s * times
+
+print(repeat("ha", 5))

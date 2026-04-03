@@ -1,0 +1,682 @@
+#include <stdexcept>
+int main()
+{
+    throw std::runtime_error("boom");
+}
+---
+#include <iostream>
+
+using namespace std;
+int main ()
+{
+       for (int i = 1; i <= 100; i++)
+       {
+               if ((i % 15) == 0)
+                       cout << "FizzBuzz\n";
+               else if ((i % 3) == 0)
+                       cout << "Fizz\n";
+               else if ((i % 5) == 0)
+                       cout << "Buzz\n";
+               else
+                       cout << i << "\n";
+       }
+       return 0;
+}
+---
+std::map<std::string, int> myDict;
+myDict["hello"] = 1;
+myDict["world"] = 2;
+myDict["!"] = 3;
+
+// iterating over key-value pairs:
+for (std::map<std::string, int>::iterator it = myDict.begin(); it != myDict.end(); ++it) {
+    // the thing pointed to by the iterator is an std::pair<const std::string, int>&
+    const std::string& key = it->first;
+    int& value = it->second;
+    std::cout << "key = " << key << ", value = " << value << std::endl;
+}
+---
+Widget spawning. There are now 1 Widgets instanciated.
+Widget spawning. There are now 2 Widgets instanciated.
+Widget dieing. There are now 1 Widgets instanciated.
+Widget spawning. There are now 2 Widgets instanciated.
+Widget dieing. There are now 1 Widgets instanciated.
+Widget dieing. There are now 0 Widgets instanciated.
+---
+#include <iostream>
+#include <string>
+#include <queue>
+#include <utility>
+
+int main() {
+  std::priority_queue<std::pair<int, std::string> > pq;
+  pq.push(std::make_pair(3, "Clear drains"));
+  pq.push(std::make_pair(4, "Feed cat"));
+  pq.push(std::make_pair(5, "Make tea"));
+  pq.push(std::make_pair(1, "Solve RC tasks"));
+  pq.push(std::make_pair(2, "Tax return"));
+
+  while (!pq.empty()) {
+    std::cout << pq.top().first << ", " << pq.top().second << std::endl;
+    pq.pop();
+  }
+
+  return 0;
+}
+---
+#include <cstdio>
+
+int main()
+{
+    std::rename("input.txt", "output.txt");
+    std::rename("docs", "mydocs");
+    std::rename("/input.txt", "/output.txt");
+    std::rename("/docs", "/mydocs");
+    return 0;
+}
+---
+template<typename Number>
+  Number multiply(Number a, Number b)
+{
+   return a*b;
+}
+---
+#include <iostream>
+#include <string>
+
+int main( ) {
+   std::string original ("This is the original");
+   std::string my_copy = original;
+   std::cout << "This is the copy: " << my_copy << std::endl;
+   original = "Now we change the original! ";
+   std::cout << "my_copy still is " << my_copy << std::endl;
+}
+---
+#include <iostream>
+using namespace std;
+/* passing arguments by reference */
+void f(int &y) /* variable is now passed by reference */
+{
+y++;
+}
+int main()
+{
+int x = 0;
+cout<<"x = "<<x<<endl; /* should produce result "x = 0" */
+f(x);                  /* call function f */
+cout<<"x = "<<x<<endl; /* should produce result "x = 1" */
+}
+---
+#include <chrono>
+#include <iostream>
+
+int main() {
+    std::cout << "The dates of the last Friday in each month of 2023:" << std::endl;
+    using namespace std::literals;
+    for ( auto ymd = std::chrono::Friday[std::chrono::last]/1/2023;
+               ymd.year() < 2024y;
+               ymd += std::chrono::months{1} )
+        std::cout << std::chrono::sys_days{ymd} << '\n';
+}
+---
+int main() {
+  NG_4 a4(1,0,0,4);
+  r2cf n4(22,7);
+  for(NG n(&a4, &n4); n.moreTerms(); std::cout << n.nextTerm() << " ");
+  std::cout << std::endl;
+  return 0;
+}
+---
+#include <algorithm>
+#include <iostream>
+#include <string>
+
+void comb(int N, int K)
+{
+    std::string bitmask(K, 1); // K leading 1's
+    bitmask.resize(N, 0); // N-K trailing 0's
+
+    // print integers and permute bitmask
+    do {
+        for (int i = 0; i < N; ++i) // [0..N-1] integers
+        {
+            if (bitmask[i]) std::cout << " " << i;
+        }
+        std::cout << std::endl;
+    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+}
+
+int main()
+{
+    comb(5, 3);
+}
+---
+//compile with g++ main.cpp -lboost_system -pthread
+
+#include <boost/asio.hpp>
+
+int main()
+{
+  boost::asio::io_context io_context;
+  boost::asio::ip::tcp::socket sock(io_context);
+  boost::asio::ip::tcp::resolver resolver(io_context);
+  boost::asio::ip::tcp::resolver::query query("localhost", "4321");
+
+  boost::asio::connect(sock, resolver.resolve(query));
+  boost::asio::write(sock, boost::asio::buffer("Hello world socket\r\n"));
+
+  return 0;
+}
+---
+#include <iostream>
+
+template <int n> struct fibo
+{
+    enum {value=fibo<n-1>::value+fibo<n-2>::value};
+};
+
+template <> struct fibo<0>
+{
+    enum {value=0};
+};
+
+template <> struct fibo<1>
+{
+    enum {value=1};
+};
+
+
+int main(int argc, char const *argv[])
+{
+    std::cout<<fibo<12>::value<<std::endl;
+    std::cout<<fibo<46>::value<<std::endl;
+    return 0;
+}
+---
+#ifndef ANIMATIONWIDGET_H
+#define ANIMATIONWIDGET_H
+
+#include <QWidget>
+
+class AnimationWidget : public QWidget {
+    Q_OBJECT
+public:
+    AnimationWidget(QWidget *parent = nullptr);
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+private:
+    bool right_ = true;
+};
+
+#endif // ANIMATIONWIDGET_H
+---
+int main() {
+  NG_4 a5(0,1,1,0);
+  SQRT2 n5;
+  int i = 0;
+  for(NG n(&a5, &n5); n.moreTerms() and i++ < 20; std::cout << n.nextTerm() << " ");
+  std::cout << "..." << std::endl;
+  for(r2cf cf(10000000, 14142136); cf.moreTerms(); std::cout << cf.nextTerm() << " ");
+  std::cout << std::endl;
+  return 0;
+}
+---
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+
+int main() {
+    double oldPhi = 1.0, phi = 1.0, limit = 1e-5;
+    int iters = 0;
+    while (true) {
+        phi = 1.0 + 1.0 / oldPhi;
+        iters++;
+        if (abs(phi - oldPhi) <= limit) break;
+        oldPhi = phi;
+    }
+    cout.setf(ios::fixed);
+    cout << "Final value of phi : " << setprecision(14) << phi << endl;
+    double actualPhi = (1.0 + sqrt(5.0)) / 2.0;
+    cout << "Number of iterations : "<< iters << endl;
+    cout << "Error (approx) : " << setprecision(14) << phi - actualPhi << endl;
+    return 0;
+}
+---
+#include <QApplication>
+#include "task.h"
+
+int main( int argc, char *argv[ ] ) {
+   QApplication app( argc , argv ) ;
+   MyWidget theWidget ;
+   theWidget.show( ) ;
+   return app.exec( ) ;
+}
+---
+int main(){
+  N n(4);
+  while (n.hasNext()) std::cout << n.next() << "\t* " << std::bitset<4>(n.next()) << std::endl;
+}
+---
+/*
+ * Nigel Galloway, July 19th., 2017 - Yes well is this any better?
+ */
+class N{
+  uint n,i,g,e,l;
+public:
+  N(uint n): n(n-1),i{},g{},e(1),l(n-1){}
+  bool hasNext(){
+    g=(1<<n)+e;for(i=l;i<n;++i) g+=1<<i;
+    if (l==2)             {l=--n; e=1; return true;}
+    if (e<((1<<(l-1))-1)) {++e;        return true;}
+                           e=1; --l;   return (l>0);
+  }
+  uint next() {return g;}
+};
+---
+#include <cstdlib>
+#include <algorithm>
+#include <iterator>
+
+template<typename RandomAccessIterator>
+void knuthShuffle(RandomAccessIterator begin, RandomAccessIterator end) {
+  if(begin == end) {
+      return;
+  }
+  for(unsigned int n = end - begin - 1; n >= 1; --n) {
+    unsigned int k = rand() % (n + 1);
+    if(k != n) {
+      std::iter_swap(begin + k, begin + n);
+    }
+  }
+}
+---
+#define STR(x) #x
+int main()
+{
+  std::cout << STR(Hello world) << std::endl; // STR(Hello world) expands to "Hello world"
+}
+---
+#include <tr1/unordered_set>
+#include <iostream>
+using namespace std;
+
+int main() {
+    typedef tr1::unordered_set<int> TyHash;
+    int data[] = {1, 2, 3, 2, 3, 4};
+
+    TyHash unique_set(data, data + 6);
+
+    cout << "Set items:" << endl;
+    for (TyHash::iterator iter = unique_set.begin(); iter != unique_set.end(); iter++)
+          cout << *iter << " ";
+    cout << endl;
+}
+---
+struct MyException
+{
+  // data with info about exception
+};
+---
+auto strA = R"(this is
+a newline-separated
+raw string)";
+---
+#include <string>
+#include "Poco/URI.h"
+#include <iostream>
+
+int main( ) {
+   std::string encoded( "http%3A%2F%2Ffoo%20bar%2F" ) ;
+   std::string decoded ;
+   Poco::URI::decode ( encoded , decoded ) ;
+   std::cout << encoded << " is decoded: " << decoded << " !" << std::endl ;
+   return 0 ;
+}
+---
+#include <string>
+
+int main()
+{
+  int* p;
+
+  p = new int;    // allocate a single int, uninitialized
+  delete p;       // deallocate it
+
+  p = new int(2); // allocate a single int, initialized with 2
+  delete p;       // deallocate it
+
+  std::string* p2;
+
+  p2 = new std::string; // allocate a single string, default-initialized
+  delete p2;            // deallocate it
+
+  p = new int[10]; // allocate an array of 10 ints, uninitialized
+  delete[] p;      // deallocation of arrays must use delete[]
+
+  p2 = new std::string[10]; // allocate an array of 10 strings, default-initialized
+  delete[] p2;              // deallocate it
+}
+---
+#include <string>
+#include <locale>
+#include <sstream>
+#include <vector>
+#include <iterator>
+#include <iostream>
+#include <algorithm>
+struct comma_ws : std::ctype<char> {
+    static const mask* make_table() {
+    static std::vector<mask> v(classic_table(), classic_table() + table_size);
+        v[','] |= space;  // comma will be classified as whitespace
+        return &v[0];
+    }
+    comma_ws(std::size_t refs = 0) : ctype<char>(make_table(), false, refs) {}
+};
+int main()
+{
+    std::string s = "Hello,How,Are,You,Today";
+    std::istringstream buf(s);
+    buf.imbue(std::locale(buf.getloc(), new comma_ws));
+    std::istream_iterator<std::string> beg(buf), end;
+    std::vector<std::string> v(beg, end);
+    copy(v.begin(), v.end(), std::ostream_iterator<std::string>(std::cout, "."));
+    std::cout << '\n';
+}
+---
+#include <fstream>
+#include <iostream>
+
+std::string execute(const std::string& command) {
+    system((command + " > temp.txt").c_str());
+
+    std::ifstream ifs("temp.txt");
+    std::string ret{ std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>() };
+    ifs.close(); // must close the inout stream so the file can be cleaned up
+    if (std::remove("temp.txt") != 0) {
+        perror("Error deleting temporary file");
+    }
+    return ret;
+}
+
+int main() {
+    std::cout << execute("whoami") << '\n';
+}
+---
+int main() {
+  int i = 0;
+  NG_4 a6(1,1,0,2);
+  SQRT2 n6;
+  for(NG n(&a6, &n6); n.moreTerms() and i++ < 20; std::cout << n.nextTerm() << " ");
+  std::cout << "..." << std::endl;
+  for(r2cf cf(24142136, 20000000); cf.moreTerms(); std::cout << cf.nextTerm() << " ");
+  std::cout << std::endl;
+  return 0;
+}
+---
+set<double> pow5s;
+	for (auto i = 1; i < MAX; i++)
+	{
+		pow5[i] = (double)i * i * i * i * i;
+		pow5s.insert(pow5[i]);
+	}
+	//...
+        if (pow5s.find(sum) != pow5s.end())
+---
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <iostream>
+#include <cstdlib>
+
+int main( int argc , char* argv[ ] ) {
+   using namespace boost::gregorian ;
+
+   greg_month months[ ] = { Jan , Feb , Mar , Apr , May , Jun , Jul ,
+      Aug , Sep , Oct , Nov , Dec } ;
+   greg_year gy = atoi( argv[ 1 ] ) ;
+   for ( int i = 0 ; i < 12 ; i++ ) {
+      last_day_of_the_week_in_month lwdm ( Friday , months[ i ] ) ;
+      date d = lwdm.get_date( gy ) ;
+      std::cout << d << std::endl ;
+   }
+   return 0 ;
+}
+---
+#include <iostream>
+
+int main()
+{
+ LOOP:
+  std::cout << "Hello, World!\n";
+ goto LOOP;
+}
+---
+#include <algorithm>
+#include <string>
+
+// Bug: calling operator++ on an empty collection invokes undefined behavior.
+std::all_of( ++(strings.begin()), strings.end(),
+             [&](std::string a){ return a == strings.front(); } )  // All equal
+
+std::is_sorted( strings.begin(), strings.end(),
+                [](std::string a, std::string b){ return !(b < a); }) )  // Strictly ascending
+---
+#include <string>
+using namespace std;
+
+string s1="abcd";
+string s2="abab";
+string s3="ab";
+//Beginning
+s1.compare(0,s3.size(),s3)==0;
+//End
+s1.compare(s1.size()-s3.size(),s3.size(),s3)==0;
+//Anywhere
+s1.find(s2)//returns string::npos
+int loc=s2.find(s3)//returns 0
+loc=s2.find(s3,loc+1)//returns 2
+---
+while (a)
+{
+  link<int>* tmp = a;
+  a = a->next;
+  delete tmp;
+}
+---
+#include <iostream>
+#include <random>
+#include <vector>
+
+int main( ) {
+   std::vector<int> numbers { 11 , 88 , -5 , 13 , 4 , 121 , 77 , 2 } ;
+   std::random_device seed ;
+   // generator
+   std::mt19937 engine( seed( ) ) ;
+   // number distribution
+   std::uniform_int_distribution<int> choose( 0 , numbers.size( ) - 1 ) ;
+   std::cout << "random element picked : " << numbers[ choose( engine ) ]
+      << " !\n" ;
+   return 0 ;
+}
+---
+int main() {
+  NG_4 a1(2,1,0,2);
+  r2cf n1(13,11);
+  for(NG n(&a1, &n1); n.moreTerms(); std::cout << n.nextTerm() << " ");
+  std::cout << std::endl;
+  return 0;
+}
+---
+#include <numeric>
+#include <vector>
+#include "boost/lambda/lambda.hpp"
+
+double vec_add_squares(std::vector<double>& v)
+{
+  using namespace boost::lambda;
+
+  return std::accumulate(v.begin(), v.end(), 0.0, _1 + _2 * _2);
+}
+---
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <algorithm>
+
+int topswops(int n) {
+  std::vector<int> list(n);
+  std::iota(std::begin(list), std::end(list), 1);
+  int max_steps = 0;
+  do {
+    auto temp_list = list;
+    for (int steps = 1; temp_list[0] != 1; ++steps) {
+      std::reverse(std::begin(temp_list), std::begin(temp_list) + temp_list[0]);
+      if (steps > max_steps) max_steps = steps;
+    }
+  } while (std::next_permutation(std::begin(list), std::end(list)));
+  return max_steps;
+}
+
+int main() {
+  for (int i = 1; i <= 10; ++i) {
+    std::cout << i << ": " << topswops(i) << std::endl;
+  }
+  return 0;
+}
+---
+#include <iostream>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <cstdlib>
+
+int main( int argc , char* argv[ ] ) {
+   using namespace boost::gregorian ;
+
+   int year =  std::atoi( argv[ 1 ] ) ;
+   for ( int i = 1 ; i < 13 ; i++ ) {
+      try {
+	 date d( year , i , 1  ) ;
+	 d = d.end_of_month( ) ;
+	 day_iterator d_itr ( d ) ;
+	 while ( d_itr->day_of_week( ) != Sunday ) {
+	    --d_itr ;
+	 }
+	 std::cout << to_simple_string ( *d_itr ) << std::endl ;
+      } catch ( bad_year by ) {
+	  std::cout << "Terminated because of " << by.what( ) << "\n" ;
+      }
+   }
+   return 0 ;
+}
+---
+#include <iostream>
+#include <thread>
+#include <chrono>
+int main()
+{
+    unsigned long microseconds;
+    std::cin >> microseconds;
+    std::cout << "Sleeping..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
+    std::cout << "Awake!\n";
+}
+---
+#include <unordered_map>
+#include <string>
+
+int main()
+{
+  std::string keys[] = { "1", "2", "3" };
+  std::string vals[] = { "a", "b", "c" };
+
+  std::unordered_map<std::string, std::string> hash;
+  for( int i = 0 ; i < 3 ; i++ )
+     hash[ keys[i] ] = vals[i] ;
+}
+---
+#include <iostream>
+#include <functional>
+
+template<class Func>
+typename Func::result_type first(Func func, typename Func::argument_type arg)
+{
+  return func(arg);
+}
+
+class second : public std::unary_function<int, int>
+{
+public:
+  result_type operator()(argument_type arg) const
+  {
+    return arg * arg;
+  }
+};
+
+int main()
+{
+  std::cout << first(second(), 2) << std::endl;
+  return 0;
+}
+---
+struct link
+{
+  link* next;
+  int data;
+};
+---
+int main()
+{
+  StraddlingCheckerboard sc("HOLMESRTABCDFGIJKNPQUVWXYZ./", 3, 7);
+
+  string original = "One night-it was on the twentieth of March, 1888-I was returning";
+  string en = sc.encode(original);
+  string de = sc.decode(en);
+
+  cout << "Original: " << original << endl;
+  cout << "Encoded:  " << en << endl;
+  cout << "Decoded:  " << de << endl;
+
+  return 0;
+}
+---
+#include <direct.h>
+#include <fstream>
+
+int main() {
+    std::fstream f("output.txt", std::ios::out);
+    f.close();
+    f.open("/output.txt", std::ios::out);
+    f.close();
+
+    _mkdir("docs");
+    _mkdir("/docs");
+
+    return 0;
+}
+---
+#include <cassert> // assert.h also works
+
+int main()
+{
+  int a;
+  // ... input or change a here
+
+  assert(a == 42); // Aborts program if a is not 42, unless the NDEBUG macro was defined
+                    // when including <cassert>, in which case it has no effect
+}
+---
+#include <chrono>
+#include <ctime> //for conversion std::ctime()
+#include <iostream>
+
+int main() {
+    auto timenow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::cout << std::ctime(&timenow) << std::endl;
+}
+---
+#include <iostream> //compiled with "Dev-C++" , from RaptorOne
+
+int main()
+{
+    for(int i=1; i*i<=100; i++)
+            std::cout<<"Door "<<i*i<<" is open!"<<std::endl;
+}

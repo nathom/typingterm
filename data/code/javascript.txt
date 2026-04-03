@@ -1,0 +1,540 @@
+function array(length) {
+	var rest= Array.prototype.slice.call(arguments);
+	var r= new Array(length);
+	if (0<rest.length) {
+		for (var j= 0; j<length; j++) {
+			r[j]= array.apply(rest);
+		}
+	}
+}
+---
+(function (x, y, z) {
+
+    // function of arity 3 mapped over nth items of each of 3 lists
+    // (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+    function zipWith3(f, xs, ys, zs) {
+        return zs.length ? [f(xs[0], ys[0], zs[0])].concat(
+            zipWith3(f, xs.slice(1), ys.slice(1), zs.slice(1))) : [];
+    }
+
+    function concat(x, y, z) {
+        return ''.concat(x, y, z);
+    }
+
+    return zipWith3(concat, x, y, z).join('\n')
+
+})(["a", "b", "c"], ["A", "B", "C"], [1, 2, 3]);
+---
+function accumulator(sum) function(n) sum += n;
+var x = accumulator(1);
+x(5);
+console.log(accumulator(3).toSource());
+console.log(x(2.3));
+---
+(() => {
+
+    // .reduceRight() can be useful when reversals
+    // are composed with some other process
+
+    let reverse1 = s => Array.from(s)
+        .reduceRight((a, x) => a + (x !== ' ' ? x : ' <- '), ''),
+
+        // but ( join . reverse . split ) is faster for
+        // simple string reversals in isolation
+
+        reverse2 = s => s.split('').reverse().join('');
+
+
+    return [reverse1, reverse2]
+        .map(f => f("Some string to be reversed"));
+
+})();
+---
+function evalWithX(expr, a, b) {
+    var x = a;
+    var atA = eval(expr);
+    x = b;
+    var atB = eval(expr);
+    return atB - atA;
+}
+---
+function printAll() {
+  for (var i=0; i<arguments.length; i++)
+    print(arguments[i])
+}
+printAll(4, 3, 5, 6, 4, 3);
+printAll(4, 3, 5);
+printAll("Rosetta", "Code", "Is", "Awesome!");
+---
+function isPrime(n) {
+  if (n == 2 || n == 3 || n == 5 || n == 7) {
+    return true;
+  } else if ((n < 2) || (n % 2 == 0)) {
+    return false;
+  } else {
+    for (var i = 3; i <= Math.sqrt(n); i += 2) {
+      if (n % i == 0)
+        return false;
+    }
+    return true;
+  }
+}
+---
+{
+  "from n in, of m length": "五六七",
+  "from n in, up to end": "四五六七八九十",
+  "all but last": "一二三四五六七八九",
+  "from matching char, of m length": "五六七",
+  "from matching string, of m length": "六七八九"
+}
+---
+var i = 0;
+
+while (true)
+    document.write(++i + ' ');
+---
+for (var i=1, n=10; i<9; n*=10, i+=1) {
+	document.write(10, '<sup>', i, '</sup> ',  sm35(n), '<br>')
+}
+---
+var fs = require("fs");
+
+var readFile = function(path) {
+    return fs.readFileSync(path).toString();
+};
+
+console.log(readFile('file.txt'));
+---
+// flatten :: NestedList a -> [a]
+const flatten = t => {
+    const go = x =>
+        Array.isArray(x) ? (
+            x.flatMap(go)
+        ) : x;
+    return go(t);
+};
+---
+const fibseries = n => [...Array(n)]
+    .reduce(
+        (fib, _, i) => i < 2 ? (
+            fib
+        ) : fib.concat(fib[i - 1] + fib[i - 2]),
+        [1, 1]
+    );
+
+const benford = array => [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    .map(val => [val, array
+        .reduce(
+            (sum, item) => sum + (
+                `${item}` [0] === `${val}`
+            ),
+            0
+        ) / array.length, Math.log10(1 + 1 / val)
+    ]);
+
+console.log(benford(fibseries(1000)))
+---
+"alpha beta gamma delta".split(" ").forEach(function (x) {
+    console.log(x);
+});
+---
+Math.E
+Math.PI
+Math.sqrt(x)
+Math.log(x)
+Math.exp(x)
+Math.abs(x)
+Math.floor(x)
+Math.ceil(x)
+Math.pow(x,y)
+---
+var N=1000, first=false
+var dxs={}, pow=Math.pow
+for (var d=1; d<=N; d+=1)
+	for (var dp=pow(d,5), x=d+1; x<=N; x+=1)
+		dxs[pow(x,5)-dp]=[d,x]
+loop:
+for (var a=1; a<N; a+=1)
+for (var ap=pow(a,5), b=a+1; b<N; b+=1)
+for (var abp=ap+pow(b,5), c=b+1; c<N; c+=1) {
+	var dx = dxs[ abp+pow(c,5) ]
+	if (!dx || c >= dx[0]) continue
+	print( [a, b, c].concat( dx ) )
+	if (first) break loop
+}
+function print(c) {
+	var e='<sup>5</sup>', ep=e+' + '
+	document.write(c[0], ep, c[1], ep, c[2], ep, c[3], e, ' = ', c[4], e, '<br>')
+}
+---
+process.openStdin().on (
+    'data',
+    function (line) {
+        var xs = String(line).match(/^\s*(\d+)\s+(\d+)\s*/)
+        console.log (
+            xs ? Number(xs[1]) + Number(xs[2]) : 'usage: <number> <number>'
+        )
+        process.exit()
+    }
+)
+---
+function isKaprekar( n, bs ) {
+	if ( n < 1 ) return false
+	if ( n == 1 ) return true
+	bs = bs || 10
+	var s = (n * n).toString(bs)
+	for (var i=1, e=s.length; i<e; i+=1) {
+		var a = parseInt(s.substr(0, i), bs)
+		var b = parseInt(s.substr(i), bs)
+		if (b && a + b == n) return true
+	}
+	return false
+}
+---
+function f(num) {
+ return (num === 0) ? 1 : num - m(f(num - 1));
+}
+
+function m(num) {
+ return (num === 0) ? 0 : num - f(m(num - 1));
+}
+
+function range(m, n) {
+  return Array.apply(null, Array(n - m + 1)).map(
+    function (x, i) { return m + i; }
+  );
+}
+
+var a = range(0, 19);
+
+//return a new array of the results and join with commas to print
+console.log(a.map(function (n) { return f(n); }).join(', '));
+console.log(a.map(function (n) { return m(n); }).join(', '));
+---
+const crypto = require('crypto');
+
+const msg = 'Rosetta code';
+const hash = crypto.createHash('sha256').update(msg).digest('hex');
+
+console.log(hash);
+---
+function quibble(words) {
+  var words2 = words.join()
+
+  var words3 = [...words2].reverse().join('');
+  var res = words3.replace(",", " dna ");
+  var words4 = [...res].reverse().join('');
+
+  return '{'+words4+'}';
+}
+---
+var gen = new SoEIncClass();
+for (var i = 1; i < 1000000; i++, gen.next());
+var prime = gen.next();
+
+if (typeof print == "undefined")
+    print = (typeof WScript != "undefined") ? WScript.Echo : alert;
+print(prime);
+---
+var string = "alphaBETA";
+var uppercase = string.toUpperCase();
+var lowercase = string.toLowerCase();
+---
+function test (n, deg) {
+    for (var i = 1; i <= deg; i ++) {
+        var results = '';
+        for (var j = 1; j <= n; j ++) {
+            results += multifact(j, i) + ' ';
+        }
+        console.log('Degree ' + i + ': ' + results);
+    }
+}
+---
+var jortSort = function( array ) {
+
+  // sort the array
+  var originalArray = array.slice(0);
+  array.sort( function(a,b){return a - b} );
+
+  // compare to see if it was originally sorted
+  for (var i = 0; i < originalArray.length; ++i) {
+    if (originalArray[i] !== array[i]) return false;
+  }
+
+  return true;
+};
+---
+function stoogeSort (array, i, j) {
+    if (j === undefined) {
+        j = array.length - 1;
+    }
+
+    if (i === undefined) {
+        i = 0;
+    }
+
+    if (array[j] < array[i]) {
+        var aux = array[i];
+        array[i] = array[j];
+        array[j] = aux;
+    }
+
+    if (j - i > 1) {
+        var t = Math.floor((j - i + 1) / 3);
+        stoogeSort(array, i, j-t);
+        stoogeSort(array, i+t, j);
+        stoogeSort(array, i, j-t);
+    }
+};
+---
+for(var door=1;i<10/*Math.sqrt(100)*/;i++){
+ console.log("Door %d is open",i*i);
+}
+---
+function a(k, x1, x2, x3, x4, x5) {
+  function b() {
+    k -= 1;
+    return a(k, b, x1, x2, x3, x4);
+  }
+  return (k > 0) ? b() : x4() + x5();
+}
+
+// this uses lambda wrappers around the numeric arguments
+function x(n) {
+  return function () {
+    return n;
+  };
+}
+alert(a(10, x(1), x(-1), x(-1), x(1), x(0)));
+---
+function binary_search_iterative(a, value) {
+  var mid, lo = 0,
+      hi = a.length - 1;
+
+  while (lo <= hi) {
+    mid = Math.floor((lo + hi) / 2);
+
+    if (a[mid] > value) {
+      hi = mid - 1;
+    } else if (a[mid] < value) {
+      lo = mid + 1;
+    } else {
+      return mid;
+    }
+  }
+  return null;
+}
+---
+(() => {
+
+    // jewelCount :: String -> String -> Int
+    const jewelCount = (j, s) => {
+        const js = j.split('');
+        return s.split('')
+            .reduce((a, c) => js.includes(c) ? a + 1 : a, 0)
+    };
+
+    // TEST -----------------------------------------------
+    return [
+            ['aA', 'aAAbbbb'],
+            ['z', 'ZZ']
+        ]
+        .map(x => jewelCount(...x))
+})();
+---
+let q = 1n, r = 180n, t = 60n, i = 2n;
+for (;;) {
+  let y = (q*(27n*i-12n)+5n*r)/(5n*t);
+  let u = 3n*(3n*i+1n)*(3n*i+2n);
+  r = 10n*u*(q*(5n*i-2n)+r-y*t);
+  q = 10n*q*i*(2n*i-1n);
+  t = t*u;
+  i = i+1n;
+  process.stdout.write(y.toString());
+  if (i === 3n) { process.stdout.write('.'); }
+}
+---
+const leoNum = (c, l0 = 1, l1 = 1, add = 1) =>
+    new Array(c).fill(add).reduce(
+        (p, c, i) => i > 1 ? (
+            p.push(p[i - 1] + p[i - 2] + c) && p
+        ) : p, [l0, l1]
+    );
+
+console.log(leoNum(25));
+console.log(leoNum(25, 0, 1, 0));
+---
+var a = WScript.StdIn.ReadLine();
+var b = WScript.StdIn.ReadLine();
+WSH.echo(a, " + " , b , " = " , Number(a)+Number(b));
+---
+function takeWhile(lst, fnTest) {
+    'use strict';
+    var varHead = lst.length ? lst[0] : null;
+
+    return varHead ? (
+        fnTest(varHead) ? [varHead].concat(
+            takeWhile(lst.slice(1), fnTest)
+        ) : []
+    ) : [];
+}
+---
+var bottles = 99;
+var songTemplate  = "{X} bottles of beer on the wall \n" +
+                    "{X} bottles of beer \n"+
+                    "Take one down, pass it around \n"+
+                    "{X-1} bottles of beer on the wall \n";
+
+function song(x, txt) {
+  return txt.replace(/\{X\}/gi, x).replace(/\{X-1\}/gi, x-1) + (x > 1 ? song(x-1, txt) : "");
+}
+
+console.log(song(bottles, songTemplate));
+---
+(() => {
+    'use strict';
+
+    // show :: a -> String
+    const show = x => JSON.stringify(x, null, 2);
+
+    // printAll [any] -> String
+    const printAll = (...a) => a.map(show)
+        .join('\n');
+
+    return printAll(1, 2, 3, 2 + 2, "five", 6);
+})();
+---
+function lookandsay(str) {
+    return str.replace(/(.)\1*/g, function(seq, p1){return seq.length.toString() + p1})
+}
+
+var num = "1";
+for (var i = 10; i > 0; i--) {
+    alert(num);
+    num = lookandsay(num);
+}
+---
+(function (p) {
+  return [
+    p.split('').reverse().join(''),
+
+    p.split(' ').map(function (x) {
+        return x.split('').reverse().join('');
+    }).join(' '),
+
+    p.split(' ').reverse().join(' ')
+
+  ].join('\n');
+
+})('rosetta code phrase reversal');
+---
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+fso.GetFile('input.txt').Size;
+fso.GetFile('c:/input.txt').Size;
+---
+String.prototype.repeat = function(n) {
+    return new Array(1 + (n || 0)).join(this);
+}
+
+console.log("ha".repeat(5));  // hahahahaha
+---
+var i = 0n;
+
+while (true)
+    document.write(++i + ' ');
+---
+function isPangram(s) {
+    var letters = "zqxjkvbpygfwmucldrhsnioate"
+    // sorted by frequency ascending (http://en.wikipedia.org/wiki/Letter_frequency)
+    s = s.toLowerCase().replace(/[^a-z]/g,'')
+    for (var i = 0; i < 26; i++)
+        if (s.indexOf(letters[i]) < 0) return false
+    return true
+}
+
+console.log(isPangram("is this a pangram"))  // false
+console.log(isPangram("The quick brown fox jumps over the lazy dog"))  // true
+---
+function MaximumSubsequence(population) {
+    var maxValue = 0;
+    var subsequence = [];
+
+    for (var i = 0, len = population.length; i < len; i++) {
+        for (var j = i; j <= len; j++) {
+            var subsequence = population.slice(i, j);
+            var value = sumValues(subsequence);
+            if (value > maxValue) {
+                maxValue = value;
+                greatest = subsequence;
+            };
+        }
+    }
+
+    return greatest;
+}
+
+function sumValues(arr) {
+    var result = 0;
+    for (var i = 0, len = arr.length; i < len; i++) {
+        result += arr[i];
+    }
+    return result;
+}
+---
+function root_mean_square(ary) {
+    var sum_of_squares = ary.reduce(function(s,x) {return (s + x*x)}, 0);
+    return Math.sqrt(sum_of_squares / ary.length);
+}
+
+print( root_mean_square([1,2,3,4,5,6,7,8,9,10]) ); // ==> 6.2048368229954285
+---
+var http = require('http');
+
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Goodbye, World!\n');
+}).listen(8080, '127.0.0.1');
+---
+(function f() {
+
+    return '(' + f.toString() + ')();';
+
+})();
+---
+function mean(array) {
+    return !array.length ? 0
+        : array.reduce(function(pre, cur, i) {
+            return (pre * i + cur) / (i + 1);
+            });
+    }
+
+alert( mean( [1,2,3,4,5] ) );   // 3
+alert( mean( [] ) );            // 0
+---
+{
+    let s = " \t String with spaces  \t  ";
+    // a future version of ECMAScript will have trimStart().  Some current
+    // implementations have trimLeft().
+    console.log("original: '" + s + "'");
+    console.log("trimmed left: '" + s.replace(/^\s+/,'') + "'");
+    // a future version of ECMAScript will have trimEnd().  Some current
+    // implementations have trimRight().
+    console.log("trimmed right: '" + s.replace(/\s+$/,'') + "'");
+    console.log("trimmed both: '" + s.trim() + "'");
+ }
+---
+function fibo(n) {
+  if (n < 0) { throw "Argument cannot be negative"; }
+
+  return (function fib(n) {
+    return (n < 2) ? n : fib(n-1) + fib(n-2);
+  })(n);
+}
+---
+ary = [["UK", "London"], ["US", "New York"], ["US", "Birmingham"], ["UK", "Birmingham"]]
+print(ary);
+
+ary.sort(function(a,b){return (a[1]<b[1] ? -1 : (a[1]>b[1] ? 1 : 0))});
+print(ary);
+
+/* a stable sort will output ["US", "Birmingham"] before ["UK", "Birmingham"] */

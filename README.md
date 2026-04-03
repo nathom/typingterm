@@ -1,51 +1,56 @@
 # typingterm
 
-A typingtest for terminal power users.
+A monkeytype-inspired typing test for the terminal, written in Rust.
 
-![screenshot](demo/demo1.png)
-
-## Usage
-
-Ensure you have `ncurses` installed. You can do this with Homebrew
-
-```bash
-brew install ncurses
-```
-
-Clone this repository
+## Install
 
 ```bash
 git clone https://github.com/nathom/typingterm
+cd typingterm
+cargo install --path .
 ```
 
-Change into the directory, compile, and link the binary.
-
-```
-cd typingterm && make install
-```
-
-Run the program with
-
-```
-typingterm
-```
-
-or
-
-```
-tterm
-```
-
-If you don't want to link the binary, you can just run `make` with no args.
-
-
+Or just build and run directly:
 
 ```bash
-❯ tterm -h
-Usage: typingterm [OPTIONS]
-
-  -t, --time         Test duration, in seconds. Default 15.
-  -f, --file         The file containing the word bank. Default 200_top_words.txt.
-  -d, --delimeter    The character separating words in the file. Default '\n'.
-  -h, --help         Show this help message.
+cargo run --release
 ```
+
+## Usage
+
+### Menu
+
+Navigate with arrow keys or `hjkl`. Press `enter` to start a test, `q` to quit.
+
+Press `/` on the language or theme rows to search.
+
+### Test modes
+
+- **time** - type for 15, 30, 60, or 120 seconds
+- **words** - type 10, 25, 50, or 100 words
+- **quote** - type a random quote
+- **zen** - no timer, no word limit
+
+### Languages
+
+19 languages: English (200/1k/5k/10k), Spanish, French, German, Portuguese, Italian, Dutch, Swedish, plus code (Rust, Python, JavaScript, TypeScript, Go, C, C++, Java).
+
+Code mode uses real snippets from [Rosetta Code](https://rosettacode.org). Indentation is auto-inserted.
+
+### Themes
+
+187 themes from monkeytype (dracula, catppuccin, nord, serika_dark, etc). Settings persist across sessions.
+
+### Keybindings
+
+| Key | Action |
+|---|---|
+| `tab` | restart test |
+| `esc` | back to menu |
+| `enter` | next line (code mode) |
+| `ctrl+backspace` / `opt+backspace` | delete word |
+| `ctrl+c` | quit |
+
+### Results
+
+After each test: WPM, raw WPM, accuracy, consistency, WPM graph over time, and character breakdown (correct/incorrect/extra/missed).
