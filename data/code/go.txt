@@ -1,0 +1,932 @@
+; lists all built-in and user-defined functions, including those within variables
+(-> (symbols)
+    (map eval)
+    (filter (comp type-of (= "func"))))
+
+; lists only user-defined functions, including those within variables
+(-> (symbols)
+    (map eval)
+    (filter (comp type-of (= "func")))
+    (remove about))
+---
+package main
+
+import (
+    "image"
+    "image/png"
+    "os"
+)
+
+func main() {
+    g := image.NewGray(image.Rect(0, 0, 256, 256))
+    for i := range g.Pix {
+        g.Pix[i] = uint8(i>>8 ^ i)
+    }
+    f, _ := os.Create("xor.png")
+    png.Encode(f, g)
+    f.Close()
+}
+---
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func stripchars(str, chr string) string {
+    return strings.Map(func(r rune) rune {
+        if strings.IndexRune(chr, r) < 0 {
+            return r
+        }
+        return -1
+    }, str)
+}
+
+func main() {
+    fmt.Println(stripchars("She was a soul stripper. She took my heart!",
+        "aei"))
+}
+---
+package main
+
+import "fmt"
+
+var a = []int{170, 45, 75, -90, -802, 24, 2, 66}
+
+func main() {
+    fmt.Println("before:", a)
+    stoogesort(a)
+    fmt.Println("after: ", a)
+    fmt.Println("nyuk nyuk nyuk")
+}
+
+func stoogesort(a []int) {
+    last := len(a) - 1
+    if a[last] < a[0] {
+        a[0], a[last] = a[last], a[0]
+    }
+    if last > 1 {
+        t := len(a) / 3
+        stoogesort(a[:len(a)-t])
+        stoogesort(a[t:])
+        stoogesort(a[:len(a)-t])
+    }
+}
+---
+package main
+
+import "fmt"
+
+func gcd(x, y int) int {
+    for y != 0 {
+        x, y = y, x%y
+    }
+    return x
+}
+
+func main() {
+    fmt.Println(gcd(33, 77))
+    fmt.Println(gcd(49865, 69811))
+}
+---
+func js(stones, jewels string) (n int) {
+    var sset ['z' + 1]int
+    for _, b := range []byte(stones) {
+        sset[b]++
+    }
+    for _, b := range []byte(jewels) {
+        n += sset[b]
+    }
+    return
+}
+---
+package main
+
+import (
+   "fmt"
+)
+
+type params struct {x, y, z int}
+
+func myFunc(p params) int {
+    return p.x + p.y + p.z
+}
+
+func main() {
+    r := myFunc(params{x: 1, y: 2, z: 3}) // all fields, same order
+    fmt.Println("r =", r)
+    s := myFunc(params{z: 3, y: 2, x: 1}) // all fields, different order
+    fmt.Println("s =", s)
+    t := myFunc(params{y: 2})             // only one field, others set to zero
+    fmt.Println("t =", t)
+}
+---
+func fib(c chan int) {
+	a, b := 0, 1
+	for {
+		c <- a
+		a, b = b, a+b
+	}
+}
+
+func main() {
+	c := make(chan int)
+	go fib(c)
+	for i := 0; i < 10; i++ {
+		fmt.Println(<-c)
+	}
+}
+---
+package main
+
+import "fmt"
+
+// int parameter, so arguments will be passed to it by value.
+func zeroval(ival int) {
+	ival = 0
+}
+// has an *int parameter, meaning that it takes an int pointer.
+func zeroptr(iptr *int) {
+	*iptr = 0
+}
+func main() {
+	i := 1
+	fmt.Println("initial:", i) // prt initial: 1
+	zeroval(i)
+	fmt.Println("zeroval:", i) // prt zeroval: 1
+	zeroptr(&i)
+	fmt.Println("zeroptr:", i)  // prt zeroptr: 0
+	fmt.Println("pointer:", &i) // prt pointer: 0xc0000140b8
+}
+---
+// Go doesn't have generics, but sometimes a type definition helps
+// readability and maintainability.   This example is written to
+// the following function type, which uses float64.
+type ffType func(float64) float64
+
+// compose function requested by task
+func compose(f, g ffType) ffType {
+    return func(x float64) float64 {
+        return f(g(x))
+    }
+}
+---
+package main
+
+import "fmt"
+
+func f(s1, s2, sep string) string {
+	return s1 + sep + sep + s2
+}
+
+func main() {
+	fmt.Println(f("Rosetta", "Code", ":"))
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+    const max = 1000
+    a := make([]int, max) // all zero by default
+    for n := 0; n < max-1; n++ {
+        for m := n - 1;  m >= 0; m-- {
+            if a[m] == a[n] {
+                a[n+1] = n - m
+                break
+            }
+        }
+    }
+    fmt.Println("The first ten terms of the Van Eck sequence are:")
+    fmt.Println(a[:10])
+    fmt.Println("\nTerms 991 to 1000 of the sequence are:")
+    fmt.Println(a[990:])
+}
+---
+package empty
+
+import "testing"
+
+func BenchmarkEmpty(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        Empty()
+    }
+}
+
+func BenchmarkCount(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        Count()
+    }
+}
+---
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+const ε = 1e-14
+
+func agm(a, g float64) float64 {
+    for math.Abs(a-g) > math.Abs(a)*ε {
+        a, g = (a+g)*.5, math.Sqrt(a*g)
+    }
+    return a
+}
+
+func main() {
+    fmt.Println(agm(1, 1/math.Sqrt2))
+}
+---
+package main
+
+import (
+    "fmt"
+    "math/rand"
+    "sort"
+    "time"
+)
+
+func main() {
+    list := []int{31, 41, 59, 26, 53, 58, 97, 93, 23, 84}
+    rand.Seed(time.Now().UnixNano())
+    fmt.Println("unsorted:", list)
+    temp := make([]int, len(list))
+    copy(temp, list)
+    for !sort.IntsAreSorted(temp) {
+        for i, v := range rand.Perm(len(list)) {
+            temp[i] = list[v]
+        }
+    }
+    fmt.Println("sorted!  ", temp)
+}
+---
+// declare a nil map variable, for maps from string to int
+var x map[string]int
+
+// make an empty map
+x = make(map[string]int)
+
+// make an empty map with an initial capacity
+x = make(map[string]int, 42)
+
+// set a value
+x["foo"] = 3
+
+// getting values
+y1 := x["bar"]     // zero value returned if no map entry exists for the key
+y2, ok := x["bar"] // ok is a boolean, true if key exists in the map
+
+// removing keys
+delete(x, "foo")
+
+// make a map with a literal
+x = map[string]int{
+	"foo": 2, "bar": 42, "baz": -1,
+}
+---
+package main
+
+import (
+    "fmt"
+    "math/big"
+    "strconv"
+)
+
+func main () {
+    s := strconv.FormatInt(26, 16) // returns the string "1a"
+    fmt.Println(s)
+
+    i, err := strconv.ParseInt("1a", 16, 64) // returns the integer (int64) 26
+    if err == nil {
+        fmt.Println(i)
+    }
+    b, ok := new(big.Int).SetString("1a", 16) // returns the big integer 26
+    if ok {
+        fmt.Println(b)
+    }
+}
+---
+package main
+
+import (
+    "bytes"
+    "fmt"
+    "os"
+    "os/exec"
+)
+
+func main() {
+    cmd := exec.Command("tput", "-S")
+    cmd.Stdin = bytes.NewBufferString("clear\ncup 5 2")
+    cmd.Stdout = os.Stdout
+    cmd.Run()
+    fmt.Println("Hello")
+}
+---
+func Ackermann(m, n uint) uint {
+	switch 0 {
+	case m:
+		return n + 1
+	case n:
+		return Ackermann(m - 1, 1)
+	}
+	return Ackermann(m - 1, Ackermann(m, n - 1))
+}
+---
+package main
+
+import "fmt"
+
+func leonardo(n, l0, l1, add int) []int {
+    leo := make([]int, n)
+    leo[0] = l0
+    leo[1] = l1
+    for i := 2; i < n; i++ {
+        leo[i] = leo[i - 1] + leo[i - 2] + add
+    }
+    return leo
+}
+
+func main() {
+    fmt.Println("The first 25 Leonardo numbers with L[0] = 1, L[1] = 1 and add number = 1 are:")
+    fmt.Println(leonardo(25, 1, 1, 1))
+    fmt.Println("\nThe first 25 Leonardo numbers with L[0] = 0, L[1] = 1 and add number = 0 are:")
+    fmt.Println(leonardo(25, 0, 1, 0))
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+    m := map[string][]int{}
+    for i, needle := range haystack {
+        m[needle] = append(m[needle], i)
+    }
+    for _, n := range []string{"soap", "gold", "fire"} {
+        fmt.Println(n, m[n])
+    }
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+	x := []int{
+		48, 96, 86, 68,
+		57, 82, 63, 70,
+		37, 34, 83, 27,
+		19, 97, 9, 17,
+	}
+
+	smallest, biggest := x[0], x[0]
+	for _, v := range x {
+		if v > biggest {
+			biggest = v
+		}
+		if v < smallest {
+			smallest = v
+		}
+	}
+
+	fmt.Println("The biggest number is ", biggest) // prt 97
+	fmt.Println("The smallest number is ", smallest) // prt 9
+}
+---
+package main
+
+import (
+    "fmt"
+    "math/rand"
+    "time"
+)
+
+func main() {
+    var a [20]int
+    for i := range a {
+        a[i] = i
+    }
+    fmt.Println(a)
+
+    rand.Seed(time.Now().UnixNano())
+    for i := len(a) - 1; i >= 1; i-- {
+        j := rand.Intn(i + 1)
+        a[i], a[j] = a[j], a[i]
+    }
+    fmt.Println(a)
+}
+---
+package main
+
+import (
+    "golang.org/x/crypto/md4"
+    "fmt"
+)
+
+func main() {
+    h := md4.New()
+    h.Write([]byte("Rosetta Code"))
+    fmt.Printf("%x\n", h.Sum(nil))
+}
+---
+package main
+
+import (
+    "fmt"
+    "math/rand"
+    "time"
+)
+
+func main() {
+    fmt.Print("Guess number from 1 to 10: ")
+    rand.Seed(time.Now().Unix())
+    n := rand.Intn(10) + 1
+    for guess := n; ; fmt.Print("No. Try again: ") {
+        switch _, err := fmt.Scan(&guess); {
+        case err != nil:
+            fmt.Println("\n", err, "\nSo, bye.")
+            return
+        case guess == n:
+            fmt.Println("Well guessed!")
+            return
+        }
+    }
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+	bottles := func(i int) string {
+		switch i {
+		case 0:
+			return "No more bottles"
+		case 1:
+			return "1 bottle"
+		default:
+			return fmt.Sprintf("%d bottles", i)
+		}
+	}
+
+	for i := 99; i > 0; i-- {
+		fmt.Printf("%s of beer on the wall\n", bottles(i))
+		fmt.Printf("%s of beer\n", bottles(i))
+		fmt.Printf("Take one down, pass it around\n")
+		fmt.Printf("%s of beer on the wall\n", bottles(i-1))
+	}
+}
+---
+package main
+
+import (
+    "bufio"
+    "io"
+    "os"
+)
+
+func main() {
+    r := bufio.NewReader(os.Stdin)
+    w := bufio.NewWriter(os.Stdout)
+    for {
+        b, err := r.ReadByte()
+        if err == io.EOF {
+            return
+        }
+        w.WriteByte(b)
+        w.Flush()
+    }
+}
+---
+package main
+
+import (
+    "fmt"
+    "math/big"
+)
+
+func main() {
+    ln2, _ := new(big.Rat).SetString("0.6931471805599453094172")
+    h := big.NewRat(1, 2)
+    h.Quo(h, ln2)
+    var f big.Rat
+    var w big.Int
+    for i := int64(1); i <= 17; i++ {
+        h.Quo(h.Mul(h, f.SetInt64(i)), ln2)
+        w.Quo(h.Num(), h.Denom())
+        f.Sub(h, f.SetInt(&w))
+        y, _ := f.Float64()
+        d := fmt.Sprintf("%.3f", y)
+        fmt.Printf("n: %2d  h: %18d%s  Nearly integer: %t\n",
+            i, &w, d[1:], d[2] == '0' || d[2] == '9')
+    }
+}
+---
+package main
+
+import (
+    "fmt"
+    "encoding/binary"
+)
+
+func main() {
+    buf := make([]byte, binary.MaxVarintLen64)
+    for _, x := range []int64{0x200000, 0x1fffff} {
+        v := buf[:binary.PutVarint(buf, x)]
+        fmt.Printf("%d encodes into %d bytes: %x\n", x, len(v), v)
+        x, _ = binary.Varint(v)
+        fmt.Println(x, "decoded")
+    }
+}
+---
+package main
+
+import (
+    "fmt"
+    "singlep"
+)
+
+func main() {
+    // dot selector syntax references package variables and functions
+    fmt.Println(singlep.X, singlep.Y)
+    fmt.Println(singlep.F())
+}
+---
+func answer(phone1, phone2 chan int) {
+    select {
+    case <-phone1:
+        // talk on phone one
+    case <-phone2:
+        // talk on phone two
+    }
+}
+---
+package main
+
+import "fmt"
+
+func pancake(n int) int {
+    gap, sum, adj := 2, 2, -1
+    for sum < n {
+        adj++
+        gap = gap*2 - 1
+        sum += gap
+    }
+    return n + adj
+}
+
+func main() {
+    for i := 0; i < 4; i++ {
+        for j := 1; j < 6; j++ {
+            n := i*5 + j
+            fmt.Printf("p(%2d) = %2d  ", n, pancake(n))
+        }
+        fmt.Println()
+    }
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+	// yes, there is more concise syntax, but this makes
+	// the data types very clear.
+	var b byte = 'a'
+	var r rune = 'π'
+	var s string = "aπ"
+
+	fmt.Println(b, r, s)
+	fmt.Println("string cast to []rune:", []rune(s))
+	// A range loop over a string gives runes, not bytes
+	fmt.Print("    string range loop: ")
+	for _, c := range s {
+		fmt.Print(c, " ") // c is type rune
+	}
+	// We can also print the bytes of a string without an explicit loop
+	fmt.Printf("\n         string bytes: % #x\n", s)
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+    const (
+        target  = 269696
+        modulus = 1000000
+    )
+    for n := 1; ; n++ { // Repeat with n=1, n=2, n=3, ...
+        square := n * n
+        ending := square % modulus
+        if ending == target {
+            fmt.Println("The smallest number whose square ends with",
+                target, "is", n,
+            )
+            return
+        }
+    }
+}
+---
+package main
+
+import (
+    "log"
+    "os"
+    "os/exec"
+)
+
+func main() {
+    args := []string{
+        "-m", "-v", "0.75", "a.wav", "-v", "0.25", "b.wav",
+        "-d",
+        "trim", "4", "6",
+        "repeat", "5",
+    }
+    cmd := exec.Command("sox", args...)
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    if err := cmd.Run(); err != nil {
+        log.Fatal(err)
+    }
+}
+---
+package main
+
+import (
+    "os"
+    "fmt"
+)
+
+func main() {
+    if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
+        fmt.Println("Hello terminal")
+    } else {
+        fmt.Println("Who are you? You're not a terminal")
+    }
+}
+---
+import soap
+
+procedure main()
+    server := SoapServer("http://example.com/soap/wsdl")
+    server.addService("soapFunc",   soapFunc)
+    server.addService("anotherSoapFunc", anotherSoapFunc)
+    msg := server.handleRequest()
+    write(msg)
+    exit(0)
+end
+
+procedure soapFunc(A[])
+    every (s := " ") ||:= (!A || " ")
+    return "Hello" || s[1:-1]
+end
+
+procedure anotherSoapFunc(A[])
+    every (s := " ") ||:= (!A || " ")
+    return "Goodbye" || s[1:-1]
+end
+---
+package main
+import "fmt"
+import "regexp"
+
+func main() {
+  str := "I am the original string"
+
+  // Test
+  matched, _ := regexp.MatchString(".*string$", str)
+  if matched { fmt.Println("ends with 'string'") }
+
+  // Substitute
+  pattern := regexp.MustCompile("original")
+  result := pattern.ReplaceAllString(str, "modified")
+  fmt.Println(result)
+}
+---
+func flatten(s []interface{}) (r []interface{}) {
+    for _, e := range s {
+        if i, ok := e.([]interface{}); ok {
+            r = append(r, flatten(i)...)
+        } else {
+            r = append(r, e)
+        }
+    }
+    return
+}
+---
+package main
+
+import (
+    "fmt"
+    "runtime"
+
+    "ex"
+)
+
+func main() {
+    // func nested() { ... not allowed here
+
+    // this is okay, variable f declared and assigned a function literal.
+    f := func() {
+        // this mess prints the name of the function to show that it's an
+        // anonymous function defined in package main
+        pc, _, _, _ := runtime.Caller(0)
+        fmt.Println(runtime.FuncForPC(pc).Name(), "here!")
+    }
+
+    ex.X(f) // function value passed to exported function
+
+    // ex.x() non-exported function not visible here
+}
+---
+package rosettacode
+
+type Tree(type T) struct {
+    val T
+    left *Tree(T)
+    right *Tree(T)
+}
+
+func (t *Tree(T)) ReplaceAll(rep T) {
+    t.val = rep
+    if t.left != nil  { t.left.ReplaceAll(rep) }
+    if t.right != nil { t.right.ReplaceAll(rep) }
+}
+---
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println(I(3))
+}
+
+func I(n int) [][]float64 {
+    m := make([][]float64, n)
+    a := make([]float64, n*n)
+    for i := 0; i < n; i++ {
+        a[i] = 1
+        m[i] = a[:n]
+        a = a[n:]
+    }
+    return m
+}
+---
+package main
+
+import (
+    "fmt"
+    "unicode/utf8"
+)
+
+func main() {
+    // ASCII contents:  Interpreting "characters" as bytes.
+    s := "ASCII"
+    fmt.Println("String:                ", s)
+    fmt.Println("First byte removed:    ", s[1:])
+    fmt.Println("Last byte removed:     ", s[:len(s)-1])
+    fmt.Println("First and last removed:", s[1:len(s)-1])
+    // UTF-8 contents:  "Characters" as runes (unicode code points)
+    u := "Δημοτική"
+    fmt.Println("String:                ", u)
+    _, sizeFirst := utf8.DecodeRuneInString(u)
+    fmt.Println("First rune removed:    ", u[sizeFirst:])
+    _, sizeLast := utf8.DecodeLastRuneInString(u)
+    fmt.Println("Last rune removed:     ", u[:len(u)-sizeLast])
+    fmt.Println("First and last removed:", u[sizeFirst:len(u)-sizeLast])
+}
+---
+package main
+
+import (
+    "fmt"
+    "os"
+    "strings"
+)
+
+func main() {
+    s := "SHELL"
+    se := s + "="
+    for _, v := range os.Environ() {
+        if strings.HasPrefix(v, se) {
+            fmt.Println(s, "has value", v[len(se):])
+            return
+        }
+    }
+    fmt.Println(s, "not found")
+}
+---
+package main
+
+import (
+    "os"
+    "os/exec"
+    "time"
+)
+
+func main() {
+    tput("civis") // hide
+    time.Sleep(3 * time.Second)
+    tput("cvvis") // show
+    time.Sleep(3 * time.Second)
+}
+
+func tput(arg string) error {
+    cmd := exec.Command("tput", arg)
+    cmd.Stdout = os.Stdout
+    return cmd.Run()
+}
+---
+package main
+
+import "fmt"
+
+var a1 = []string{"a", "b", "c"}
+var a2 = []byte{'A', 'B', 'C'}
+var a3 = []int{1, 2, 3}
+
+func main() {
+	for i := range a1 {
+		fmt.Printf("%v%c%v\n", a1[i], a2[i], a3[i])
+	}
+}
+---
+import "os"
+
+func processFile() {
+    f, err := os.Open("file")
+    if err != nil {
+        // (probably do something with the error)
+        return // no need to close file, it didn't open
+    }
+    defer f.Close() // file is open.  no matter what, close it on return
+    var lucky bool
+    // some processing
+    if (lucky) {
+        // f.Close() will get called here
+        return
+    }
+    // more processing
+    // f.Close() will get called here too
+}
+---
+import (
+	"math/big"
+)
+
+func fib(n uint64) *big.Int {
+	if n < 2 {
+		return big.NewInt(int64(n))
+	}
+	a, b := big.NewInt(0), big.NewInt(1)
+	for n--; n > 0; n-- {
+		a.Add(a, b)
+		a, b = b, a
+	}
+	return b
+}
+---
+package main
+
+import "fmt"
+import "math/cmplx"
+
+func mandelbrot(a complex128) (z complex128) {
+    for i := 0; i < 50; i++ {
+        z = z*z + a
+    }
+    return
+}
+
+func main() {
+    for y := 1.0; y >= -1.0; y -= 0.05 {
+        for x := -2.0; x <= 0.5; x += 0.0315 {
+            if cmplx.Abs(mandelbrot(complex(x, y))) < 2 {
+                fmt.Print("*")
+            } else {
+                fmt.Print(" ")
+            }
+        }
+        fmt.Println("")
+    }
+}
+---
+package main
+
+import "time"
+import "fmt"
+
+func main() {
+    fmt.Print("Enter number of seconds to sleep: ")
+    var sec float64
+    fmt.Scanf("%f", &sec)
+    fmt.Print("Sleeping…")
+    time.Sleep(time.Duration(sec * float64(time.Second)))
+    fmt.Println("\nAwake!")
+}

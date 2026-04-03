@@ -1,0 +1,687 @@
+import java.util.stream.IntStream;
+
+public class Letters {
+    public static void main(String[] args) throws Exception {
+        System.out.print("Upper case: ");
+        IntStream.rangeClosed(0, 0x10FFFF)
+                 .filter(Character::isUpperCase)
+                 .limit(72)
+                 .forEach(n -> System.out.printf("%c", n));
+        System.out.println("...");
+
+        System.out.print("Lower case: ");
+        IntStream.rangeClosed(0, 0x10FFFF)
+                 .filter(Character::isLowerCase)
+                 .limit(72)
+                 .forEach(n -> System.out.printf("%c", n));
+        System.out.println("...");
+    }
+}
+---
+public class Math
+{
+     public static    int multiply(   int a,    int b) { return a*b; }
+     public static double multiply(double a, double b) { return a*b; }
+}
+---
+public class MyClass{
+
+  // instance variable
+  private int variable;  // Note: instance variables are usually "private"
+
+  /**
+  * The constructor
+  */
+  public MyClass(){
+    // creates a new instance
+  }
+
+  /**
+  * A method
+  */
+  public void someMethod(){
+   this.variable = 1;
+  }
+}
+---
+import static java.math.BigInteger.ONE;
+
+import java.util.stream.Stream;
+
+public class Count {
+    public static void main(String[] args) {
+        Stream.iterate(ONE, i -> i.add(ONE))
+              .forEach(System.out::println);
+    }
+}
+---
+import java.math.BigInteger;
+
+public class Count {
+    public static void main(String[] args) {
+        for(BigInteger i = BigInteger.ONE; ;i = i.add(BigInteger.ONE)) System.out.println(i);
+    }
+}
+---
+import java.security.SecureRandom;
+
+public class RandomExample {
+  public static void main(String[] args) {
+    SecureRandom rng = new SecureRandom();
+
+    /* Prints a random signed 32-bit integer. */
+    System.out.println(rng.nextInt());
+  }
+}
+---
+//All of these objects will be deallocated automatically once the program leaves
+//their scope and there are no more pointers to the objects
+Object foo = new Object(); //Allocate an Object and a reference to it
+int[] fooArray = new int[size]; //Allocate all spaces in an array and a reference to it
+int x = 0; //Allocate an integer and set its value to 0
+---
+package delegate;
+
+public final class Delegate implements Thingable {
+  @Override
+  public String thing() {
+    return "delegate implementation";
+  }
+}
+---
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+---
+String generateHTMLTable() {
+    StringBuilder string = new StringBuilder();
+    string.append("<table border=\"1\">");
+    string.append(System.lineSeparator());
+    string.append("<tr>".indent(2));
+    string.append("<th width=\"40\"></th>".indent(4));
+    string.append("<th width=\"50\">X</th>".indent(4));
+    string.append("<th width=\"50\">Y</th>".indent(4));
+    string.append("<th width=\"50\">Z</th>".indent(4));
+    string.append("</tr>".indent(2));
+    Random random = new Random();
+    int number;
+    for (int countA = 0; countA < 10; countA++) {
+        string.append("<tr>".indent(2));
+        string.append("<td>%d</td>".formatted(countA).indent(4));
+        for (int countB = 0; countB < 3; countB++) {
+            number = random.nextInt(1, 9999);
+            string.append("<td>%,d</td>".formatted(number).indent(4));
+        }
+        string.append("</tr>".indent(2));
+    }
+    string.append("</table>");
+    return string.toString();
+}
+---
+Point getPoint() {
+    return new Point(1, 2);
+}
+
+static class Point {
+    int x, y;
+
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+---
+public static long fib(int n) {
+    if (n < 0)
+        throw new IllegalArgumentException("n can not be a negative number");
+
+    return new Object() {
+        private long fibInner(int n) {
+            return (n < 2) ? n : (fibInner(n - 1) + fibInner(n - 2));
+        }
+    }.fibInner(n);
+}
+---
+public static void main(String[] args) {
+    for (int i = 1; ; i++) {
+        System.out.print(i);
+        if (i == 10)
+            break;
+        System.out.print(", ");
+    }
+    System.out.println();
+}
+---
+public class HTML {
+
+   public static String array2HTML(Object[][] array){
+      StringBuilder html = new StringBuilder(
+            "<table>");
+      for(Object elem:array[0]){
+         html.append("<th>" + elem.toString() + "</th>");
+      }
+      for(int i = 1; i < array.length; i++){
+         Object[] row = array[i];
+         html.append("<tr>");
+         for(Object elem:row){
+            html.append("<td>" + elem.toString() + "</td>");
+         }
+         html.append("</tr>");
+      }
+      html.append("</table>");
+      return html.toString();
+   }
+
+   public static void main(String[] args){
+      Object[][] ints = {{"","X","Y","Z"},{1,1,2,3},{2,4,5,6},{3,7,8,9},{4,10,11,12}};
+      System.out.println(array2HTML(ints));
+   }
+}
+---
+public class Blah{
+   //...other methods/data members...
+   protected void finalize() throws Throwable{
+      //Finalization code here
+   }
+   //...other methods/data members...
+}
+---
+public static void sortByName(Pair[] pairs) {
+        Arrays.sort(pairs, (p1, p2) -> p1.name.compareTo(p2.name));
+    }
+---
+public static double[][] mult(double a[][], double b[][]){//a[m][n], b[n][p]
+   if(a.length == 0) return new double[0][0];
+   if(a[0].length != b.length) return null; //invalid dims
+
+   int n = a[0].length;
+   int m = a.length;
+   int p = b[0].length;
+
+   double ans[][] = new double[m][p];
+
+   for(int i = 0;i < m;i++){
+      for(int j = 0;j < p;j++){
+         for(int k = 0;k < n;k++){
+            ans[i][j] += a[i][k] * b[k][j];
+         }
+      }
+   }
+   return ans;
+}
+---
+public static <A,B> Function<A,B> Y(Function<Function<A,B>, Function<A,B>> f) {
+        return x -> f.apply(Y(f)).apply(x);
+    }
+---
+public class LowerAscii {
+
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder(26);
+        for (char ch = 'a'; ch <= 'z'; ch++)
+            sb.append(ch);
+        System.out.printf("lower ascii: %s, length: %s", sb, sb.length());
+    }
+}
+---
+public class SeqNonSquares {
+    public static int nonsqr(int n) {
+        return n + (int)Math.round(Math.sqrt(n));
+    }
+
+    public static void main(String[] args) {
+        // first 22 values (as a list) has no squares:
+        for (int i = 1; i < 23; i++)
+            System.out.print(nonsqr(i) + " ");
+        System.out.println();
+
+        // The following check shows no squares up to one million:
+        for (int i = 1; i < 1000000; i++) {
+            double j = Math.sqrt(nonsqr(i));
+            assert j != Math.floor(j);
+        }
+    }
+}
+---
+import java.io.*;
+public class Test {
+  public static void main (String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader("input.txt"));
+    BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"));
+    String line;
+    while ((line = br.readLine()) != null) {
+      bw.write(line);
+      bw.newLine();
+    }
+    br.close();
+    bw.close();
+  }
+}
+---
+import java.io.File;
+import java.io.IOException;
+
+public class CreateTempFile {
+    public static void main(String[] args)  {
+        try {
+            //create a temp file
+            File temp = File.createTempFile("temp-file-name", ".tmp");
+            System.out.println("Temp file : " + temp.getAbsolutePath());
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+    	}
+    }
+}
+---
+final int immutableInt = 4;
+int mutableInt = 4;
+mutableInt = 6; //this is fine
+immutableInt = 6; //this is an error
+---
+// GaussJordan.java
+
+import java.util.Random;
+
+public class GaussJordan {
+    public static void main(String[] args) {
+        int rows = 5;
+        Matrix m = new Matrix(rows, rows);
+        Random r = new Random();
+        for (int row = 0; row < rows; ++row) {
+            for (int column = 0; column < rows; ++column)
+                m.set(row, column, r.nextDouble());
+        }
+        System.out.println("Matrix:");
+        m.print();
+        System.out.println("Inverse:");
+        Matrix inv = m.inverse();
+        inv.print();
+        System.out.println("Product of matrix and inverse:");
+        Matrix.product(m, inv).print();
+    }
+}
+---
+import java.util.Arrays;
+
+public class CompareListOfStrings {
+
+    public static void main(String[] args) {
+        String[][] arr = {{"AA", "AA", "AA", "AA"}, {"AA", "ACB", "BB", "CC"}};
+        for (String[] a : arr) {
+            System.out.println(Arrays.toString(a));
+            System.out.println(Arrays.stream(a).distinct().count() < 2);
+            System.out.println(Arrays.equals(Arrays.stream(a).distinct().sorted().toArray(), a));
+        }
+    }
+}
+---
+import java.util.function.Supplier;
+import java.util.ArrayList;
+
+public class ValueCapture {
+    public static void main(String[] args) {
+	ArrayList<Supplier<Integer>> funcs = new ArrayList<>();
+	for (int i = 0; i < 10; i++) {
+	    int j = i;
+	    funcs.add(() -> j * j);
+	}
+
+	Supplier<Integer> foo = funcs.get(3);
+	System.out.println(foo.get()); // prints "9"
+    }
+}
+---
+int a;
+double b;
+AClassNameHere c;
+---
+import java.util.function.LongUnaryOperator;
+import java.util.stream.LongStream;
+
+public class FibUtil {
+ public static LongStream fibStream() {
+  return LongStream.iterate( 1l, new LongUnaryOperator() {
+   private long lastFib = 0;
+   @Override public long applyAsLong( long operand ) {
+    long ret = operand + lastFib;
+    lastFib = operand;
+    return ret;
+   }
+  });
+ }
+ public static long fib(long n) {
+  return fibStream().limit( n ).reduce((prev, last) -> last).getAsLong();
+ }
+}
+---
+import java.nio.file.*;
+public class Copy{
+   public static void main(String[] args) throws Exception{
+      FileSystem fs = FileSystems.getDefault();
+      Path in = fs.getPath("input.txt");
+      Path out = fs.getPath("output.txt");
+      Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING);
+   }
+}
+---
+import java.util.stream.LongStream;
+
+public class Count {
+    public static void main(String[] args) {
+        LongStream.iterate(1, l -> l + 1)
+                  .forEach(System.out::println);
+    }
+}
+---
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.AbstractList;
+
+public class Disjoint {
+    public static <T extends Comparable<? super T>> void sortDisjoint(
+            final List<T> array, final int[] idxs) {
+        Arrays.sort(idxs);
+        Collections.sort(new AbstractList<T>() {
+		public int size() { return idxs.length; }
+		public T get(int i) { return array.get(idxs[i]); }
+		public T set(int i, T x) { return array.set(idxs[i], x); }
+	    });
+    }
+
+    public static void main(String[] args) {
+        List<Integer> list = Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0);
+        int[] indices = {6, 1, 7};
+        System.out.println(list);
+        sortDisjoint(list, indices);
+        System.out.println(list);
+    }
+}
+---
+public static boolean isPalindrome(String input) {
+	for (int i = 0, j = input.length() - 1; i < j; i++, j--) {
+		char startChar = input.charAt(i);
+		char endChar = input.charAt(j);
+
+		// Handle surrogate pairs in UTF-16
+		if (Character.isLowSurrogate(endChar)) {
+			if (startChar != input.charAt(--j)) {
+				return false;
+			}
+			if (input.charAt(++i) != endChar) {
+				return false;
+			}
+		} else if (startChar != endChar) {
+			return false;
+		}
+	}
+	return true;
+}
+---
+void printCompare(String stringA, String stringB) {
+    if (stringA.length() > stringB.length()) {
+        System.out.printf("%d %s%n", stringA.length(), stringA);
+        System.out.printf("%d %s%n", stringB.length(), stringB);
+    } else {
+        System.out.printf("%d %s%n", stringB.length(), stringB);
+        System.out.printf("%d %s%n", stringA.length(), stringA);
+    }
+}
+
+void printDescending(String... strings) {
+    List<String> list = new ArrayList<>(List.of(strings));
+    list.sort(Comparator.comparingInt(String::length).reversed());
+    for (String string : list)
+        System.out.printf("%d %s%n", string.length(), string);
+}
+---
+import java.util.function.Function;
+
+public class Compose {
+    public static void main(String[] args) {
+        Function<Double,Double> sin_asin = ((Function<Double,Double>)Math::sin).compose(Math::asin);
+
+        System.out.println(sin_asin.apply(0.5)); // prints "0.5"
+    }
+}
+---
+static String commonPath(String...  paths){
+		String commonPath = "";
+		String[][] folders = new String[paths.length][];
+		
+		for(int i=0; i<paths.length; i++){
+			folders[i] = paths[i].split("/");
+		}
+			
+		for(int j = 0; j< folders[0].length; j++){
+			String s = folders[0][j];
+			for(int i=1; i<paths.length; i++){
+				if(!s.equals(folders[i][j]))
+					return commonPath;
+			}
+			commonPath += s + "/";
+		}
+		return commonPath;		
+	}
+---
+public class RangeExtraction {
+
+    public static void main(String[] args) {
+        int[] arr = {0, 1, 2, 4, 6, 7, 8, 11, 12, 14,
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+            25, 27, 28, 29, 30, 31, 32, 33, 35, 36,
+            37, 38, 39};
+
+        int len = arr.length;
+        int idx = 0, idx2 = 0;
+        while (idx < len) {
+            while (++idx2 < len && arr[idx2] - arr[idx2 - 1] == 1);
+            if (idx2 - idx > 2) {
+                System.out.printf("%s-%s,", arr[idx], arr[idx2 - 1]);
+                idx = idx2;
+            } else {
+                for (; idx < idx2; idx++)
+                    System.out.printf("%s,", arr[idx]);
+            }
+        }
+    }
+}
+---
+factorial[10] = 3628800
+ackermann[3, 2] = 29
+fibonacci[20] = 6765
+---
+import java.util.LinkedList;
+
+public class Sieve{
+       public static LinkedList<Integer> sieve(int n){
+               if(n < 2) return new LinkedList<Integer>();
+               LinkedList<Integer> primes = new LinkedList<Integer>();
+               LinkedList<Integer> nums = new LinkedList<Integer>();
+
+               for(int i = 2;i <= n;i++){ //unoptimized
+                       nums.add(i);
+               }
+
+               while(nums.size() > 0){
+                       int nextPrime = nums.remove();
+                       for(int i = nextPrime * nextPrime;i <= n;i += nextPrime){
+                               nums.removeFirstOccurrence(i);
+                       }
+                       primes.add(nextPrime);
+               }
+               return primes;
+       }
+}
+---
+public static void main(String[] args){
+	String num = "1";
+	
+	for (int i=1;i<=10;i++) {
+		System.out.println(num);
+		num = lookandsay(num);
+	}
+}
+---
+int[] concat(int[] arrayA, int[] arrayB) {
+    int[] array = new int[arrayA.length + arrayB.length];
+    System.arraycopy(arrayA, 0, array, 0, arrayA.length);
+    System.arraycopy(arrayB, 0, array, arrayA.length, arrayB.length);
+    return array;
+}
+---
+public class Animal{
+   //functions go here...
+}
+public class Dog extends Animal{
+   //functions go here...
+}
+public class Cat extends Animal{
+   //functions go here...
+}
+public class Lab extends Dog{
+   //functions go here...
+}
+public class Collie extends Dog{
+   //functions go here...
+}
+---
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class Digester {
+
+    public static void main(String[] args) {
+        System.out.println(hexDigest("Rosetta code", "MD5"));
+    }
+
+    static String hexDigest(String str, String digestName) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(digestName);
+            byte[] digest = md.digest(str.getBytes(StandardCharsets.UTF_8));
+            char[] hex = new char[digest.length * 2];
+            for (int i = 0; i < digest.length; i++) {
+                hex[2 * i] = "0123456789abcdef".charAt((digest[i] & 0xf0) >> 4);
+                hex[2 * i + 1] = "0123456789abcdef".charAt(digest[i] & 0x0f);
+            }
+            return new String(hex);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+}
+---
+public class EmptyMainClass {
+    public static void main(String[] args) {
+    }
+}
+---
+public class IntegerLiterals {
+    public static void main(String[] args) {
+        System.out.println( 727 == 0x2d7 &&
+                            727 == 01327   );
+    }
+}
+---
+public final class VariableSize {
+
+	public static void main(String[] aArgs) {		
+		System.out.println("A  Byte    variable occupies: " + Byte.SIZE / 8 + " byte");
+		System.out.println("A  Char    variable occupies: " + Character.SIZE / 8 + " bytes");
+		System.out.println("A  Short   variable occupies: " + Short.SIZE / 8 + " bytes");
+		System.out.println("A  Float   variable occupies: " + Float.SIZE / 8 + " bytes");
+		System.out.println("An Integer variable occupies: " + Integer.SIZE / 8 + " bytes");
+		System.out.println("A  Double  variable occupies: " + Double.SIZE / 8 + " bytes");		
+		System.out.println("A  Long    variable occupies: " + Long.SIZE / 8 + " bytes");
+	}
+
+}
+---
+import java.util.function.Consumer;
+import java.util.stream.IntStream;
+
+public class Repeat {
+
+    public static void main(String[] args) {
+        repeat(3, (x) -> System.out.println("Example " + x));
+    }
+
+    static void repeat (int n, Consumer<Integer> fun) {
+        IntStream.range(0, n).forEach(i -> fun.accept(i + 1));
+    }
+}
+---
+import java.util.Stack;
+
+public class StackTest {
+    public static void main( final String[] args ) {
+        final Stack<String> stack = new Stack<String>();
+
+        System.out.println( "New stack empty? " + stack.empty() );
+
+        stack.push( "There can be only one" );
+        System.out.println( "Pushed stack empty? " + stack.empty() );
+        System.out.println( "Popped single entry: " + stack.pop() );
+
+        stack.push( "First" );
+        stack.push( "Second" );
+        System.out.println( "Popped entry should be second: " + stack.pop() );
+
+        // Popping an empty stack will throw...
+        stack.pop();
+        stack.pop();
+    }
+}
+---
+public class TestVolitileClass throws Exception{
+   public static void main(String[] args){
+      VolatileClass vc = new VolatileClass();
+      vc.mutex.acquire(); //will wait automatically if another class has the mutex
+                          //can be interrupted similarly to a Thread
+                          //use acquireUninterruptibly() to avoid that
+      vc.needsToBeSynched();
+      vc.mutex.release();
+   }
+}
+---
+import java.util.Comparator;
+import java.util.Arrays;
+
+public class Test {
+  public static void main(String[] args) {
+    String[] strings = {"Here", "are", "some", "sample", "strings", "to", "be", "sorted"};
+
+    Arrays.sort(strings, new Comparator<String>() {
+      public int compare(String s1, String s2) {
+        int c = s2.length() - s1.length();
+        if (c == 0)
+          c = s1.compareToIgnoreCase(s2);
+        return c;
+      }
+    });
+
+    for (String s: strings)
+      System.out.print(s + " ");
+  }
+}
+---
+public class CalculateE {
+    public static final double EPSILON = 1.0e-15;
+
+    public static void main(String[] args) {
+        long fact = 1;
+        double e = 2.0;
+        int n = 2;
+        double e0;
+        do {
+            e0 = e;
+            fact *= n++;
+            e += 1.0 / fact;
+        } while (Math.abs(e - e0) >= EPSILON);
+        System.out.printf("e = %.15f\n", e);
+    }
+}

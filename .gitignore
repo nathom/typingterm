@@ -1,5 +1,10 @@
 *.o
 typingtest
 /test
-/typingterm
+/tterm
 /test.c
+/err
+/strlist_test
+
+# Rust
+/target
