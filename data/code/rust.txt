@@ -1,154 +1,56 @@
-fn sq_sum(v: &[f64]) -> f64 {
-    v.iter().fold(0., |sum, &num| sum + num*num)
+fn leonardo(mut n0: u32, mut n1: u32, add: u32) -> impl std::iter::Iterator<Item = u32> {
+    std::iter::from_fn(move || {
+        let n = n0;
+        n0 = n1;
+        n1 += n + add;
+        Some(n)
+    })
 }
 
 fn main() {
-    let v = vec![3.0, 1.0, 4.0, 1.0, 5.5, 9.7];
-    println!("{}", sq_sum(&v));
-
-    let u : Vec<f64> = vec![];
-    println!("{}", sq_sum(&u));
-}
----
-use std::fs;
-
-fn main() {
-    let err = "File move error";
-    fs::rename("input.txt", "output.txt").ok().expect(err);
-    fs::rename("docs", "mydocs").ok().expect(err);
-    fs::rename("/input.txt", "/output.txt").ok().expect(err);
-    fs::rename("/docs", "/mydocs").ok().expect(err);
-}
----
-extern crate itertools;
-
-fn shuffle<T>(mut deck: Vec<T>) -> Vec<T> {
-    let index = deck.len() / 2;
-    let right_half = deck.split_off(index);
-    itertools::interleave(deck, right_half).collect()
-}
-
-fn main() {
-    for &size in &[8, 24, 52, 100, 1020, 1024, 10_000] {
-        let original_deck: Vec<_> = (0..size).collect();
-        let mut deck = original_deck.clone();
-        let mut iterations = 0;
-        loop {
-            deck = shuffle(deck);
-            iterations += 1;
-            if deck == original_deck {
-                break;
-            }
-        }
-        println!("{: >5}: {: >4}", size, iterations);
+    println!("First 25 Leonardo numbers:");
+    for i in leonardo(1, 1, 1).take(25) {
+        print!("{} ", i);
     }
-}
----
-use std::io::{self, Write};
-use std::fs::{remove_file,remove_dir};
-use std::path::Path;
-use std::{process,display};
-
-const FILE_NAME: &'static str = "output.txt";
-const DIR_NAME : &'static str = "docs";
-
-fn main() {
-    delete(".").and(delete("/"))
-               .unwrap_or_else(|e| error_handler(e,1));
-}
-
-
-fn delete<P>(root: P) -> io::Result<()>
-    where P: AsRef<Path>
-{
-    remove_file(root.as_ref().join(FILE_NAME))
-        .and(remove_dir(root.as_ref().join(DIR_NAME)))
-}
-
-fn error_handler<E: fmt::Display>(error: E, code: i32) -> ! {
-    let _ = writeln!(&mut io::stderr(), "{:?}", error);
-    process::exit(code)
-}
----
-extern crate rand;
-use rand::{thread_rng, Rng};
-
-fn main() {
-    let mut rng = thread_rng();
-    loop {
-        let num = rng.gen_range(0, 20);
-        if num == 10 {
-            println!("{}", num);
-            break;
-        }
-        println!("{}", rng.gen_range(0, 20));
+    println!();
+    println!("First 25 Fibonacci numbers:");
+    for i in leonardo(0, 1, 0).take(25) {
+        print!("{} ", i);
     }
+    println!();
 }
 ---
-extern crate autopilot;
-extern crate rand;
-use rand::Rng;
-
-const TWO_PI: f64 = std::f64::consts::PI * 2.0;
-fn sine_mouse_wave() -> Result<(), autopilot::mouse::MouseError> {
-    let screen_size = autopilot::screen::size();
-    let scoped_height = screen_size.height / 2.0 - 10.0;
-    for x in 0..screen_size.width as u64 {
-        let y = (scoped_height * ((TWO_PI * x as f64) / screen_size.width).sin() + scoped_height)
-            .round();
-        let duration: u64 = rand::thread_rng().gen_range(1, 3);
-        try!(autopilot::mouse::move_to(autopilot::geometry::Point::new(
-            x as f64,
-            y as f64
-        )));
-        std::thread::sleep(std::time::Duration::from_millis(duration));
-    }
-    Ok(())
-}
+use std::collections::HashSet;
 
 fn main() {
-    sine_mouse_wave().expect("Unable to move mouse");
-}
----
-fn ack(m: u64, n: u64) -> u64 {
-	match (m, n) {
-		(0, n) => n + 1,
-		(m, 0) => ack(m - 1, 1),
-		(m, n) => ack(m - 1, ack(m, n - 1)),
-	}
-}
----
-fn main() {
-    for num in fibonacci_sequence() {
-        println!("{}", num);
-    }
-}
+    let a: HashSet<_> = ["John", "Bob", "Mary", "Serena"]
+        .iter()
+        .collect();
+    let b = ["Jim", "Mary", "John", "Bob"]
+        .iter()
+        .collect();
 
-fn fibonacci_sequence() -> impl Iterator<Item = u64> {
-    let sqrt_5 = 5.0f64.sqrt();
-    let p = (1.0 + sqrt_5) / 2.0;
-    let q = 1.0 / p;
-    (0..1).chain((1..70).map(move |n| ((p.powi(n) + q.powi(n)) / sqrt_5 + 0.5) as u64))
+    let diff = a.symmetric_difference(&b);
+    println!("{:?}", diff);
 }
 ---
-extern crate num_iter;
-fn main() {
-    println!("Police Sanitation Fire");
-    println!("----------------------");
+struct DigitIter(usize, usize);
 
-    for police in num_iter::range_step(2, 7, 2) {
-        for sanitation in 1..8 {
-            for fire in 1..8 {
-                if police != sanitation
-                    && sanitation != fire
-                    && fire != police
-                    && police + fire + sanitation == 12
-                {
-                    println!("{:6}{:11}{:4}", police, sanitation, fire);
-                }
-            }
+impl Iterator for DigitIter {
+    type Item = usize;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.0 == 0 {
+            None
+        } else {
+            let ret = self.0 % self.1;
+            self.0 /= self.1;
+            Some(ret)
         }
     }
+}
+
+fn main() {
+    println!("{}", DigitIter(1234,10).sum::<usize>());
 }
 ---
 fn padovan(n: u64, x: u64) -> u64 {
@@ -170,158 +72,148 @@ fn main() {
     });
 }
 ---
-fn integral<F>(f: F, range: std::ops::Range<f64>, n_steps: u32) -> f64
-    where F: Fn(f64) -> f64
-{
-    let step_size = (range.end - range.start)/n_steps as f64;
-
-    let mut integral = (f(range.start) + f(range.end))/2.;
-    let mut pos = range.start + step_size;
-    while pos < range.end {
-        integral += f(pos);
-        pos += step_size;
+fn check_number(num: &Option<u8>) {
+    if num.is_none() {
+        println!("Number is: None");
+    } else {
+        println!("Number is: {}", num.unwrap());
     }
-    integral * step_size
 }
 
 fn main() {
-    println!("{}", integral(|x| x.powi(3), 0.0..1.0, 100));
-    println!("{}", integral(|x| 1.0/x, 1.0..100.0, 1000));
-    println!("{}", integral(|x| x, 0.0..5000.0, 5_000_000));
-    println!("{}", integral(|x| x, 0.0..6000.0, 6_000_000));
+    let mut possible_number: Option<u8> = None;
+    check_number(&possible_number);
+
+    possible_number = Some(31);
+    check_number(&possible_number);
 }
 ---
+extern crate rand;
+
+use rand::Rng;
+use std::f64::consts::PI;
+
+fn is_inside_circle((x, y): (f64, f64)) -> bool {
+    x * x + y * y <= 1.0
+}
+
+fn simulate<R: Rng>(rng: &mut R, samples: usize) -> f64 {
+    let mut count = 0;
+    for _ in 0..samples {
+        if is_inside_circle(rng.gen()) {
+            count += 1;
+        }
+    }
+    (count as f64) / (samples as f64)
+}
+
 fn main() {
-    let (mut abundant, mut deficient, mut perfect) = (0u32, 1u32, 0u32);
-    for i in 1..20_001 {
-        if let Some(divisors) = i.proper_divisors() {
-            let sum: u64 = divisors.iter().sum();
-            if sum < i {
-                deficient += 1
-            } else if sum > i {
-                abundant += 1
-            } else {
-                perfect += 1
+    let mut rng = rand::weak_rng();
+
+    println!("Real pi: {}", PI);
+
+    for samples in (3..9).map(|e| 10_usize.pow(e)) {
+        let estimate = 4.0 * simulate(&mut rng, samples);
+        let deviation = 100.0 * (1.0 - estimate / PI).abs();
+        println!("{:9}: {:<11} dev: {:.5}%", samples, estimate, deviation);
+    }
+}
+---
+use primes::{is_prime,factors_uniq};
+
+fn contains_its_prime_factors_all_over_7(n: u64) -> bool {
+    if n < 10 || is_prime(n) {
+        return false;
+    }
+    let strn = &n.to_string();
+    let pfacs = factors_uniq(n);
+    return pfacs.iter().all(|f| f > &9 && strn.contains(&f.to_string()));
+}
+
+fn main() {
+    let mut found = 0;
+    for n in 0..30_000_000 {
+        if contains_its_prime_factors_all_over_7(n) {
+            found += 1;
+            print!("{:12}{}", n, {if found % 10 == 0 {"\n"} else {""}});
+            if found == 20 {
+                break;
             }
         }
     }
-    println!("deficient:\t{:5}\nperfect:\t{:5}\nabundant:\t{:5}",
-             deficient, perfect, abundant);
 }
 ---
-#![feature(fs_walk)]
+#[derive(Clone)]
+struct Tree<T> {
+    left: Leaf<T>,
+    data: T,
+    right: Leaf<T>,
+}
 
-use std::fs;
-use std::path::Path;
+type Leaf<T> = Option<Box<Tree<T>>>;
+
+impl<T> Tree<T> {
+    fn root(data: T) -> Self {
+        Self { left: None, data, right: None }
+    }
+
+    fn leaf(d: T) -> Leaf<T> {
+        Some(Box::new(Self::root(d)))
+    }
+}
 
 fn main() {
-    for f in fs::walk_dir(&Path::new("/home/pavel/Music")).unwrap() {
-        let p = f.unwrap().path();
-        if p.extension().unwrap_or("".as_ref()) == "mp3" {
-            println!("{:?}", p);
+    let mut tree = Tree::root([4, 5, 6]);
+    tree.right = Tree::leaf([1, 2, 3]);
+    tree.left = Tree::leaf([7, 8, 9]);
+
+    let newtree = tree.clone();
+}
+---
+fn hofq(q: &mut Vec<u32>, x : u32) -> u32 {
+    let cur_len=q.len()-1;
+    let i=x as usize;
+    if i>cur_len {
+        q.reserve(i+1);
+        for j in (cur_len+1)..(i+1) {
+            let qj=(q[j-q[j-1] as usize]+q[j-q[j-2] as usize]) as u32;
+            q.push(qj);
         }
     }
+    q[i]
 }
----
+
 fn main() {
-    let numbers = [4, 65, 2, -31, 0, 99, 2, 83, 782, 1];
-    println!("{:?}\n", quick_sort(numbers.iter()));
-}
-
-fn quick_sort<T, E>(mut v: T) -> Vec<E>
-where
-    T: Iterator<Item = E>,
-    E: PartialOrd,
-{
-    match v.next() {
-        None => Vec::new(),
-
-        Some(pivot) => {
-            let (lower, higher): (Vec<_>, Vec<_>) = v.partition(|it| it < &pivot);
-            let lower = quick_sort(lower.into_iter());
-            let higher = quick_sort(higher.into_iter());
-            lower.into_iter()
-                .chain(core::iter::once(pivot))
-                .chain(higher.into_iter())
-                .collect()
-        }
+    let mut q_memo: Vec<u32>=vec![0,1,1];
+    let mut q=|i| {hofq(&mut q_memo, i)};
+    for i in 1..11 {
+        println!("Q({})={}", i, q(i));
     }
+    println!("Q(1000)={}", q(1000));
+    let q100001=q(100_000);
+    println!("Q(100000)={}", q100000);
+    let nless=(1..100_000).fold(0,|s,i|{if q(i+1)<q(i) {s+1} else {s}});
+    println!("Term is less than preceding term {} times", nless);
 }
 ---
-fn nthRoot(n: f64, A: f64) -> f64 {
-
-   let      p  =  1e-9_f64 ;
-   let mut x0  =     A / n ;
-
-   loop {
-      let mut x1 = ( (n-1.0) * x0 + A / f64::powf(x0, n-1.0) ) / n;
-      if (x1-x0).abs() < (x0*p).abs() { return x1 };
-      x0 = x1
-   }
-}
+let mut v = Vec::new();
+v.push(1);
+v.push(2);
+v.push(3);
+let v = vec![1,2,3];
+---
+use std::collections::VecDeque;
 
 fn main() {
-   println!("{}", nthRoot(3. , 8. ));
-}
----
-(0..10).filter_map(move |x| {
-    if x != 5 && true {
-        Some(x)
-    } else {
-        None
+    let mut queue = VecDeque::new();
+    queue.push_back("Hello");
+    queue.push_back("World");
+    while let Some(item) = queue.pop_front() {
+        println!("{}", item);
     }
-})
----
-fn compose<'a,F,G,T,U,V>(f: F, g: G) -> Box<Fn(T) -> V + 'a>
-    where F: Fn(U) -> V + 'a,
-          G: Fn(T) -> U + 'a,
-{
-   Box::new(move |x| f(g(x)))
-}
----
-fn strip_characters(original: &str, to_strip: &str) -> String {
-    let mut result = String::new();
-    for c in original.chars() {
-        if !to_strip.contains(c) {
-            result.push(c);
-        }
-    }
-    result
-}
----
-println!("{}",gcd(399,-3999));
-   println!("{}",gcd(0,3999));
-   println!("{}",gcd(13*13,13*29));
 
-3
-3999
-13
----
-extern crate time;
-
-use time::{at_utc, Timespec};
-
-fn main() {
-    let epoch = at_utc(Timespec::new(0, 0));
-    println!("{}", epoch.asctime());
-}
----
-fn main() {
-    print!("\x07");
-}
----
-use unicode_segmentation::UnicodeSegmentation;
-
-let output: String = "as⃝df̅".graphemes(true).rev().collect();
-assert_eq!(output, "f̅ds⃝a");
----
-fn main() {
-    let squares: Vec<_> = (1..11).map(|n| n * n).collect();
-    let is_square = |num| squares.binary_search(&num).is_ok();
-
-    for i in 1..101 {
-        let state = if is_square(i) { "open" } else { "closed" };
-        println!("Door {} is {}", i, state);
+    if queue.is_empty() {
+        println!("Yes, it is empty!");
     }
 }
 ---
@@ -339,201 +231,22 @@ pub struct CursorMut<'a, T: 'a> {
     list: &'a mut LinkedList<T>,
 }
 ---
-use std::char::from_u32;
-
 fn main() {
-    println!("{}", 'a' as u8);
-    println!("{}", 97 as char);
-
-    println!("{}", 'π' as u32);
-    println!("{}", from_u32(960).unwrap());
+    let now = chrono::Utc::now();
+    println!("{}", now.format("%Y-%m-%d"));
+    println!("{}", now.format("%A, %B %d, %Y"));
 }
 ---
 fn main() {
-    let fs: Vec<_> = (0..10).map(|i| {move || i*i} ).collect();
-    println!("7th val: {}", fs[7]());
-}
----
-fn primes(n: usize) -> impl Iterator<Item = usize> {
-    const START: usize = 2;
-    if n < START {
-        Vec::new()
-    } else {
-        let mut is_prime = vec![true; n + 1 - START];
-        let limit = (n as f64).sqrt() as usize;
-        for i in START..limit + 1 {
-            let mut it = is_prime[i - START..].iter_mut().step_by(i);
-            if let Some(true) = it.next() {
-                it.for_each(|x| *x = false);
-            }
-        }
-        is_prime
-    }
-    .into_iter()
-    .enumerate()
-    .filter_map(|(e, b)| if b { Some(e + START) } else { None })
-}
----
-use std::f32;
+    println!(
+        "Parse from plain decimal: {}",
+        "123".parse::<u32>().unwrap()
+    );
 
-fn harmonic_sum<F>(lo: usize, hi: usize, term: F) -> f32
-where
-    F: Fn(f32) -> f32,
-{
-    (lo..hi + 1).fold(0.0, |acc, item| acc + term(item as f32))
-}
-
-fn main() {
-    println!("{}", harmonic_sum(1, 100, |i| 1.0 / i));
-}
----
-#[derive(Copy, Clone, Debug)]
-enum Endianness {
-    Big, Little,
-}
-
-impl Endianness {
-    fn target() -> Self {
-        #[cfg(target_endian = "big")]
-        {
-            Endianness::Big
-        }
-        #[cfg(not(target_endian = "big"))]
-        {
-            Endianness::Little
-        }
-    }
-}
-
-fn main() {
-    println!("Word size: {} bytes", std::mem::size_of::<usize>());
-    println!("Endianness: {:?}", Endianness::target());
-}
----
-fn function(x: usize) {
-    print!("{};", x);
-}
-
-fn main() {
-    repeat(function, 4);
-}
----
-use rand::Rng;
-
-extern crate rand;
-
-fn main() {
-    let mut matrix = [[0u8; 10]; 10];
-    let mut rng = rand::thread_rng();
-
-    for row in matrix.iter_mut() {
-        for item in row.iter_mut() {
-        }
-    }
-
-    'outer: for row in matrix.iter() {
-        for &item in row.iter() {
-            print!("{:2} ", item);
-            if item == 20 { break 'outer }
-        }
-        println!();
-    }
-}
----
-fn is_harshad (n : u32) -> bool {
-    let sum_digits = n.to_string()
-                      .chars()
-                      .map(|c| c.to_digit(10).unwrap())
-                      .fold(0, |a, b| a+b);
-    n % sum_digits == 0
-}
-
-fn main() {
-    for i in (1u32..).filter(|num| is_harshad(*num)).take(20) {
-        println!("Harshad : {}", i);
-    }
-    for i in (1_001u32..).filter(|num| is_harshad(*num)).take(1) {
-        println!("First Harshad bigger than 1_000 : {}", i);
-    }
-}
----
-fn mod_inv(a: isize, module: isize) -> isize {
-  let mut mn = (module, a);
-  let mut xy = (0, 1);
-
-  while mn.1 != 0 {
-    xy = (xy.1, xy.0 - (mn.0 / mn.1) * xy.1);
-    mn = (mn.1, mn.0 % mn.1);
-  }
-
-  while xy.0 < 0 {
-    xy.0 += module;
-  }
-  xy.0
-}
-
-fn main() {
-  println!("{}", mod_inv(42, 2017))
-}
----
-let x = r#"
-    This is a "raw string literal," roughly equivalent to a heredoc.
-"#;
-
-let y = r##"
-  This string contains a #.
-"##;
----
-fn is_leap(year: i32) -> bool {
-    let factor = |x| year % x == 0;
-    factor(4) && (!factor(100) || factor(400))
-}
----
-#[derive(Serialize, Deserialize)]
-struct W { a: i32, b: i32 }
-
-#[derive(Serialize, Deserialize)]
-struct X(i32, i32);
-
-#[derive(Serialize, Deserialize)]
-struct Y(i32);
-
-#[derive(Serialize, Deserialize)]
-struct Z;
-
-#[derive(Serialize, Deserialize)]
-enum E {
-    W { a: i32, b: i32 },
-    X(i32, i32),
-    Y(i32),
-    Z,
-}
----
-fn check_number(num: &Option<u8>) {
-    if num.is_none() {
-        println!("Number is: None");
-    } else {
-        println!("Number is: {}", num.unwrap());
-    }
-}
-
-fn main() {
-    let mut possible_number: Option<u8> = None;
-    check_number(&possible_number);
-
-    possible_number = Some(31);
-    check_number(&possible_number);
-}
----
-fn strip_characters(original: &str, to_strip: &str) -> String {
-    original
-        .chars()
-        .filter(|&c| !to_strip.contains(c))
-        .collect()
-}
-
-fn strip_characters(original: &str, to_strip: &str) -> String {
-    original.split(|c| to_strip.contains(c)).collect()
+    println!(
+        "Parse with a given radix (2-36 supported): {}",
+        u32::from_str_radix("deadbeef", 16).unwrap()
+    );
 }
 ---
 fn main() {
@@ -547,6 +260,716 @@ fn main() {
     );
 }
 ---
+fn main() {
+    let exts = ["zip", "rar", "7z", "gz", "archive", "A##", "tar.bz2"];
+    let filenames = [
+        "MyData.a##",
+        "MyData.tar.Gz",
+        "MyData.gzip",
+        "MyData.7z.backup",
+        "MyData...",
+        "MyData",
+        "MyData_v1.0.tar.bz2",
+        "MyData_v1.0.bz2",
+    ];
+
+    println!("extenstions: {:?}\n", exts);
+
+    for filename in filenames.iter() {
+        let check = exts.iter().any(|ext| {
+            filename
+                .to_lowercase()
+                .ends_with(&format!(".{}", ext.to_lowercase()))
+        });
+        println!("{:20} {}", filename, check);
+    }
+}
+---
+extern crate num;
+use num::complex::Complex;
+
+fn main() {
+    let a = Complex {re:-4.0, im: 5.0};
+    let b = Complex::new(1.0, 1.0);
+
+    println!("   a    = {}", a);
+    println!("   b    = {}", b);
+    println!(" a + b  = {}", a + b);
+    println!(" a * b  = {}", a * b);
+    println!(" 1 / a  = {}", a.inv());
+    println!("  -a    = {}", -a);
+    println!("conj(a) = {}", a.conj());
+}
+---
+use std::f64::consts::*;
+
+fn main() {
+    let mut x = E;
+    x += PI;
+    x = x.sqrt();
+    x = x.ln();
+    x = x.ceil();
+    x = x.exp();
+    x = x.abs();
+    x = x.floor();
+    x = x.powf(x);
+
+    assert_eq!(x, 4.0);
+}
+---
+use std::fs::File;
+use std::io::Read;
+
+use reqwest::blocking::Client;
+use reqwest::Identity;
+
+fn main() -> std::io::Result<()> {
+    let identity = {
+        let mut buf = Vec::new();
+
+        File::open("badssl.com-client.p12")?.read_to_end(&mut buf)?;
+
+        Identity::from_pkcs12_der(&buf, "badssl.com").unwrap()
+    };
+
+    let client = Client::builder().identity(identity).build().unwrap();
+    let response = client.get("https://client.badssl.com/").send().unwrap();
+
+    if !response.status().is_success() {
+        eprintln!("HTTP error requesting URL: {}", response.status());
+    }
+
+    println!("Got response from server: {}", response.text().unwrap());
+
+    Ok(())
+}
+---
+name: myapp
+version: "1.0"
+author: A Rust Developer <rustme@home.com>
+about: Does awesome things
+args:
+  - STRING1:
+      about: First string to use
+      required: true
+      index: 1
+  - STRING2:
+      about: Second string to use
+      required: true
+      index: 2
+  - SEPARATOR:
+      about: Separtor to use
+      required: true
+      index: 3
+---
+fn main() {
+    let contents = std::fs::read("input.txt").expect("error reading input.txt");
+    std::fs::write("output.txt", contents).expect("error writing output.txt");
+}
+---
+trait Eatable {
+    fn eat();
+}
+
+struct FoodBox<T: Eatable> {
+    _data: Vec<T>,
+}
+
+impl<T: Eatable> FoodBox<T> {
+    fn new() -> FoodBox<T> {
+        FoodBox::<T> { _data: Vec::<T>::new() }
+    }
+}
+
+struct Banana {}
+
+impl Eatable for Banana {
+    fn eat() {}
+}
+
+impl Eatable for char {
+    fn eat() {}
+}
+
+fn main() {
+    let _fb1 = FoodBox::<Banana>::new();
+
+    let _fb2 = FoodBox::<char>::new();
+
+}
+---
+extern crate hyper;
+
+use std::io::Read;
+use hyper::client::Client;
+
+fn main() {
+    let client = Client::new();
+    let mut resp = client.get("http://rosettacode.org").send().unwrap();
+    let mut body = String::new();
+    resp.read_to_string(&mut body).unwrap();
+    println!("{}", body);
+}
+---
+fn main() {
+    let x = 7.125;
+
+    println!("{:9}", x);
+    println!("{:09}", x);
+    println!("{:9}", -x);
+    println!("{:09}", -x);
+}
+---
+extern crate libc;
+
+fn main() {
+    let istty = unsafe { libc::isatty(libc::STDIN_FILENO as i32) } != 0;
+    if istty {
+        println!("stdout is tty");
+    } else {
+        println!("stdout is not tty");
+    }
+}
+---
+use std::collections::HashMap;
+
+fn main() {
+    let mut original = HashMap::new();
+    original.insert("name", "Rocket Skates");
+    original.insert("price", "12.75");
+    original.insert("color", "yellow");
+
+    let mut update = HashMap::new();
+    update.insert("price", "15.25");
+    update.insert("color", "red");
+    update.insert("year", "1974");
+
+    original.extend(&update);
+
+    println!("{:#?}", original);
+}
+---
+fn aks_coefficients(k: usize) -> Vec<i64> {
+	if k == 0 {
+		vec![1i64]
+	} else {
+		let zero = Some(0i64);
+		range(1, k).fold(vec![1i64, -1], |r, _| {
+			let a = r.iter().chain(zero.iter());
+			let b = zero.iter().chain(r.iter());
+			a.zip(b).map(|(x, &y)| x-y).collect()
+		})
+	}
+}
+---
+extern crate time;
+
+use time::Date;
+
+fn main() {
+    (2000..=2099)
+        .filter(|&year| is_long_year(year))
+        .for_each(|year| println!("{}", year));
+}
+
+fn is_long_year(year: i32) -> bool {
+    Date::try_from_ymd(year, 12, 28).map_or(false, |date| date.week() == 53)
+}
+---
+fn main() {
+    let array = ["foo", "bar", "baz", "biff"];
+    println!("the array has {} elements", array.len());
+}
+---
+fn pancake(n: i32) -> i32 {
+    let mut gap = 2;
+    let mut sum = 2;
+    let mut adj = -1;
+
+    while sum < n {
+        adj += 1;
+        gap = gap * 2 - 1;
+        sum += gap;
+    }
+
+    n + adj
+}
+
+fn main() {
+    for i in 0..4 {
+        for j in 1..6 {
+            let n = i * 5 + j;
+            print!("p({:2}) = {:2}  ", n, pancake(n));
+        }
+        println!();
+    }
+}
+---
+use std::net::ToSocketAddrs;
+
+fn main() {
+    let host = "www.kame.net";
+    let host_port = (host, 0);
+    let ip_iter = host_port.to_socket_addrs().unwrap();
+
+
+    for ip_port in ip_iter {
+        println!("{}", ip_port.ip());
+    }
+}
+---
+use std::collections::VecDeque;
+fn main() {
+    let mut stack = VecDeque::new();
+    stack.push_back("Element1");
+    stack.push_back("Element2");
+    stack.push_back("Element3");
+
+    assert_eq!(Some(&"Element1"), stack.front());
+    assert_eq!(Some("Element1"), stack.pop_front());
+    assert_eq!(Some("Element2"), stack.pop_front());
+    assert_eq!(Some("Element3"), stack.pop_front());
+    assert_eq!(None, stack.pop_front());
+}
+---
+use std::cmp::{Ord, Eq};
+
+fn jort_sort<T: Ord + Eq + Clone>(array: Vec<T>) -> bool {
+    let mut sorted_array = array.to_vec();
+    sorted_array.sort();
+
+    for i in 0..array.len() {
+        if array[i] != sorted_array[i] {
+            return false;
+        }
+    }
+
+    return true;
+}
+---
+mod pagesieve;
+
+use pagesieve::{count_primes_paged, primes_paged};
+
+fn main() {
+    println!("First 20 primes:\n {:?}",
+             primes_paged().take(20).collect::<Vec<_>>());
+    println!("Primes between 100 and 150:\n {:?}",
+             primes_paged().skip_while(|&x| x < 100)
+                           .take_while(|&x| x < 150)
+                           .collect::<Vec<_>>());
+    let diff = count_primes_paged(8000) - count_primes_paged(7700);
+    println!("There are {} primes between 7,700 and 8,000", diff);
+    println!("The 10,000th prime is {}", primes_paged().nth(10_000 - 1).unwrap());
+}
+---
+mod ulam;
+use ulam::*;
+
+fn main() {
+    print!("{}", Ulam::new(9, 1, '\0'));
+    print!("{}", Ulam::new(9, 1, '*'));
+}
+---
+use itertools::Itertools;
+
+fn split_text(s: &str) -> String {
+    let mut r = Vec::new();
+    for (_, group) in &s.chars().chunk_by(|e| *e) {
+        r.push(group.collect::<String>())
+    }
+
+    r.join(", ")
+}
+
+fn main() {
+    println!("output string: {}", split_text("gHHH5YY++///\\"));
+}
+---
+fn ones(len: u32) -> Vec<u32> {
+    vec![1; len as usize]
+}
+
+fn sequence(len: u32) -> Vec<u32> {
+    (1..=len).collect()
+}
+
+fn random(mut rng: &mut rand::rngs::ThreadRng, len: u32) -> Vec<u32> {
+    use rand::seq::SliceRandom;
+
+    let mut seq = sequence(len);
+    seq.shuffle(&mut rng);
+
+    seq
+}
+---
+2.3
+3.
+2f64
+1_000.2_f32
+---
+use std::error::Error;
+use std::num::ParseIntError;
+use csv::{Reader, Writer};
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut reader = Reader::from_path("data.csv")?;
+    let mut writer = Writer::from_path("output.csv")?;
+
+    let mut headers = reader.headers()?.clone();
+    headers.push_field("SUM");
+    writer.write_record(headers.iter())?;
+
+    for row in reader.records() {
+        let mut row = row?;
+
+        let sum: Result<_, ParseIntError> = row.iter().try_fold(0, |accum, s| {
+            Ok(accum + s.parse::<i64>()?)
+        });
+
+        row.push_field(&sum?.to_string());
+        writer.write_record(row.iter())?;
+    }
+
+    writer.flush()?;
+    Ok(())
+}
+---
+use std::process::Command;
+fn main() {
+    let output = Command::new("ls").output().unwrap_or_else(|e| {
+        panic!("failed to execute process: {}", e)
+    });
+    println!("{}", String::from_utf8_lossy(&output.stdout));
+}
+---
+use std::collections::HashMap;
+
+fn main() {
+    let keys = ["a", "b", "c"];
+    let values = [1, 2, 3];
+
+    let hash = keys.iter().zip(values.iter()).collect::<HashMap<_, _>>();
+    println!("{:?}", hash);
+}
+---
+use std::collections::HashSet;
+
+fn main() {
+  let a = vec![1, 3, 4].into_iter().collect::<HashSet<i32>>();
+  let b = vec![3, 5, 6].into_iter().collect::<HashSet<i32>>();
+
+  println!("Set A: {:?}", a.iter().collect::<Vec<_>>());
+  println!("Set B: {:?}", b.iter().collect::<Vec<_>>());
+  println!("Does A contain 4? {}", a.contains(&4));
+  println!("Union: {:?}", a.union(&b).collect::<Vec<_>>());
+  println!("Intersection: {:?}", a.intersection(&b).collect::<Vec<_>>());
+  println!("Difference: {:?}", a.difference(&b).collect::<Vec<_>>());
+  println!("Is A a subset of B? {}", a.is_subset(&b));
+  println!("Is A equal to B? {}", a == b);
+}
+---
+const LOWER: i32 = 1;
+const UPPER: i32 = 1000;
+
+const NUMBER_OF_TERMS: i32 = (UPPER + 1) - LOWER;
+fn main() {
+    println!("{}", (NUMBER_OF_TERMS * (LOWER + UPPER)) / 2);
+    println!("{}", (LOWER..UPPER + 1).fold(0, |sum, x| sum + x));
+}
+---
+fn main() {
+    let m = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    println!("Matrix:\n{}", matrix_to_string(&m));
+    let t = matrix_transpose(m);
+    println!("Transpose:\n{}", matrix_to_string(&t));
+}
+
+fn matrix_to_string(m: &Vec<Vec<i32>>) -> String {
+    m.iter().fold("".to_string(), |a, r| {
+        a + &r
+            .iter()
+            .fold("".to_string(), |b, e| b + "\t" + &e.to_string())
+            + "\n"
+    })
+}
+
+fn matrix_transpose(m: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut t = vec![Vec::with_capacity(m.len()); m[0].len()];
+    for r in m {
+        for i in 0..r.len() {
+            t[i].push(r[i]);
+        }
+    }
+    t
+}
+---
+fn verse(name: &str) -> String {
+    let lower_name = name.to_lowercase();
+    let mut x = lower_name.clone();
+    x.replace_range(0..1, x[0..1].to_uppercase().as_str());
+    let y = if "AEIOU".contains(&x[0..=0]) {lower_name.as_str()} else {&x[1..]};
+    let b = if &x[0..1] == "B" {""} else {"b"};
+    let f = if &x[0..1] == "F" {""} else {"f"};
+    let m = if &x[0..1] == "M"{""} else {"m"};
+    return format!(r#"
+    {x}, {x}, bo-{b}{y}
+    Banana-fana fo-{f}{y}
+    Fee-fi-mo-{m}{y}
+    {x}!"#);
+}
+
+fn main() {
+    for name in ["gARY", "Earl", "Billy", "Felix", "Mary", "sHIRley"] {
+        println!("{}", verse(name));
+    }
+}
+---
+use std::collections::HashSet;
+use std::hash::Hash;
+
+fn remove_duplicate_elements_hashing<T: Hash + Eq>(elements: &mut Vec<T>) {
+    let set: HashSet<_> = elements.drain(..).collect();
+    elements.extend(set.into_iter());
+}
+
+fn remove_duplicate_elements_sorting<T: Ord>(elements: &mut Vec<T>) {
+    elements.sort_unstable();
+    elements.dedup();
+}
+
+fn main() {
+    let mut sample_elements = vec![0, 0, 1, 1, 2, 3, 2];
+    println!("Before removal of duplicates : {:?}", sample_elements);
+    remove_duplicate_elements_sorting(&mut sample_elements);
+    println!("After removal of duplicates : {:?}", sample_elements);
+}
+---
+fn c_n(n: u64) -> u64 {
+    match n {
+        0 => 1,
+        _ => c_n(n - 1) * 2 * (2 * n - 1) / (n + 1)
+    }
+}
+
+fn main() {
+    for i in 1..16 {
+        println!("c_n({}) = {}", i, c_n(i));
+    }
+}
+---
+fn step_up() {
+	while !step() {
+		step_up();
+	}
+}
+---
+fn gamma(N: u32) -> f64 {
+
+    return 1f64 / 2f64 - 1f64 / 3f64
+        + ((2..=N).map(|n| {
+            let power: u32 = 2u32.pow(n);
+            let mut sign: f64 = -1f64;
+            let mut term: f64 = 0f64;
+
+            for denominator in power..=(2 * power - 1) {
+                sign *= -1f64;
+                term += sign / f64::from(denominator);
+            }
+
+            return f64::from(n) * term;
+        }))
+        .sum::<f64>();
+}
+
+fn main() {
+    println!("{}", gamma(23));
+}
+---
+fn powerset_from_recursion() -> Vec<u32> {
+    let ps = powerset(123456789);
+
+    ps.into_iter().filter(|n| is_prime(*n)).collect()
+}
+
+fn powerset(digits: u32) -> Vec<u32> {
+    let (rem, quo) = (digits % 10, digits / 10);
+
+    if rem == 0 {
+        return vec![0];
+    }
+
+    let mut powerset = powerset(quo);
+    let new = powerset.clone().into_iter().map(|n| n * 10 + rem);
+    powerset.extend(new);
+
+    powerset
+}
+---
+let x = r#"
+    This is a "raw string literal," roughly equivalent to a heredoc.
+"#;
+
+let y = r##"
+  This string contains a #.
+"##;
+---
+10
+0b10
+0x10
+0o10
+1_000
+10_i32
+10i32
+---
+pub struct BitArray {
+    array: Vec<u32>,
+}
+
+impl BitArray {
+    pub fn new(size: usize) -> BitArray {
+        BitArray {
+            array: vec![0; (size + 31) / 32],
+        }
+    }
+    pub fn get(&self, index: usize) -> bool {
+        let bit = 1 << (index & 31);
+        (self.array[index >> 5] & bit) != 0
+    }
+    pub fn set(&mut self, index: usize, new_val: bool) {
+        let bit = 1 << (index & 31);
+        if new_val {
+            self.array[index >> 5] |= bit;
+        } else {
+            self.array[index >> 5] &= !bit;
+        }
+    }
+}
+---
+use std::rc::Rc;
+use std::cell::RefCell;
+
+fn main() {
+    let size = 3;
+
+    let mut v: Vec<String> = vec![String::new(); size];
+    v[0].push('a');
+    println!("{:?}", v);
+
+    let mut v: Vec<String> = (0..size).map(|i| i.to_string()).collect();
+    v[0].push('a');
+    println!("{:?}", v);
+
+    let v: Vec<Rc<RefCell<String>>> = vec![Rc::new(RefCell::new(String::new())); size];
+    v[0].borrow_mut().push('a');
+    println!("{:?}", v);
+}
+---
+fn digit_square_sum(mut num: usize) -> usize {
+    let mut sum = 0;
+    while num != 0 {
+        sum += (num % 10).pow(2);
+        num /= 10;
+    }
+    sum
+}
+
+fn last_in_chain(num: usize) -> usize {
+    match num {
+        1 | 89 => num,
+        _ => last_in_chain(digit_square_sum(num)),
+    }
+}
+
+fn main() {
+    let count = (1..100_000_000).filter(|&n| last_in_chain(n) == 89).count();
+    println!("{}", count);
+}
+---
+#![crate_type = "cdylib"]
+
+extern crate libc;
+
+use std::ffi::CString;
+
+use libc::{c_char, c_int, size_t};
+
+#[no_mangle]
+#[allow(non_snake_case)]
+#[allow(clippy::missing_safety_doc)]
+pub unsafe extern "C" fn Query(data: *mut c_char, length: *mut size_t) -> c_int {
+    let string = "Here am I";
+    if *length + 1 < string.len() {
+        0
+    } else {
+        let c_string = CString::new(string).unwrap();
+        libc::strcpy(data, c_string.as_ptr());
+        1
+    }
+}
+---
+use std::net::{Shutdown, TcpListener};
+use std::thread;
+use std::io::Write;
+
+const RESPONSE: &'static [u8] = b"HTTP/1.1 200 OK\r
+Content-Type: text/html; charset=UTF-8\r\n\r
+<!DOCTYPE html><html><head><title>Bye-bye baby bye-bye</title>
+<style>body { background-color: #111 }
+h1 { font-size:4cm; text-align: center; color: black;
+text-shadow: 0 0 2mm red}</style></head>
+<body><h1>Goodbye, world!</h1></body></html>\r";
+
+
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
+
+    for stream in listener.incoming() {
+        thread::spawn(move || {
+            let mut stream = stream.unwrap();
+            match stream.write(RESPONSE) {
+                Ok(_) => println!("Response sent!"),
+                Err(e) => println!("Failed sending response: {}!", e),
+            }
+            stream.shutdown(Shutdown::Write).unwrap();
+        });
+    }
+}
+---
+fn binary_search<T:PartialOrd>(searchvalue: T, v: &[T] ) -> Option<usize> {
+    let mut lower = 0 as usize;
+    let mut upper = v.len();
+    while upper > lower {
+        let mid = lower + (upper - lower) / 2;
+        if v[mid] == searchvalue {
+            return Some(mid);
+        } else if searchvalue < v[mid] {
+            upper = mid;
+        } else {
+            lower = mid + 1;
+        }
+    }
+    None
+}
+---
+fn main() {
+    let mut n: i32 = 1024;
+    while n > 0 {
+        println!("{}", n);
+        n /= 2;
+    }
+}
+---
+fn main() {
+    let a1 = ["a", "b", "c"];
+    let a2 = ["A", "B", "C"];
+    let a3 = [1, 2, 3];
+
+    for ((&x, &y), &z) in a1.iter().zip(a2.iter()).zip(a3.iter()) {
+        println!("{}{}{}", x, y, z);
+    }
+}
+---
 let mut var07;
 let mut var08: f32;
 let mut var09 = 1.5;
@@ -557,153 +980,300 @@ var07 = var11;
 var08 = 3.1416f32;
 var08 = 2.7183f32;
 ---
-use std::{mem,ptr};
-
-fn main() {
-    let mut data: i32;
-
-    unsafe {data = mem::uninitialized()}
-
-    let address = &mut data as *mut _;
-
-    unsafe {ptr::write(address, 5)}
-    println!("{0:p}: {0}", &data);
-
-    unsafe {ptr::write(address, 6)}
-    println!("{0:p}: {0}", &data);
-
+struct Node<T> {
+    elem: T,
+    next: Option<Box<Node<T>>>,
 }
 ---
-serde = { version = "1.0.89", features = ["derive"] }
-bincode = "1.1.2"
-typetag = "0.1.1"
----
-extern crate reqwest;
-
-fn main() {
-    let response = match reqwest::blocking::get("https://sourceforge.net") {
-        Ok(response) => response,
-        Err(e) => panic!("error encountered while making request: {:?}", e),
-    };
-
-    println!("{}", response.text().unwrap());
-}
----
-fn main ( ) {
-	fn factor_sum(n: i32) -> i32 {
-	    let mut v = Vec::new();
-	    for  x in 1..n-1 {
-	    	if n%x == 0 {
-	    		v.push(x);
-	    	}
-	    }
-    let mut sum = v.iter().sum();
-    return sum;
-    }
-
-    fn perfect_nums(n: i32) {
-    	for x in 2..n {
-    		if factor_sum(x) == x {//call factor_sum on each value of x, if return value is = x
-    			println!("{} is a perfect number.", x);
-    		}
-    	}
-    }
-    perfect_nums(10000);
-}
----
-fn stoogesort<E>(a: &mut [E])
-    where E: PartialOrd
-{
-    let len = a.len();
-
-    if a.first().unwrap() > a.last().unwrap() {
-        a.swap(0, len - 1);
-    }
-    if len - 1 > 1 {
-        let t = len / 3;
-        stoogesort(&mut a[..len - 1]);
-        stoogesort(&mut a[t..]);
-        stoogesort(&mut a[..len - 1]);
-    }
+fn is_own_digits_power_sum(n: u32) -> bool {
+    let n_str = n.to_string();
+    n_str.chars()
+        .map(|c| {
+            let digit = c.to_digit(10).unwrap();
+            digit.pow(n_str.len() as u32)
+        })
+        .sum::<u32>()
+        == n
 }
 
 fn main() {
-    let mut numbers = vec![1_i32, 9, 4, 7, 6, 5, 3, 2, 8];
-    println!("Before: {:?}", &numbers);
-    stoogesort(&mut numbers);
-    println!("After: {:?}", &numbers);
+    let result: Vec<u32> = (10u32.pow(2)..10u32.pow(9))
+        .filter(|&n| is_own_digits_power_sum(n))
+        .collect();
+
+    println!("{:?}", result);
 }
 ---
-fn f(n: u32) -> u32 {
-    match n {
-        0 => 1,
-        _ => n - m(f(n - 1))
+use std::collections::BTreeSet;
+
+fn powerset<T: Ord + Clone>(mut set: BTreeSet<T>) -> BTreeSet<BTreeSet<T>> {
+    if set.is_empty() {
+        let mut powerset = BTreeSet::new();
+        powerset.insert(set);
+        return powerset;
+    }
+    let entry = set.iter().nth(0).unwrap().clone();
+    set.remove(&entry);
+    let mut powerset = powerset(set);
+    for mut set in powerset.clone().into_iter() {
+        set.insert(entry.clone());
+        powerset.insert(set);
+    }
+    powerset
+}
+
+fn main() {
+    let set = (1..5).collect();
+    let set = powerset(set);
+    println!("{:?}", set);
+
+    let set = ["a", "b", "c", "d"].iter().collect();
+    let set = powerset(set);
+    println!("{:?}", set);
+}
+---
+fn main() {
+    for i in 0..4 {
+        println!("\nN={}", i);
+        println!("{}", sierpinski_carpet(i));
     }
 }
 
-fn m(n: u32) -> u32 {
-    match n {
-        0 => 0,
-        _ => n - f(m(n - 1))
+fn sierpinski_carpet(n: u32) -> String {
+    let mut carpet = vec!["#".to_string()];
+    for _ in 0..n {
+        let mut top: Vec<_> = carpet.iter().map(|x| x.repeat(3)).collect();
+        let middle: Vec<_> = carpet
+            .iter()
+            .map(|x| x.to_string() + &x.replace("#", " ") + x)
+            .collect();
+        let bottom = top.clone();
+
+        top.extend(middle);
+        top.extend(bottom);
+        carpet = top;
+    }
+    carpet.join("\n")
+}
+---
+fn main() -> std::io::Result<()> {
+    print!("Enter temperature in Kelvin to convert: ");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    match input.trim().parse::<f32>() {
+        Ok(kelvin) => {
+            if kelvin < 0.0 {
+                println!("Negative Kelvin values are not acceptable.");
+            } else {
+                println!("{} K", kelvin);
+                println!("{} °C", kelvin - 273.15);
+                println!("{} °F", kelvin * 1.8 - 459.67);
+                println!("{} °R", kelvin * 1.8);
+            }
+        }
+
+        _ => println!("Could not parse the input to a number."),
+    }
+
+    Ok(())
+}
+---
+fn main() {
+    println!("The program is running");
+    return;
+    println!("This line won't be printed");
+}
+---
+extern crate libc;
+
+fn main() {
+    let istty = unsafe { libc::isatty(libc::STDOUT_FILENO as i32) } != 0;
+    if istty {
+        println!("stdout is tty");
+    } else {
+        println!("stdout is not tty");
+    }
+}
+---
+const MAX_N : u64 = 250;
+
+fn eulers_sum_of_powers() -> (usize, usize, usize, usize, usize) {
+    let pow5: Vec<u64> = (0..MAX_N).map(|i| i.pow(5)).collect();
+    let pow5_to_n = |pow| pow5.binary_search(&pow);
+
+    for x0 in 1..MAX_N as usize {
+        for x1 in 1..x0 {
+            for x2 in 1..x1 {
+                for x3 in 1..x2 {
+                    let pow_sum = pow5[x0] + pow5[x1] + pow5[x2] + pow5[x3];
+                    if let Ok(n) = pow5_to_n(pow_sum) {
+                        return (x0, x1, x2, x3, n)
+                    }
+                }
+            }
+        }
+    }
+
+    panic!();
+}
+
+fn main() {
+	let (x0, x1, x2, x3, y) = eulers_sum_of_powers();
+	println!("{}^5 + {}^5 + {}^5 + {}^5 == {}^5", x0, x1, x2, x3, y)
+}
+---
+use std::fs::File;
+use std::io::Write;
+
+fn main() -> std::io::Result<()> {
+    let data = "Sample text.";
+    let mut file = File::create("filename.txt")?;
+    write!(file, "{}", data)?;
+    Ok(())
+}
+---
+fn main() {
+    let isbns = ["978-0596528126", "978-0596528120", "978-1788399081", "978-1788399083"];
+    isbns.iter().for_each(|isbn| println!("{}: {}", isbn, check_isbn(isbn)));
+}
+
+fn check_isbn(isbn: &str) -> bool {
+    if isbn.chars().filter(|c| c.is_digit(10)).count() != 13 {
+            return false;
+    }
+    let checksum = isbn.chars().filter_map(|c| c.to_digit(10))
+        .zip([1, 3].iter().cycle())
+        .fold(0, |acc, (val, fac)| acc + val * fac);
+    checksum % 10 == 0
+}
+---
+use rand::Rng;
+
+extern crate rand;
+
+fn knuth_shuffle<T>(v: &mut [T]) {
+    let mut rng = rand::thread_rng();
+    let l = v.len();
+
+    for n in 0..l {
+        let i = rng.gen_range(0, l - n);
+        v.swap(i, l - n - 1);
     }
 }
 
 fn main() {
-    for i in (0..20).map(f) {
-        print!("{} ", i);
+    let mut v: Vec<_> = (0..10).collect();
+
+    println!("before: {:?}", v);
+    knuth_shuffle(&mut v);
+    println!("after:  {:?}", v);
+}
+---
+let mut x = 0;
+
+loop {
+    x += 1;
+    println!("{}", x);
+
+    if x % 6 == 0 { break; }
+}
+---
+use itertools::Itertools;
+use num::Num;
+
+fn is_sorted<T>(data: &Vec<&T>) -> bool where T: Num + Ord {
+    return data.windows(2).all(|pair| pair[0] <= pair[1]);
+}
+
+fn permsort<T>(arr: Vec<T>) -> Vec<T> where T: Num + Ord + Clone {
+    for perm in arr.iter().permutations(arr.len()) {
+        if is_sorted(&perm) {
+            return perm.iter().cloned().cloned().collect();
+        }
     }
-    println!("");
-
-    for i in (0..20).map(m) {
-        print!("{} ", i);
-    }
-    println!("")
-}
----
-let mut buffer = b"abcdef".to_vec();
-buffer.reverse();
-assert_eq!(buffer, b"fedcba");
----
-fn main() {
-    println!("new vec filtered: ");
-    let nums: Vec<i32> = (1..20).collect();
-    let evens: Vec<i32> = nums.iter().cloned().filter(|x| x % 2 == 0).collect();
-    println!("{:?}", evens);
-
-    println!("original vec filtered: ");
-    let mut nums: Vec<i32> = (1..20).collect();
-    nums.retain(|x| x % 2 == 0);
-    println!("{:?}", nums);
-}
----
-enum Fruits {
-    Apple,
-    Banana,
-    Cherry
-}
-
-enum FruitsWithNumbers {
-    Strawberry = 0,
-    Pear = 27,
+    unreachable!("No ordered permutation found");
 }
 
 fn main() {
-    println!("{}", FruitsWithNumbers::Pear as u8);
+    let x = [4, 6, 5, 3, 1, 8, 7, 9, 10, 2].to_vec();
+    println!("{:?}", permsort(x));
+    return ();
 }
 ---
 fn main() {
-    let mut sum = 0.0;
-    let mut prod = 1;
-    let mut recsum = 0.0;
-    for i in 1..11{
-        sum += i as f32;
-        prod *= i;
-        recsum += 1.0/(i as f32);
-    }
-    let avg = sum/10.0;
-    let gmean = (prod as f32).powf(0.1);
-    let hmean = 10.0/recsum;
-    println!("Average: {}, Geometric mean: {}, Harmonic mean: {}", avg, gmean, hmean);
-    assert!( ( (avg >= gmean) && (gmean >= hmean) ), "Incorrect calculation");
 
+    let true_value = true;
+    if true_value {
+        println!("foo is {}.", true_value);
+    }
+
+    let false_value = false;
+    if !false_value {
+        println!("bar is {}.", false_value);
+    }
+}
+---
+use num::BigUint;
+
+fn main() {
+    let bt = bell_triangle(51);
+    for i in 1..=15 {
+        println!("{}: {}", i, bt[i][0]);
+    }
+
+    println!("50: {}", bt[50][0])
+}
+
+fn bell_triangle(n: usize) -> Vec<Vec<BigUint>> {
+    let mut tri: Vec<Vec<BigUint>> = Vec::with_capacity(n);
+    for i in 0..n {
+        let v = vec![BigUint::from(0u32); i];
+        tri.push(v);
+    }
+    tri[1][0] = BigUint::from(1u32);
+
+    for i in 2..n {
+        tri[i][0] = BigUint::from_bytes_be(&tri[i - 1][i - 2].to_bytes_be());
+        for j in 1..i {
+            let added_big_uint = &tri[i][j - 1] + &tri[i - 1][j - 1];
+            tri[i][j] = BigUint::from_bytes_be(&added_big_uint.to_bytes_be());
+        }
+    }
+
+    tri
+}
+---
+fn main() {
+    println!("Sum: {}", (1..10).fold(0, |acc, n| acc + n));
+    println!("Product: {}", (1..10).fold(1, |acc, n| acc * n));
+    let chars = ['a', 'b', 'c', 'd', 'e'];
+    println!("Concatenation: {}",
+             chars.iter().map(|&c| (c as u8 + 1) as char).collect::<String>());
+}
+---
+extern crate chrono;
+use chrono::prelude::*;
+
+fn main() {
+   let utc: DateTime<Utc> = Utc::now();
+   println!("{}", utc.format("%d/%m/%Y %T"));
+}
+---
+use std::fs::OpenOptions;
+use std::io::Write;
+
+fn main() {
+    let file = OpenOptions::new().write(true).open("/dev/lp0").unwrap();
+    file.write(b"Hello, World!").unwrap();
+}
+---
+fn stripped(tostrip: &str) -> String {
+    return tostrip
+        .chars()
+        .filter(|c| !c.is_ascii_control() && c.is_ascii())
+        .collect();
+}
+
+fn main() {
+    println!("{}", stripped("\x08a\x00b\n\rc\x0cd\u{00c3}"));
 }

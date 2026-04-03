@@ -1,7 +1,732 @@
-#include <stdexcept>
+#include <string>
+using std::string;
+
 int main()
 {
-    throw std::runtime_error("boom");
+  string s = "Hello, world!";
+  string::size_type length = s.length();
+  string::size_type size = s.size();
+  string::size_type bytes = s.length() * sizeof(string::value_type);
+}
+---
+int main(void) {
+  for (N G(101N); G <= 101010N; ++G) std::cout << G << std::endl;
+  return 0;
+}
+---
+#include <iostream>
+
+int main()
+{
+  std::cout <<
+R"EOF(  A  raw  string  begins  with  R,  then a double-quote ("),  then an optional
+identifier (here I've used "EOF"),  then an opening parenthesis ('(').  If you
+use  an  identifier,  it  cannot  be longer than 16 characters,  and it cannot
+contain a space,  either opening or closing parentheses, a backslash, a tab, a
+vertical tab, a form feed, or a newline.
+
+  It  ends with a closing parenthesis (')'),  the identifer (if you used one),
+and a double-quote.
+
+  All  characters are okay in a raw string,  no escape sequences are necessary
+or recognized, and all whitespace is preserved.
+)EOF";
+}
+---
+#include <boost/asio.hpp>
+
+int main()
+{
+  boost::asio::io_context io_context;
+  boost::asio::ip::tcp::socket sock(io_context);
+  boost::asio::ip::tcp::resolver resolver(io_context);
+  boost::asio::ip::tcp::resolver::query query("localhost", "4321");
+
+  boost::asio::connect(sock, resolver.resolve(query));
+  boost::asio::write(sock, boost::asio::buffer("Hello world socket\r\n"));
+
+  return 0;
+}
+---
+#include <string>
+#include <iostream>
+
+int main() {
+   std::string s = "hello";
+   std::cout << s << " literal" << std::endl;
+   std::string s2 = s + " literal";
+   std::cout << s2 << std::endl;
+   return 0;
+}
+---
+#include <algorithm>
+#include <iostream>
+#include <string>
+
+struct entry {
+  std::string name;
+  std::string value;
+};
+
+int main() {
+  entry array[] = { { "grass", "green" }, { "snow", "white" },
+                    { "sky", "blue" }, { "cherry", "red" } };
+
+  std::cout << "Before sorting:\n";
+  for (const auto &e : array) {
+    std::cout << "{" << e.name << ", " << e.value << "}\n";
+  }
+
+  std::sort(std::begin(array), std::end(array),
+            [](const entry & a, const entry & b) {
+    return a.name < b.name;
+  });
+
+  std::cout << "After sorting:\n";
+  for (const auto &e : array) {
+    std::cout << "{" << e.name << ", " << e.value << "}\n";
+  }
+}
+---
+int noargs();
+int twoargs(int a,int b);
+int twoargs(int ,int);
+int anyargs(...);
+int atleastoneargs(int, ...);
+template<typename T> T declval(T);
+template<typename ...T> tuple<T...> make_tuple(T...);
+---
+#include <iostream>
+
+inline int p(int year) {
+    return (year + (year/4) - (year/100) + (year/400)) % 7;
+}
+
+bool is_long_year(int year) {
+    return p(year) == 4 || p(year - 1) == 3;
+}
+
+void print_long_years(int from, int to) {
+    for (int year = from, count = 0; year <= to; ++year) {
+        if (is_long_year(year)) {
+            if (count > 0)
+                std::cout << ((count % 10 == 0) ? '\n' : ' ');
+            std::cout << year;
+            ++count;
+        }
+    }
+}
+
+int main() {
+    std::cout << "Long years between 1800 and 2100:\n";
+    print_long_years(1800, 2100);
+    std::cout << '\n';
+    return 0;
+}
+---
+#include <iostream>
+#include <boost/multiprecision/cpp_int.hpp>
+
+template <typename T> T sum_multiples(T n, T m) {
+    n -= T(1);
+    n -= n % m;
+    return (n / m) * (m + n) / T(2);
+}
+
+template <typename T> T sum35(T n) {
+    return sum_multiples(n, T(3)) + sum_multiples(n, T(5)) -
+           sum_multiples(n, T(15));
+}
+
+int main() {
+    using big_int = boost::multiprecision::cpp_int;
+
+    std::cout << sum35(1000) << '\n';
+    std::cout << sum35(big_int("100000000000000000000")) << '\n';
+}
+---
+#include <iostream>
+#include <cmath>
+int SumDigits(const unsigned long long int digits, const int BASE = 10) {
+    int sum = 0;
+    unsigned long long int x = digits;
+    for (int i = log(digits)/log(BASE); i>0; i--){
+        const double z = std::pow(BASE,i);
+	  const unsigned long long int t = x/z;
+	  sum += t;
+	  x -= t*z;
+    }
+    return x+sum;
+}
+
+int main() {
+        std::cout << SumDigits(1) << ' '
+                  << SumDigits(12345) << ' '
+                  << SumDigits(123045) << ' '
+                  << SumDigits(0xfe, 16) << ' '
+                  << SumDigits(0xf0e, 16) << std::endl;
+        return 0;
+}
+---
+#include <iostream>
+
+int main()
+{
+  int dim1, dim2;
+  std::cin >> dim1 >> dim2;
+
+  double* array_data = new double[dim1*dim2];
+  double** array = new double*[dim1];
+  for (int i = 0; i < dim1; ++i)
+    array[i] = array_data + dim2*i;
+
+  array[0][0] = 3.5;
+
+  std::cout << array[0][0] << std::endl;
+
+  delete[] array;
+  delete[] array_data;
+
+  return 0;
+}
+---
+#include <iostream>
+
+bool gapful(int n) {
+    int m = n;
+    while (m >= 10)
+        m /= 10;
+    return n % ((n % 10) + 10 * (m % 10)) == 0;
+}
+
+void show_gapful_numbers(int n, int count) {
+    std::cout << "First " << count << " gapful numbers >= " << n << ":\n";
+    for (int i = 0; i < count; ++n) {
+        if (gapful(n)) {
+            if (i != 0)
+                std::cout << ", ";
+            std::cout << n;
+            ++i;
+        }
+    }
+    std::cout << '\n';
+}
+
+int main() {
+    show_gapful_numbers(100, 30);
+    show_gapful_numbers(1000000, 15);
+    show_gapful_numbers(1000000000, 10);
+    return 0;
+}
+---
+include <vector>
+#include <algorithm>
+#include <string>
+#include <iostream>
+
+int main( ) {
+   std::vector<std::string> myStrings { "prepended to" , "my string" } ;
+   std::string prepended = std::accumulate( myStrings.begin( ) ,
+	 myStrings.end( ) , std::string( "" ) , []( std::string a ,
+	    std::string b ) { return a + b ; } ) ;
+   std::cout << prepended << std::endl ;
+   return 0 ;
+}
+---
+#include <iostream>
+#include <thread>
+#include <chrono>
+int main()
+{
+    unsigned long microseconds;
+    std::cin >> microseconds;
+    std::cout << "Sleeping..." << std::endl;
+    std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
+    std::cout << "Awake!\n";
+}
+---
+#include <stdio.h>
+
+int f(float X, float Y, float x, float y, int n){
+return (x*x+y*y<4 && n<100)?1+f(X, Y, x*x-y*y+X, 2*x*y+Y, n+1):0;
+}
+
+main(){
+for(float j=1; j>=-1; j-=.015)
+for(float i=-2, x; i<=.5; i+=.015, x=f(i, j, 0, 0, 0))
+printf("%c%s", x<10?' ':x<20?'.':x<50?':':x<80?'*':'#', i>-2?" ":"\n");
+}
+---
+#ifndef INTERACTION_H
+#define INTERACTION_H
+#include <QWidget>
+
+class QPushButton ;
+class QLineEdit ;
+class QVBoxLayout ;
+class MyWidget : public QWidget {
+   Q_OBJECT
+
+public :
+   MyWidget( QWidget *parent = 0 ) ;
+private :
+   QLineEdit *entryField ;
+   QPushButton *increaseButton ;
+   QPushButton *randomButton ;
+   QVBoxLayout *myLayout ;
+private slots :
+   void doIncrement( ) ;
+   void findRandomNumber( ) ;
+} ;
+#endif
+---
+#include <iostream>
+
+int main(int argc, const char** args) {
+    cards::deck d;
+    d.shuffle();
+    std::cout << d;
+
+    return 0;
+}
+---
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main()
+{
+     long int integer_input;
+     string string_input;
+     cout << "Enter an integer:  ";
+     cin >> integer_input;
+     cout << "Enter a string:  ";
+     cin >> string_input;
+     return 0;
+}
+---
+template <typename T>
+struct Node
+{
+    Node* next;
+    Node* prev;
+    T data;
+};
+---
+T* p = new T[n];
+
+for(size_t i = 0; i != n; ++i)
+   p[i] = make_a_T();
+
+delete[] p;
+---
+#ifndef TASK_H
+#define TASK_H
+
+#include <QWidget>
+
+class QLabel ;
+class QLineEdit ;
+class QVBoxLayout ;
+class QHBoxLayout ;
+
+class EntryWidget : public QWidget {
+
+   Q_OBJECT
+public :
+   EntryWidget( QWidget *parent = 0 ) ;
+private :
+   QHBoxLayout *upperpart , *lowerpart ;
+   QVBoxLayout *entryLayout ;
+   QLineEdit *stringinput ;
+   QLineEdit *numberinput ;
+   QLabel *stringlabel ;
+   QLabel *numberlabel ;
+} ;
+
+#endif
+---
+#include <chrono>
+#include <ranges>
+#include <iostream>
+
+int main() {
+    std::cout << "Yuletide holidays must be allowed in the following years:\n";
+    for (int year : std::views::iota(2008, 2121)
+               | std::views::filter([](auto year) {
+                    if (std::chrono::weekday{
+                            std::chrono::year{year}/std::chrono::December/25}
+                            == std::chrono::Sunday) {
+                        return true;
+                    }
+                    return false;
+                })) {
+        std::cout << year << '\n';
+    }
+}
+---
+template<class UnaryFunction>
+void primesupto(int limit, UnaryFunction yield)
+{
+  std::vector<bool> is_prime(limit, true);
+
+  const int sqrt_limit = static_cast<int>(std::sqrt(limit));
+  for (int n = 2; n <= sqrt_limit; ++n)
+    if (is_prime[n]) {
+   yield(n);
+
+   for (unsigned k = n*n, ulim = static_cast<unsigned>(limit); k < ulim; k += n)
+     is_prime[k] = false;
+    }
+
+  for (int n = sqrt_limit + 1; n < limit; ++n)
+    if (is_prime[n])
+   yield(n);
+}
+---
+int main (){
+  fifteenSolver start(8,0xfe169b4c0a73d852);
+  start.Solve();
+}
+---
+#include <iostream>
+
+int main()
+{
+    int undefined;
+    if (undefined == 42)
+    {
+        std::cout << "42";
+    }
+
+    if (undefined != 42)
+    {
+        std::cout << "not 42";
+    }
+}
+---
+int a[5];
+a[0] = 1;
+
+int primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
+
+#include <string>
+std::string strings[4];
+---
+#include <boost/filesystem/operations.hpp>
+#include <ctime>
+#include <iostream>
+
+int main( int argc , char *argv[ ] ) {
+   if ( argc != 2 ) {
+      std::cerr << "Error! Syntax: moditime <filename>!\n" ;
+      return 1 ;
+   }
+   boost::filesystem::path p( argv[ 1 ] ) ;
+   if ( boost::filesystem::exists( p ) ) {
+      std::time_t t = boost::filesystem::last_write_time( p ) ;
+      std::cout << "On " << std::ctime( &t ) << " the file " << argv[ 1 ]
+	 << " was modified the last time!\n" ;
+      std::cout << "Setting the modification time to now:\n" ;
+      std::time_t n = std::time( 0 ) ;
+      boost::filesystem::last_write_time( p , n ) ;
+      t = boost::filesystem::last_write_time( p ) ;
+      std::cout << "Now the modification time is " << std::ctime( &t ) << std::endl ;
+      return 0 ;
+   } else {
+      std::cout << "Could not find file " << argv[ 1 ] << '\n' ;
+      return 2 ;
+   }
+}
+---
+#include <cassert>
+#include <iomanip>
+#include <iostream>
+
+int largest_proper_divisor(int n) {
+    assert(n > 0);
+    if ((n & 1) == 0)
+        return n >> 1;
+    for (int p = 3; p * p <= n; p += 2) {
+        if (n % p == 0)
+            return n / p;
+    }
+    return 1;
+}
+
+int main() {
+    for (int n = 1; n < 101; ++n) {
+        std::cout << std::setw(2) << largest_proper_divisor(n)
+            << (n % 10 == 0 ? '\n' : ' ');
+    }
+}
+---
+#include <iostream>
+#include <set>
+
+template<typename Set> std::set<Set> powerset(const Set& s, size_t n)
+{
+    typedef typename Set::const_iterator SetCIt;
+    typedef typename std::set<Set>::const_iterator PowerSetCIt;
+    std::set<Set> res;
+    if(n > 0) {
+        std::set<Set> ps = powerset(s, n-1);
+        for(PowerSetCIt ss = ps.begin(); ss != ps.end(); ss++)
+            for(SetCIt el = s.begin(); el != s.end(); el++) {
+                Set subset(*ss);
+                subset.insert(*el);
+                res.insert(subset);
+            }
+        res.insert(ps.begin(), ps.end());
+    } else
+        res.insert(Set());
+    return res;
+}
+template<typename Set> std::set<Set> powerset(const Set& s)
+{
+    return powerset(s, s.size());
+}
+---
+class N{
+  uint n,i,g,e,l;
+public:
+  N(uint n): n(n-1),i{},g{},e(1),l(n-1){}
+  bool hasNext(){
+    g=(1<<n)+e;for(i=l;i<n;++i) g+=1<<i;
+    if (l==2)             {l=--n; e=1; return true;}
+    if (e<((1<<(l-1))-1)) {++e;        return true;}
+                           e=1; --l;   return (l>0);
+  }
+  uint next() {return g;}
+};
+---
+#include <iostream>
+#include <vector>
+class Ham {
+private:
+	std::vector<unsigned int> _H, _hp, _hv, _x;
+public:
+	bool operator!=(const Ham& other) const {return true;}
+	Ham begin() const {return *this;}
+        Ham end() const {return *this;}
+	unsigned int operator*() const {return _x.back();}
+	Ham(const std::vector<unsigned int> &pfs):_H(pfs),_hp(pfs.size(),0),_hv({pfs}),_x({1}){}
+	const Ham& operator++() {
+	  for (int i=0; i<_H.size(); i++) for (;_hv[i]<=_x.back();_hv[i]=_x[++_hp[i]]*_H[i]);
+	  _x.push_back(_hv[0]);
+	  for (int i=1; i<_H.size(); i++) if (_hv[i]<_x.back()) _x.back()=_hv[i];
+	  return *this;
+	}
+};
+---
+#include <iostream>
+
+int main()
+{
+  int a, b;
+
+  if (!(std::cin >> a >> b)) {
+    std::cerr << "could not read the numbers\n";
+    return 1;
+  }
+
+  if (a < b)
+    std::cout << a << " is less than " << b << "\n";
+
+  if (a == b)
+    std::cout << a << " is equal to " << b << "\n";
+
+  if (a > b)
+    std::cout << a << " is greater than " << b << "\n";
+}
+---
+template<typename T>
+class tree {
+  T value;
+  tree *left;
+  tree *right;
+public:
+  void replace_all (T new_value);
+};
+---
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <iostream>
+#include <cstdlib>
+
+int main( int argc , char* argv[ ] ) {
+   using namespace boost::gregorian ;
+
+   greg_month months[ ] = { Jan , Feb , Mar , Apr , May , Jun , Jul ,
+      Aug , Sep , Oct , Nov , Dec } ;
+   greg_year gy = atoi( argv[ 1 ] ) ;
+   for ( int i = 0 ; i < 12 ; i++ ) {
+      last_day_of_the_week_in_month lwdm ( Friday , months[ i ] ) ;
+      date d = lwdm.get_date( gy ) ;
+      std::cout << d << std::endl ;
+   }
+   return 0 ;
+}
+---
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/rational.hpp>
+#include <iostream>
+#include <vector>
+
+typedef boost::rational<boost::multiprecision::int1024_t> rational;
+
+rational bernoulli(size_t n) {
+    auto out = std::vector<rational>();
+
+    for (size_t m = 0; m <= n; m++) {
+        out.emplace_back(1, (m + 1));
+        for (size_t j = m; j >= 1; j--) {
+            out[j - 1] = rational(j) * (out[j - 1] - out[j]);
+        }
+    }
+    return out[0];
+}
+
+int main() {
+    for (size_t n = 0; n <= 60; n += n >= 2 ? 2 : 1) {
+        auto b = bernoulli(n);
+        std::cout << "B(" << std::right << std::setw(2) << n << ") = ";
+        std::cout << std::right << std::setw(44) << b.numerator();
+        std::cout << " / " << b.denominator() << std::endl;
+    }
+
+    return 0;
+}
+---
+#ifndef HONEYCOMBWIDGET_H
+#define HONEYCOMBWIDGET_H
+
+#include <QWidget>
+#include <vector>
+
+class HoneycombWidget : public QWidget {
+    Q_OBJECT
+public:
+    HoneycombWidget(QWidget *parent = nullptr);
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+private:
+    struct Cell {
+        Cell(const QPolygon& p, int l, char ch)
+            : polygon(p), letter(l), character(ch), selected(false) {}
+        QPolygon polygon;
+        int letter;
+        char character;
+        bool selected;
+    };
+    std::vector<Cell> cells;
+};
+
+#endif
+---
+class MyClass
+{
+public:
+  void someMethod();
+  MyClass();
+private:
+  int variable;
+};
+
+MyClass::MyClass():
+  variable(0)
+{
+}
+
+void MyClass::someMethod()
+{
+  variable = 1;
+}
+
+MyClass instance;
+
+MyClass* pInstance = new MyClass;
+delete pInstance;
+---
+#include <iostream>
+
+int main()
+{
+  int square = 1, increment = 3;
+  for (int door = 1; door <= 100; ++door)
+  {
+    std::cout << "door #" << door;
+    if (door == square)
+    {
+      std::cout << " is open." << std::endl;
+      square += increment;
+      increment += 2;
+    }
+    else
+      std::cout << " is closed." << std::endl;
+  }
+  return 0;
+}
+---
+#include <iostream>
+#include <time.h>
+
+using namespace std;
+
+class stooge
+{
+public:
+    void sort( int* arr, int start, int end )
+    {
+        if( arr[start] > arr[end - 1] ) swap( arr[start], arr[end - 1] );
+	int n = end - start; if( n > 2 )
+	{
+	    n /= 3; sort( arr, start, end - n );
+	    sort( arr, start + n, end ); sort( arr, start, end - n );
+        }
+    }
+};
+int main( int argc, char* argv[] )
+{
+    srand( static_cast<unsigned int>( time( NULL ) ) ); stooge s; int a[80], m = 80;
+    cout << "before:\n";
+    for( int x = 0; x < m; x++ ) { a[x] = rand() % 40 - 20;  cout << a[x] << " "; }
+    s.sort( a, 0, m ); cout << "\n\nafter:\n";
+    for( int x = 0; x < m; x++ ) cout << a[x] << " "; cout << "\n\n";
+    return system( "pause" );
+}
+---
+#include <string>
+#include <iostream>
+#include <algorithm>
+
+int main() {
+  std::string s;
+  std::getline(std::cin, s);
+  std::reverse(s.begin(), s.end());
+  std::cout << s << '\n';
+}
+---
+#include <tr1/functional>
+#include <iostream>
+
+using namespace std;
+using namespace std::tr1;
+
+void first(function<void()> f)
+{
+  f();
+}
+
+void second()
+{
+  cout << "second\n";
+}
+
+int main()
+{
+  first(second);
 }
 ---
 #include <iostream>
@@ -23,43 +748,270 @@ int main ()
        return 0;
 }
 ---
-std::map<std::string, int> myDict;
-myDict["hello"] = 1;
-myDict["world"] = 2;
-myDict["!"] = 3;
+#include <iostream>
 
-for (std::map<std::string, int>::iterator it = myDict.begin(); it != myDict.end(); ++it) {
-    const std::string& key = it->first;
-    int& value = it->second;
-    std::cout << "key = " << key << ", value = " << value << std::endl;
+int main()
+{
+  int i;
+  for (i = 1; i<=10 ; i++){
+    std::cout << i;
+    if (i < 10)
+     std::cout << ", ";
+  }
+  return 0;
 }
 ---
-Widget spawning. There are now 1 Widgets instanciated.
-Widget spawning. There are now 2 Widgets instanciated.
-Widget dieing. There are now 1 Widgets instanciated.
-Widget spawning. There are now 2 Widgets instanciated.
-Widget dieing. There are now 1 Widgets instanciated.
-Widget dieing. There are now 0 Widgets instanciated.
+#include <gmpxx.h>
+
+struct menu_entry {
+    mpz_class amount;
+    std::string name;
+    mpf_class price;
+};
+
+int main() {
+    menu_entry menu[] = { 4000000000000000, "hamburgers", 5.50,
+                          2, "milkshakes", 2.86 };
+    mpf_class taxRate;
+    taxRate.set_str("0.0765", 10);
+    mpf_class total = 0;
+    for (menu_entry i : menu)
+        total += i.price * i.amount;
+    gmp_printf("total: €%.2Ff\n", total.get_mpf_t());
+    mpf_class tax = total * taxRate;
+    gmp_printf("tax: €%.2Ff\n", tax.get_mpf_t());
+    gmp_printf("total+tax: €%.2Ff\n", mpf_class{total+tax}.get_mpf_t());
+}
 ---
 #include <iostream>
 #include <string>
-#include <queue>
-#include <utility>
+#include <vector>
+
+std::vector<std::string> makeList(std::string separator) {
+  auto counter = 0;
+  auto makeItem = [&](std::string item) {
+    return std::to_string(++counter) + separator + item;
+  };
+  return {makeItem("first"), makeItem("second"), makeItem("third")};
+}
 
 int main() {
-  std::priority_queue<std::pair<int, std::string> > pq;
-  pq.push(std::make_pair(3, "Clear drains"));
-  pq.push(std::make_pair(4, "Feed cat"));
-  pq.push(std::make_pair(5, "Make tea"));
-  pq.push(std::make_pair(1, "Solve RC tasks"));
-  pq.push(std::make_pair(2, "Tax return"));
+  for (auto item : makeList(". "))
+    std::cout << item << "\n";
+}
+---
+#include <iostream>
+#include <string>
+#include <vector>
 
-  while (!pq.empty()) {
-    std::cout << pq.top().first << ", " << pq.top().second << std::endl;
-    pq.pop();
+int main() {
+    std::string simple_string = "This is a simple string";
+    char letter = 'A';
+    std::cout << simple_string << "    " << letter << std::endl;
+
+    std::string multiline_string = R"(
+            An example of multi-line string.
+                Text formatting is preserved.
+            This is a raw string literal, introduced in C++ 11.)";
+    std::cout << multiline_string << std::endl;
+
+    const int block_length = 64;
+    std::cout << "block length = " << block_length << std::endl;
+
+    std::vector<double> state = { 1.0, 2.0, 3.0 };
+}
+---
+template<typename T> void swap(T& left, T& right)
+{
+  T tmp(left);
+  left = right;
+  right = tmp;
+}
+---
+class Abs {
+public:
+	virtual int method1(double value) = 0;
+	virtual int add(int a, int b){
+		return a+b;
+	}
+};
+---
+#include <boost/multiprecision/gmp.hpp>
+#include <iostream>
+
+using namespace boost::multiprecision;
+
+mpz_int p(uint n, uint p) {
+    mpz_int r = 1;
+    mpz_int k = n - p;
+    while (n > k)
+        r *= n--;
+    return r;
+}
+
+mpz_int c(uint n, uint k) {
+    mpz_int r = p(n, k);
+    while (k)
+        r /= k--;
+    return r;
+}
+
+int main() {
+    for (uint i = 1u; i < 12u; i++)
+        std::cout << "P(12," << i << ") = " << p(12u, i) << std::endl;
+    for (uint i = 10u; i < 60u; i += 10u)
+        std::cout << "C(60," << i << ") = " << c(60u, i) << std::endl;
+
+    return 0;
+}
+---
+#if !defined __TESTER_H__
+#define __TESTER_H__
+
+#include <iostream>
+
+namespace rosetta
+  {
+  namespace catalanNumbers
+    {
+
+    template <int N, typename A>
+    class Test
+      {
+      public:
+        static void Do()
+          {
+          A algorithm;
+          for(int i = 0; i <= N; i++)
+            std::cout<<"C("<<i<<")\t= "<<algorithm(i)<<std::endl;
+          }
+      };
+
+    }
   }
 
+#endif
+---
+int main() {
+  NG_4 a1(2,1,0,2);
+  r2cf n1(13,11);
+  for(NG n(&a1, &n1); n.moreTerms(); std::cout << n.nextTerm() << " ");
+  std::cout << std::endl;
   return 0;
+}
+---
+#include<string>
+#include<iostream>
+
+auto split(const std::string& input, const std::string& delim){
+	std::string res;
+	for(auto ch : input){
+		if(!res.empty() && ch != res.back())
+			res += delim;
+		res += ch;
+	}
+	return res;
+}
+
+int main(){
+	std::cout << split("gHHH5  ))YY++,,,///\\", ", ") << std::endl;
+}
+---
+#include <iostream>
+class U0 {};
+class U1 {};
+
+void baz(int i)
+{
+    if (!i) throw U0();
+    else throw U1();
+}
+void bar(int i) { baz(i); }
+
+void foo()
+{
+    for (int i = 0; i < 2; i++)
+    {
+        try {
+            bar(i);
+        } catch(U0 e) {
+		std::cout<< "Exception U0 caught\n";
+        }
+    }
+}
+
+int main() {
+    foo();
+    std::cout<< "Should never get here!\n";
+    return 0;
+}
+---
+#include <algorithm>
+
+template<typename ForwardIterator>
+ void permutation_sort(ForwardIterator begin, ForwardIterator end)
+{
+  while (std::next_permutation(begin, end))
+  {
+  }
+}
+---
+#include <iostream>
+#include <iterator>
+
+int main() {
+    using namespace std;
+    noskipws(cin);
+    copy(
+        istream_iterator<char>(cin),
+        istream_iterator<char>(),
+        ostream_iterator<char>(cout)
+    );
+    return 0;
+}
+---
+#include <cstdlib>
+#include <cstdio>
+
+int main()
+{
+   puts(getenv("HOME"));
+   return 0;
+}
+---
+template<class InputIterator, class InputIterator2>
+void writedat(const char* filename,
+              InputIterator xbegin, InputIterator xend,
+              InputIterator2 ybegin, InputIterator2 yend,
+              int xprecision=3, int yprecision=5)
+{
+  std::ofstream f;
+  f.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+  f.open(filename);
+  for ( ; xbegin != xend and ybegin != yend; ++xbegin, ++ybegin)
+    f << std::setprecision(xprecision) << *xbegin << '\t'
+      << std::setprecision(yprecision) << *ybegin << '\n';
+}
+---
+#include <boost/asio.hpp>
+#include <iostream>
+
+int main() {
+  int rc {EXIT_SUCCESS};
+  try {
+    boost::asio::io_service io_service;
+    boost::asio::ip::tcp::resolver resolver {io_service};
+    auto entries = resolver.resolve({"www.kame.net", ""});
+    boost::asio::ip::tcp::resolver::iterator entries_end;
+    for (; entries != entries_end; ++entries) {
+      std::cout << entries->endpoint().address() << std::endl;
+    }
+  }
+  catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    rc = EXIT_FAILURE;
+  }
+  return rc;
 }
 ---
 #include <cstdio>
@@ -73,530 +1025,118 @@ int main()
     return 0;
 }
 ---
-template<typename Number>
-  Number multiply(Number a, Number b)
-{
-   return a*b;
-}
----
 #include <iostream>
 #include <string>
 
-int main( ) {
-   std::string original ("This is the original");
-   std::string my_copy = original;
-   std::cout << "This is the copy: " << my_copy << std::endl;
-   original = "Now we change the original! ";
-   std::cout << "my_copy still is " << my_copy << std::endl;
-}
----
-#include <iostream>
-using namespace std;
-void f(int &y) /* variable is now passed by reference */
-{
-y++;
-}
 int main()
 {
-int x = 0;
-cout<<"x = "<<x<<endl; /* should produce result "x = 0" */
-f(x);                  /* call function f */
-cout<<"x = "<<x<<endl; /* should produce result "x = 1" */
-}
----
-#include <chrono>
-#include <iostream>
+  std::string s = "0123456789";
 
-int main() {
-    std::cout << "The dates of the last Friday in each month of 2023:" << std::endl;
-    using namespace std::literals;
-    for ( auto ymd = std::chrono::Friday[std::chrono::last]/1/2023;
-               ymd.year() < 2024y;
-               ymd += std::chrono::months{1} )
-        std::cout << std::chrono::sys_days{ymd} << '\n';
-}
----
-int main() {
-  NG_4 a4(1,0,0,4);
-  r2cf n4(22,7);
-  for(NG n(&a4, &n4); n.moreTerms(); std::cout << n.nextTerm() << " ");
-  std::cout << std::endl;
-  return 0;
-}
----
-#include <algorithm>
-#include <iostream>
-#include <string>
+  int const n = 3;
+  int const m = 4;
+  char const c = '2';
+  std::string const sub = "456";
 
-void comb(int N, int K)
-{
-    std::string bitmask(K, 1); // K leading 1's
-    bitmask.resize(N, 0); // N-K trailing 0's
-
-    do {
-        for (int i = 0; i < N; ++i)
-        {
-            if (bitmask[i]) std::cout << " " << i;
-        }
-        std::cout << std::endl;
-    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-}
-
-int main()
-{
-    comb(5, 3);
-}
----
-#include <boost/asio.hpp>
-
-int main()
-{
-  boost::asio::io_context io_context;
-  boost::asio::ip::tcp::socket sock(io_context);
-  boost::asio::ip::tcp::resolver resolver(io_context);
-  boost::asio::ip::tcp::resolver::query query("localhost", "4321");
-
-  boost::asio::connect(sock, resolver.resolve(query));
-  boost::asio::write(sock, boost::asio::buffer("Hello world socket\r\n"));
-
-  return 0;
+  std::cout << s.substr(n, m)<< "\n";
+  std::cout << s.substr(n) << "\n";
+  std::cout << s.substr(0, s.size()-1) << "\n";
+  std::cout << s.substr(s.find(c), m) << "\n";
+  std::cout << s.substr(s.find(sub), m) << "\n";
 }
 ---
 #include <iostream>
+#include <numbers>
 
-template <int n> struct fibo
-{
-    enum {value=fibo<n-1>::value+fibo<n-2>::value};
-};
-
-template <> struct fibo<0>
-{
-    enum {value=0};
-};
-
-template <> struct fibo<1>
-{
-    enum {value=1};
-};
-
-
-int main(int argc, char const *argv[])
-{
-    std::cout<<fibo<12>::value<<std::endl;
-    std::cout<<fibo<46>::value<<std::endl;
-    return 0;
+double area_circle(const double& radius) {
+	return (std::numbers::pi * radius * radius);
 }
----
-#ifndef ANIMATIONWIDGET_H
-#define ANIMATIONWIDGET_H
 
-#include <QWidget>
-
-class AnimationWidget : public QWidget {
-    Q_OBJECT
-public:
-    AnimationWidget(QWidget *parent = nullptr);
-protected:
-    void mousePressEvent(QMouseEvent *event) override;
-private:
-    bool right_ = true;
-};
-
-#endif
----
 int main() {
-  NG_4 a5(0,1,1,0);
-  SQRT2 n5;
-  int i = 0;
-  for(NG n(&a5, &n5); n.moreTerms() and i++ < 20; std::cout << n.nextTerm() << " ");
-  std::cout << "..." << std::endl;
-  for(r2cf cf(10000000, 14142136); cf.moreTerms(); std::cout << cf.nextTerm() << " ");
-  std::cout << std::endl;
-  return 0;
+	double radius;
+	std::cout << "Enter the radius of a circle in centimetres: ";
+	std::cin >> radius;
+
+	std::cout << "The area of the circle is " << area_circle(radius) << " cm\u00b2" << "\n";
 }
 ---
 #include <iostream>
 #include <cmath>
-#include <iomanip>
 
-using namespace std;
+#ifdef M_E
+static double euler_e = M_E;
+#else
+static double euler_e = std::exp(1);
+#endif
 
-int main() {
-    double oldPhi = 1.0, phi = 1.0, limit = 1e-5;
-    int iters = 0;
-    while (true) {
-        phi = 1.0 + 1.0 / oldPhi;
-        iters++;
-        if (abs(phi - oldPhi) <= limit) break;
-        oldPhi = phi;
-    }
-    cout.setf(ios::fixed);
-    cout << "Final value of phi : " << setprecision(14) << phi << endl;
-    double actualPhi = (1.0 + sqrt(5.0)) / 2.0;
-    cout << "Number of iterations : "<< iters << endl;
-    cout << "Error (approx) : " << setprecision(14) << phi - actualPhi << endl;
-    return 0;
-}
----
-#include <QApplication>
-#include "task.h"
-
-int main( int argc, char *argv[ ] ) {
-   QApplication app( argc , argv ) ;
-   MyWidget theWidget ;
-   theWidget.show( ) ;
-   return app.exec( ) ;
-}
----
-int main(){
-  N n(4);
-  while (n.hasNext()) std::cout << n.next() << "\t* " << std::bitset<4>(n.next()) << std::endl;
-}
----
-class N{
-  uint n,i,g,e,l;
-public:
-  N(uint n): n(n-1),i{},g{},e(1),l(n-1){}
-  bool hasNext(){
-    g=(1<<n)+e;for(i=l;i<n;++i) g+=1<<i;
-    if (l==2)             {l=--n; e=1; return true;}
-    if (e<((1<<(l-1))-1)) {++e;        return true;}
-                           e=1; --l;   return (l>0);
-  }
-  uint next() {return g;}
-};
----
-#include <cstdlib>
-#include <algorithm>
-#include <iterator>
-
-template<typename RandomAccessIterator>
-void knuthShuffle(RandomAccessIterator begin, RandomAccessIterator end) {
-  if(begin == end) {
-      return;
-  }
-  for(unsigned int n = end - begin - 1; n >= 1; --n) {
-    unsigned int k = rand() % (n + 1);
-    if(k != n) {
-      std::iter_swap(begin + k, begin + n);
-    }
-  }
-}
----
-#define STR(x) #x
-int main()
-{
-  std::cout << STR(Hello world) << std::endl;
-}
----
-#include <tr1/unordered_set>
-#include <iostream>
-using namespace std;
-
-int main() {
-    typedef tr1::unordered_set<int> TyHash;
-    int data[] = {1, 2, 3, 2, 3, 4};
-
-    TyHash unique_set(data, data + 6);
-
-    cout << "Set items:" << endl;
-    for (TyHash::iterator iter = unique_set.begin(); iter != unique_set.end(); iter++)
-          cout << *iter << " ";
-    cout << endl;
-}
----
-struct MyException
-{
-};
----
-auto strA = R"(this is
-a newline-separated
-raw string)";
----
-#include <string>
-#include "Poco/URI.h"
-#include <iostream>
-
-int main( ) {
-   std::string encoded( "http%3A%2F%2Ffoo%20bar%2F" ) ;
-   std::string decoded ;
-   Poco::URI::decode ( encoded , decoded ) ;
-   std::cout << encoded << " is decoded: " << decoded << " !" << std::endl ;
-   return 0 ;
-}
----
-#include <string>
+#ifdef M_PI
+static double pi = M_PI;
+#else
+static double pi = std::acos(-1);
+#endif
 
 int main()
 {
-  int* p;
-
-  p = new int;
-  delete p;
-
-  p = new int(2);
-  delete p;
-
-  std::string* p2;
-
-  p2 = new std::string;
-  delete p2;
-
-  p = new int[10];
-  delete[] p;
-
-  p2 = new std::string[10];
-  delete[] p2;
+  std::cout << "e = " << euler_e
+            << "\npi = " << pi
+            << "\nsqrt(2) = " << std::sqrt(2.0)
+            << "\nln(e) = " << std::log(euler_e)
+            << "\nlg(100) = " << std::log10(100.0)
+            << "\nexp(3) = " << std::exp(3.0)
+            << "\n|-4.5| = " << std::abs(-4.5)
+            << "\nfloor(4.5) = " << std::floor(4.5)
+            << "\nceiling(4.5) = " << std::ceil(4.5)
+            << "\npi^2 = " << std::pow(pi,2.0) << std::endl;
 }
 ---
-#include <string>
-#include <locale>
-#include <sstream>
+#include <thread>
+#include <iostream>
 #include <vector>
-#include <iterator>
-#include <iostream>
-#include <algorithm>
-struct comma_ws : std::ctype<char> {
-    static const mask* make_table() {
-    static std::vector<mask> v(classic_table(), classic_table() + table_size);
-        v[','] |= space;
-        return &v[0];
-    }
-    comma_ws(std::size_t refs = 0) : ctype<char>(make_table(), false, refs) {}
-};
-int main()
-{
-    std::string s = "Hello,How,Are,You,Today";
-    std::istringstream buf(s);
-    buf.imbue(std::locale(buf.getloc(), new comma_ws));
-    std::istream_iterator<std::string> beg(buf), end;
-    std::vector<std::string> v(beg, end);
-    copy(v.begin(), v.end(), std::ostream_iterator<std::string>(std::cout, "."));
-    std::cout << '\n';
-}
----
-#include <fstream>
-#include <iostream>
-
-std::string execute(const std::string& command) {
-    system((command + " > temp.txt").c_str());
-
-    std::ifstream ifs("temp.txt");
-    std::string ret{ std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>() };
-    ifs.close();
-    if (std::remove("temp.txt") != 0) {
-        perror("Error deleting temporary file");
-    }
-    return ret;
-}
-
-int main() {
-    std::cout << execute("whoami") << '\n';
-}
----
-int main() {
-  int i = 0;
-  NG_4 a6(1,1,0,2);
-  SQRT2 n6;
-  for(NG n(&a6, &n6); n.moreTerms() and i++ < 20; std::cout << n.nextTerm() << " ");
-  std::cout << "..." << std::endl;
-  for(r2cf cf(24142136, 20000000); cf.moreTerms(); std::cout << cf.nextTerm() << " ");
-  std::cout << std::endl;
-  return 0;
-}
----
-set<double> pow5s;
-	for (auto i = 1; i < MAX; i++)
-	{
-		pow5[i] = (double)i * i * i * i * i;
-		pow5s.insert(pow5[i]);
-	}
-        if (pow5s.find(sum) != pow5s.end())
----
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <iostream>
-#include <cstdlib>
-
-int main( int argc , char* argv[ ] ) {
-   using namespace boost::gregorian ;
-
-   greg_month months[ ] = { Jan , Feb , Mar , Apr , May , Jun , Jul ,
-      Aug , Sep , Oct , Nov , Dec } ;
-   greg_year gy = atoi( argv[ 1 ] ) ;
-   for ( int i = 0 ; i < 12 ; i++ ) {
-      last_day_of_the_week_in_month lwdm ( Friday , months[ i ] ) ;
-      date d = lwdm.get_date( gy ) ;
-      std::cout << d << std::endl ;
-   }
-   return 0 ;
-}
----
-#include <iostream>
-
-int main()
-{
- LOOP:
-  std::cout << "Hello, World!\n";
- goto LOOP;
-}
----
-#include <algorithm>
-#include <string>
-
-std::all_of( ++(strings.begin()), strings.end(),
-             [&](std::string a){ return a == strings.front(); } )
-
-std::is_sorted( strings.begin(), strings.end(),
-                [](std::string a, std::string b){ return !(b < a); }) )
----
-#include <string>
-using namespace std;
-
-string s1="abcd";
-string s2="abab";
-string s3="ab";
-s1.compare(0,s3.size(),s3)==0;
-s1.compare(s1.size()-s3.size(),s3.size(),s3)==0;
-s1.find(s2)//returns string::npos
-int loc=s2.find(s3)//returns 0
-loc=s2.find(s3,loc+1)//returns 2
----
-while (a)
-{
-  link<int>* tmp = a;
-  a = a->next;
-  delete tmp;
-}
----
-#include <iostream>
 #include <random>
-#include <vector>
+#include <chrono>
 
-int main( ) {
-   std::vector<int> numbers { 11 , 88 , -5 , 13 , 4 , 121 , 77 , 2 } ;
-   std::random_device seed ;
-   std::mt19937 engine( seed( ) ) ;
-   std::uniform_int_distribution<int> choose( 0 , numbers.size( ) - 1 ) ;
-   std::cout << "random element picked : " << numbers[ choose( engine ) ]
-      << " !\n" ;
-   return 0 ;
-}
----
-int main() {
-  NG_4 a1(2,1,0,2);
-  r2cf n1(13,11);
-  for(NG n(&a1, &n1); n.moreTerms(); std::cout << n.nextTerm() << " ");
-  std::cout << std::endl;
+int main()
+{
+  std::random_device rd;
+  std::mt19937 eng(rd());
+  std::uniform_int_distribution<> dist(1,1000);
+  std::vector<std::thread> threads;
+
+  for(const auto& str: {"Enjoy\n", "Rosetta\n", "Code\n"}) {
+    std::chrono::milliseconds duration(dist(eng));
+
+    threads.emplace_back([str, duration](){
+      std::this_thread::sleep_for(duration);
+      std::cout << str;
+    });
+  }
+
+  for(auto& t: threads) t.join();
+
   return 0;
 }
 ---
+#include <iostream>
 #include <numeric>
 #include <vector>
-#include "boost/lambda/lambda.hpp"
+
+double add_square(double prev_sum, double new_val)
+{
+  return prev_sum + new_val*new_val;
+}
 
 double vec_add_squares(std::vector<double>& v)
 {
-  using namespace boost::lambda;
-
-  return std::accumulate(v.begin(), v.end(), 0.0, _1 + _2 * _2);
+  return std::accumulate(v.begin(), v.end(), 0.0, add_square);
 }
----
-#include <iostream>
-#include <vector>
-#include <numeric>
-#include <algorithm>
-
-int topswops(int n) {
-  std::vector<int> list(n);
-  std::iota(std::begin(list), std::end(list), 1);
-  int max_steps = 0;
-  do {
-    auto temp_list = list;
-    for (int steps = 1; temp_list[0] != 1; ++steps) {
-      std::reverse(std::begin(temp_list), std::begin(temp_list) + temp_list[0]);
-      if (steps > max_steps) max_steps = steps;
-    }
-  } while (std::next_permutation(std::begin(list), std::end(list)));
-  return max_steps;
-}
-
-int main() {
-  for (int i = 1; i <= 10; ++i) {
-    std::cout << i << ": " << topswops(i) << std::endl;
-  }
-  return 0;
-}
----
-#include <iostream>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <cstdlib>
-
-int main( int argc , char* argv[ ] ) {
-   using namespace boost::gregorian ;
-
-   int year =  std::atoi( argv[ 1 ] ) ;
-   for ( int i = 1 ; i < 13 ; i++ ) {
-      try {
-	 date d( year , i , 1  ) ;
-	 d = d.end_of_month( ) ;
-	 day_iterator d_itr ( d ) ;
-	 while ( d_itr->day_of_week( ) != Sunday ) {
-	    --d_itr ;
-	 }
-	 std::cout << to_simple_string ( *d_itr ) << std::endl ;
-      } catch ( bad_year by ) {
-	  std::cout << "Terminated because of " << by.what( ) << "\n" ;
-      }
-   }
-   return 0 ;
-}
----
-#include <iostream>
-#include <thread>
-#include <chrono>
-int main()
-{
-    unsigned long microseconds;
-    std::cin >> microseconds;
-    std::cout << "Sleeping..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
-    std::cout << "Awake!\n";
-}
----
-#include <unordered_map>
-#include <string>
 
 int main()
 {
-  std::string keys[] = { "1", "2", "3" };
-  std::string vals[] = { "a", "b", "c" };
+  std::vector<double> v;
+  std::cout << vec_add_squares(v) << std::endl;
 
-  std::unordered_map<std::string, std::string> hash;
-  for( int i = 0 ; i < 3 ; i++ )
-     hash[ keys[i] ] = vals[i] ;
-}
----
-#include <iostream>
-#include <functional>
-
-template<class Func>
-typename Func::result_type first(Func func, typename Func::argument_type arg)
-{
-  return func(arg);
-}
-
-class second : public std::unary_function<int, int>
-{
-public:
-  result_type operator()(argument_type arg) const
-  {
-    return arg * arg;
-  }
-};
-
-int main()
-{
-  std::cout << first(second(), 2) << std::endl;
+  double data[] = { 0, 1, 3, 1.5, 42, 0.1, -4 };
+  v.assign(data, data+7);
+  std::cout << vec_add_squares(v) << std::endl;
   return 0;
 }
 ---
@@ -606,58 +1146,249 @@ struct link
   int data;
 };
 ---
-int main()
+#include <algorithm>
+#include <iterator>
+#include <functional>
+
+template<class It, class Comp = std::less<>>
+constexpr auto max_value(It first, It last, Comp compare = std::less{})
 {
-  StraddlingCheckerboard sc("HOLMESRTABCDFGIJKNPQUVWXYZ./", 3, 7);
+    return *std::max_element(first, last, compare);
+}
 
-  string original = "One night-it was on the twentieth of March, 1888-I was returning";
-  string en = sc.encode(original);
-  string de = sc.decode(en);
-
-  cout << "Original: " << original << endl;
-  cout << "Encoded:  " << en << endl;
-  cout << "Decoded:  " << de << endl;
-
-  return 0;
+template<class C, class Comp = std::less<>>
+constexpr auto max_value(const C& container, Comp compare = std::less{})
+{
+    using std::begin; using std::end;
+    return max_value(begin(container), end(container), compare);
 }
 ---
-#include <direct.h>
-#include <fstream>
+#include <iostream>
+#include <set>
+#include <boost/filesystem.hpp>
 
-int main() {
-    std::fstream f("output.txt", std::ios::out);
-    f.close();
-    f.open("/output.txt", std::ios::out);
-    f.close();
+namespace fs = boost::filesystem;
 
-    _mkdir("docs");
-    _mkdir("/docs");
+int main(void)
+{
+    fs::path p(fs::current_path());
+    std::set<std::string> tree;
+
+    for (auto it = fs::directory_iterator(p); it != fs::directory_iterator(); ++it)
+        tree.insert(it->path().filename().native());
+
+    for (auto entry : tree)
+        std::cout << entry << '\n';
+}
+---
+#include <iostream>
+#include <numeric>
+
+int main()
+{
+    int a[] = { 1, 3, -5 };
+    int b[] = { 4, -2, -1 };
+
+    std::cout << std::inner_product(a, a + sizeof(a) / sizeof(a[0]), b, 0) << std::endl;
 
     return 0;
 }
 ---
-#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <string>
+
+int main() {
+	uint32_t Δ = 1;
+	double π = 3.14159;
+	std::string 你好 = "Hello";
+	Δ++;
+	std::cout << Δ << " :: " << π << " :: " << 你好 << std::endl;
+}
+---
+#include <iostream>
+
+template<typename T>
+ void print(T const& t)
+{
+  std::cout << t;
+}
+
+template<typename First, typename ... Rest>
+ void print(First const& first, Rest const& ... rest)
+{
+  std::cout << first;
+  print(rest ...);
+}
 
 int main()
 {
-  int a;
-
-  assert(a == 42);
+  int i = 10;
+  std::string s = "Hello world";
+  print("i = ", i, " and s = \"", s, "\"\n");
 }
 ---
-#include <chrono>
-#include <ctime>
+#include <iostream>
+
+std::string scs(std::string x, std::string y) {
+    if (x.empty()) {
+        return y;
+    }
+    if (y.empty()) {
+        return x;
+    }
+    if (x[0] == y[0]) {
+        return x[0] + scs(x.substr(1), y.substr(1));
+    }
+    if (scs(x, y.substr(1)).size() <= scs(x.substr(1), y).size()) {
+        return y[0] + scs(x, y.substr(1));
+    } else {
+        return x[0] + scs(x.substr(1), y);
+    }
+}
+
+int main() {
+    auto res = scs("abcbdab", "bdcaba");
+    std::cout << res << '\n';
+    return 0;
+}
+---
+#include <iostream>
+#include <functional>
+#include <cmath>
+
+template <typename A, typename B, typename C>
+std::function<C(A)> compose(std::function<C(B)> f, std::function<B(A)> g) {
+  return [f,g](A x) { return f(g(x)); };
+}
+
+int main() {
+  std::function<double(double)> f = sin;
+  std::function<double(double)> g = asin;
+  std::cout << compose(f, g)(0.5) << std::endl;
+}
+---
+#include <iostream>
+class ContinuedFraction {
+	public:
+	virtual const int nextTerm(){};
+	virtual const bool moreTerms(){};
+};
+class r2cf : public ContinuedFraction {
+	private: int n1, n2;
+	public:
+	r2cf(const int numerator, const int denominator): n1(numerator), n2(denominator){}
+	const int nextTerm() {
+		const int thisTerm = n1/n2;
+		const int t2 = n2; n2 = n1 - thisTerm * n2; n1 = t2;
+		return thisTerm;
+	}
+	const bool moreTerms() {return fabs(n2) > 0;}
+};
+class SQRT2 : public ContinuedFraction {
+	private: bool first=true;
+	public:
+	const int nextTerm() {if (first) {first = false; return 1;} else return 2;}
+	const bool moreTerms() {return true;}
+};
+---
+#include <iostream>
+
+int main()
+{
+  int a, b;
+  std::cin >> a >> b;
+  std::cout << "a+b = " << a+b << "\n";
+  std::cout << "a-b = " << a-b << "\n";
+  std::cout << "a*b = " << a*b << "\n";
+  std::cout << "a/b = " << a/b << ", remainder " << a%b << "\n";
+  return 0;
+}
+---
 #include <iostream>
 
 int main() {
-    auto timenow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::cout << std::ctime(&timenow) << std::endl;
+  std::cerr << "Goodbye, World!\n";
+}
+---
+#include <iostream>
+using std::cout;
+
+int main()
+{
+  for(int bottles(99); bottles > 0; bottles -= 1){
+    cout << bottles << " bottles of beer on the wall\n"
+         << bottles << " bottles of beer\n"
+         << "Take one down, pass it around\n"
+         << bottles - 1 << " bottles of beer on the wall\n\n";
+  }
+}
+---
+#include <bitset>
+#include <iostream>
+#include <limits>
+#include <string>
+
+void print_bin(unsigned int n) {
+  std::string str = "0";
+
+  if (n > 0) {
+    str = std::bitset<std::numeric_limits<unsigned int>::digits>(n).to_string();
+    str = str.substr(str.find('1'));
+  }
+
+  std::cout << str << '\n';
+}
+
+int main() {
+  print_bin(0);
+  print_bin(5);
+  print_bin(50);
+  print_bin(9000);
+}
+---
+#include <array>
+#include <iostream>
+#include <list>
+#include <map>
+#include <vector>
+
+int main()
+{
+    auto myNumbers = std::vector<std::string>{"one", "two", "three", "four"};
+    auto myColors = std::vector<std::string>{"red", "green", "blue"};
+    auto myArray = std::array<std::vector<std::string>, 2>{myNumbers, myColors};
+    auto myMap = std::map<int, decltype(myArray)> {{3, myArray}, {7, myArray}};
+
+    auto mapCopy = myMap;
+
+    mapCopy[3][0][1] = "2";
+    mapCopy[7][1][2] = "purple";
+
+    std::cout << "the original values:\n";
+    std::cout << myMap[3][0][1] << "\n";
+    std::cout << myMap[7][1][2] << "\n\n";
+
+    std::cout << "the modified copy:\n";
+    std::cout << mapCopy[3][0][1] << "\n";
+    std::cout << mapCopy[7][1][2] << "\n";
+}
+---
+#include <iostream>
+
+int main() {
+  std::cout << (int)'a' << std::endl;
+  std::cout << (char)97 << std::endl;
+  return 0;
 }
 ---
 #include <iostream>
 
 int main()
 {
-    for(int i=1; i*i<=100; i++)
-            std::cout<<"Door "<<i*i<<" is open!"<<std::endl;
+  std::cout << ( (727 == 0x2d7) &&
+                 (727 == 01327)     ? "true" : "false")
+            << std::endl;
+
+  return 0;
 }

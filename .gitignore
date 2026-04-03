@@ -1,10 +1,5 @@
-*.o
-typingtest
-/test
-/tterm
-/test.c
-/err
-/strlist_test
-
 # Rust
 /target
+
+# macOS
+.DS_Store

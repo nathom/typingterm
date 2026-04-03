@@ -98,10 +98,8 @@ fn draw_menu(f: &mut Frame, app: &App, area: Rect) {
     }
 
     // Language row
-    let all_langs = Language::all();
-    let lang_labels: Vec<String> = all_langs.iter().map(|l| l.label().to_string()).collect();
-    let lang_idx = all_langs.iter().position(|l| *l == app.config.language).unwrap_or(0);
-    draw_menu_row(f, theme, chunks[4], "language", &lang_labels, lang_idx, app.menu_row == MenuRow::Language);
+    let lang_labels: Vec<String> = app.language_names.iter().map(|l| l.to_string()).collect();
+    draw_menu_row(f, theme, chunks[4], "language", &lang_labels, app.language_index, app.menu_row == MenuRow::Language);
 
     // Theme row
     let theme_names: Vec<String> = app.theme_catalog.names().to_vec();

@@ -68,15 +68,15 @@ pub struct App {
     // Menu state
     pub menu_row: MenuRow,
     pub menu_col: usize,
+    pub language_names: Vec<&'static str>,
     pub language_index: usize,
     pub theme_index: usize,
 
-    // Search mode (activated by '/' on language or theme rows)
+    // Search mode
     pub search_active: bool,
     pub search_query: String,
     pub search_results: Vec<String>,
     pub search_selected: usize,
-    /// Which row the search was initiated from
     pub search_row: MenuRow,
 }
 
@@ -85,7 +85,6 @@ impl App {
         let catalog = ThemeCatalog::load();
         let saved = PersistentConfig::load();
 
-        // Resolve theme
         let theme_name = saved.theme.as_deref().unwrap_or("serika_dark");
         let theme_name = if catalog.names().iter().any(|n| n == theme_name) {
             theme_name
@@ -95,17 +94,22 @@ impl App {
         let theme = catalog.get(theme_name);
         let theme_index = catalog.names().iter().position(|n| n == theme_name).unwrap_or(0);
 
-        // Resolve language
         let mut config = TestConfig::default();
         if let Some(lang_str) = &saved.language {
-            if let Some(lang) = Language::all().iter().find(|l| l.label() == lang_str.as_str()) {
-                config.language = *lang;
-            }
+            config.language = lang_str.clone();
         }
-        if let Some(p) = saved.punctuation { config.punctuation = p; }
-        if let Some(n) = saved.numbers { config.numbers = n; }
+        if let Some(p) = saved.punctuation {
+            config.punctuation = p;
+        }
+        if let Some(n) = saved.numbers {
+            config.numbers = n;
+        }
 
-        let language_index = Language::all().iter().position(|l| *l == config.language).unwrap_or(0);
+        let language_names = words::all_language_names();
+        let language_index = language_names
+            .iter()
+            .position(|n| *n == config.language.as_str())
+            .unwrap_or(0);
 
         Self {
             screen: Screen::Menu,
@@ -116,6 +120,7 @@ impl App {
             should_quit: false,
             menu_row: MenuRow::Mode,
             menu_col: 0,
+            language_names,
             language_index,
             theme_index,
             search_active: false,
@@ -126,11 +131,10 @@ impl App {
         }
     }
 
-    /// Save current settings persistently
     pub fn save_config(&self) {
         let config = PersistentConfig {
             theme: Some(self.theme.name.clone()),
-            language: Some(self.config.language.label().to_string()),
+            language: Some(self.config.language.clone()),
             mode: Some(self.config.mode.label().to_string()),
             time_duration: Some(self.config.time_duration.seconds()),
             word_count: Some(self.config.word_count.count()),
@@ -184,9 +188,8 @@ impl App {
         if let Some(selected) = self.search_results.get(self.search_selected).cloned() {
             match self.search_row {
                 MenuRow::Language => {
-                    let all = Language::all();
-                    if let Some(idx) = all.iter().position(|l| l.label() == selected) {
-                        self.config.language = all[idx];
+                    if let Some(idx) = self.language_names.iter().position(|n| *n == selected.as_str()) {
+                        self.config.language = selected;
                         self.language_index = idx;
                     }
                 }
@@ -197,7 +200,6 @@ impl App {
                         .iter()
                         .position(|n| n == &selected)
                         .unwrap_or(0);
-                    // Live preview on confirm is already applied above
                 }
                 _ => {}
             }
@@ -207,22 +209,22 @@ impl App {
     }
 
     fn update_search_results(&mut self) {
+        let q = self.search_query.to_lowercase();
         match self.search_row {
             MenuRow::Language => {
-                let q = self.search_query.to_lowercase();
-                self.search_results = Language::all()
+                self.search_results = self.language_names
                     .iter()
-                    .map(|l| l.label().to_string())
-                    .filter(|name| q.is_empty() || name.to_lowercase().contains(&q))
+                    .filter(|n| q.is_empty() || n.to_lowercase().contains(&q))
+                    .map(|n| n.to_string())
                     .collect();
             }
             MenuRow::Theme => {
-                if self.search_query.is_empty() {
+                if q.is_empty() {
                     self.search_results = self.theme_catalog.names().to_vec();
                 } else {
                     self.search_results = self
                         .theme_catalog
-                        .search(&self.search_query)
+                        .search(&q)
                         .into_iter()
                         .map(|s| s.to_string())
                         .collect();
@@ -236,13 +238,9 @@ impl App {
 
     // --- Test management ---
 
-    pub fn is_code_language(&self) -> bool {
-        Language::code_languages().contains(&self.config.language)
-    }
-
     pub fn start_test(&mut self) {
-        if self.is_code_language() {
-            let lines = words::get_code_snippet(self.config.language);
+        if words::is_code_language(&self.config.language) {
+            let lines = words::get_code_snippet(&self.config.language);
             let time_limit = match self.config.mode {
                 TestMode::Time => Some(self.config.time_duration.seconds()),
                 _ => None,
@@ -271,7 +269,7 @@ impl App {
             text.split_whitespace().map(|s| s.to_string()).collect()
         } else {
             words::generate_words(
-                self.config.language,
+                &self.config.language,
                 word_count,
                 self.config.punctuation,
                 self.config.numbers,
@@ -333,7 +331,7 @@ impl App {
                 TestMode::Words => WordCount::all().len(),
                 _ => 0,
             },
-            MenuRow::Language => Language::all().len(),
+            MenuRow::Language => self.language_names.len(),
             MenuRow::Theme => self.theme_catalog.count(),
             MenuRow::Punctuation => 2,
             MenuRow::Numbers => 2,
@@ -389,9 +387,8 @@ impl App {
                 _ => {}
             },
             MenuRow::Language => {
-                let all = Language::all();
-                if let Some(lang) = all.get(self.menu_col) {
-                    self.config.language = *lang;
+                if let Some(name) = self.language_names.get(self.menu_col) {
+                    self.config.language = name.to_string();
                     self.language_index = self.menu_col;
                 }
             }

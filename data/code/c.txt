@@ -1,310 +1,733 @@
-if (a==b) {
-	...;	/* this is run if a and b are equal */
-}
----
-#include <stdio.h>
-
-unsigned int lpd(unsigned int n) {
-    if (n<=1) return 1;
-    int i;
-    for (i=n-1; i>0; i--)
-        if (n%i == 0) return i;
-}
-
-int main() {
-    int i;
-    for (i=1; i<=100; i++) {
-        printf("%3d", lpd(i));
-        if (i % 10 == 0) printf("\n");
-    }
-    return 0;
-}
----
-int frequency[26];
-int ch;
-FILE* txt_file = fopen ("a_text_file.txt", "rt");
-
-for (ch = 0; ch < 26; ch++)
-    frequency[ch] = 0;
-
-while (1) {
-    ch = fgetc(txt_file);
-    if (ch == EOF) break; /* end of file or read error.  EOF is typically -1 */
-
-    if ('a' <= ch && ch <= 'z')      /* lower case */
-        frequency[ch-'a']++;
-    else if ('A' <= ch && ch <= 'Z') /* upper case */
-        frequency[ch-'A']++;
-}
----
-int rand5()
-{
-	int r, rand_max = RAND_MAX - (RAND_MAX % 5);
-	while ((r = rand()) >= rand_max);
-	return r / (rand_max / 5) + 1;
-}
-
-int rand5_7()
-{
-	int r;
-	while ((r = rand5() * 5 + rand5()) >= 27);
-	return r / 3 - 1;
-}
-
-int main()
-{
-	printf(check(rand5, 5, 1000000, .05) ? "flat\n" : "not flat\n");
-	printf(check(rand7, 7, 1000000, .05) ? "flat\n" : "not flat\n");
-	return 0;
-}
----
-#include <stdio.h>
-
-int valid(int n, int nuts)
-{
-	int k;
-	for (k = n; k; k--, nuts -= 1 + nuts/n)
-		if (nuts%n != 1) return 0;
-	return nuts && !(nuts%n);
-}
-
-int main(void)
-{
-	int n, x;
-	for (n = 2; n < 10; n++) {
-		for (x = 0; !valid(n, x); x++);
-		printf("%d: %d\n", n, x);
-	}
-	return 0;
-}
----
-int add(int a, int b) {
-    return a + b;
-}
----
 #include <stdlib.h>
 #include <stdio.h>
 
 int main(void)
 {
-  printf("Hello world!\n");
-  return EXIT_SUCCESS;
+  FILE *fh = tmpfile(); /* file is automatically deleted when program exits */
+  fclose(fh);
+  return 0;
 }
 ---
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "polifitgsl.h"
+typedef struct floatList {
+    float *list;
+    int   size;
+} *FloatList;
 
-#define NP 11
-double x[] = {0,  1,  2,  3,  4,  5,  6,   7,   8,   9,   10};
-double y[] = {1,  6,  17, 34, 57, 86, 121, 162, 209, 262, 321};
+int floatcmp( const void *a, const void *b) {
+    if (*(const float *)a < *(const float *)b) return -1;
+    else return *(const float *)a > *(const float *)b;
+}
 
-#define DEGREE 3
-double coeff[DEGREE];
+float median( FloatList fl )
+{
+    qsort( fl->list, fl->size, sizeof(float), floatcmp);
+    return 0.5 * ( fl->list[fl->size/2] + fl->list[(fl->size-1)/2]);
+}
 
 int main()
 {
-  int i;
+    static float floats1[] = { 5.1, 2.6, 6.2, 8.8, 4.6, 4.1 };
+    static struct floatList flist1 = { floats1, sizeof(floats1)/sizeof(float) };
 
-  polynomialfit(NP, DEGREE, x, y, coeff);
-  for(i=0; i < DEGREE; i++) {
-    printf("%lf\n", coeff[i]);
-  }
-  return 0;
+    static float floats2[] = { 5.1, 2.6, 8.8, 4.6, 4.1 };
+    static struct floatList flist2 = { floats2, sizeof(floats2)/sizeof(float) };
+
+    printf("flist1 median is %7.2f\n", median(&flist1)); /* 4.85 */
+    printf("flist2 median is %7.2f\n", median(&flist2)); /* 4.60 */
+    return 0;
 }
 ---
-void step_up(void)
-{
-    int i = 0;
+int isPrime(int n){
+	if (n%2==0) return n==2;
+	if (n%3==0) return n==3;
+	int d=5;
+	while(d*d<=n){
+		if(n%d==0) return 0;
+		d+=2;
+		if(n%d==0) return 0;
+		d+=4;}
+	return 1;}
 
-    while (i < 1) {
-        if (step()) {
-            ++i;
-        } else {
-            --i;
-        }
+main() {int i,d,p,r,q=929;
+	if (!isPrime(q)) return 1;
+	r=q;
+	while(r>0) r<<=1;
+	d=2*q+1;
+	do { 	for(p=r, i= 1; p; p<<= 1){
+			i=((long long)i * i) % d;
+			if (p < 0) i *= 2;
+			if (i > d) i -= d;}
+		if (i != 1) d += 2*q;
+		else break;
+	} while(1);
+	printf("2^%d - 1 = 0 (mod %d)\n", q, d);}
+---
+typedef unsigned int histogram_t;
+typedef histogram_t *histogram;
+
+#define GET_LUM(IMG, X, Y) ( (IMG)->buf[ (Y) * (IMG)->width + (X)][0] )
+
+histogram get_histogram(grayimage im);
+luminance histogram_median(histogram h);
+---
+#include <stdio.h>
+
+int mul_inv(int a, int b)
+{
+	int b0 = b, t, q;
+	int x0 = 0, x1 = 1;
+	if (b == 1) return 1;
+	while (a > 1) {
+		q = a / b;
+		t = b, b = a % b, a = t;
+		t = x0, x0 = x1 - q * x0, x1 = t;
+	}
+	if (x1 < 0) x1 += b0;
+	return x1;
+}
+
+int main(void) {
+	printf("%d\n", mul_inv(42, 2017));
+	return 0;
+}
+---
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+char *bin(uint32_t x);
+
+int main(void)
+{
+    for (size_t i = 0; i < 20; i++) {
+        char *binstr = bin(i);
+        printf("%s\n", binstr);
+        free(binstr);
     }
 }
----
-#include <windows.h>
-#include "resource.h"
 
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDD_DLG DIALOG 0, 0, 154, 46
-STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION |
-WS_VISIBLE | WS_POPUP | WS_SYSMENU
-CAPTION "GUI Component Interaction"
-FONT 12, "Ms Shell Dlg" {
-    EDITTEXT        IDC_INPUT, 7, 7, 140, 12, ES_AUTOHSCROLL | ES_NUMBER
-    PUSHBUTTON      "Increment", IDC_INCREMENT, 7, 25, 50, 14
-    PUSHBUTTON      "Random", IDC_RANDOM, 62, 25, 50, 14
-    PUSHBUTTON      "Quit", IDC_QUIT, 117, 25, 30, 14
-}
----
-int noargs(void); /* Declare a function with no argument that returns an integer */
-int twoargs(int a,int b); /* Declare a function with two arguments that returns an integer */
-int twoargs(int ,int); /* Parameter names are optional in a prototype definition */
-int anyargs(); /* An empty parameter list can be used to declare a function that accepts varargs */
-int atleastoneargs(int, ...); /* One mandatory integer argument followed by varargs */
----
-double v[] = { 2,4,4,4,5,5,7,9 };
-
-int main()
+char *bin(uint32_t x)
 {
-  int i;
-  StatObject so = NewStatObject( STDDEV );
-
-  for(i=0; i < sizeof(v)/sizeof(double) ; i++)
-    printf("val: %lf  std dev: %lf\n", v[i], stat_object_add(so, v[i]));
-
-  FREE_STAT_OBJECT(so);
-  return 0;
+    size_t bits = (x == 0) ? 1 : log10((double) x)/log10(2) + 1;
+    char *ret = malloc((bits + 1) * sizeof (char));
+    for (size_t i = 0; i < bits ; i++) {
+       ret[bits - i - 1] = (x & 1) ? '1' : '0';
+       x >>= 1;
+    }
+    ret[bits] = '\0';
+    return ret;
 }
 ---
-void quad_bezier(
+void draw_line_antialias(
         image img,
+        unsigned int x0, unsigned int y0,
         unsigned int x1, unsigned int y1,
-        unsigned int x2, unsigned int y2,
-        unsigned int x3, unsigned int y3,
         color_component r,
         color_component g,
         color_component b );
 ---
-#include <gadget/gadget.h>
-LIB_GADGET_START
-
-Main
-   String w, v="María tenía un corderito";
-
-   Stack{
-       Store( v, Substr(v, Str_at("tenía",v),Str_len( Upper(v) )) );
-       Store( v, Trim(Left( Upper(v), Str_at("CORDERITO",Upper(v))-1)));
-   }Stack_off;
-
-   Print "msg stack : [%s]\n\n", v;
-
-   Let( v, "María tenía un corderito");
-
-   w = Substr(v, Str_at("tenía",v),Str_len(v));
-   Print "msg normal: %s\n", w;
-
-   Free secure w,v;
-End
----
-#include <stdio.h>
-
-void pascaltriangle(unsigned int n)
+#define MAXCMDBUF 100
+void print_jpg(image img, int qual)
 {
-  unsigned int c, i, j, k;
+   char buf[MAXCMDBUF];
+   unsigned int n;
+   FILE *pipe;
 
-  for(i=0; i < n; i++) {
-    c = 1;
-    for(j=1; j <= 2*(n-1-i); j++) printf(" ");
-    for(k=0; k <= i; k++) {
-      printf("%3d ", c);
-      c = c * (i-k)/(k+1);
-    }
-    printf("\n");
-  }
-}
-
-int main()
-{
-  pascaltriangle(8);
-  return 0;
+   snprintf(buf, MAXCMDBUF, "convert ppm:- -quality %d jpg:-", qual);
+   pipe = popen(buf, "w");
+   if ( pipe != NULL )
+   {
+           fprintf(pipe, "P6\n%d %d\n255\n", img->width, img->height);
+           n = img->width * img->height;
+           fwrite(img->buf, sizeof(pixel), n, pipe);
+           pclose(pipe);
+   }
 }
 ---
-#include <stdio.h>
-main(){
-  float r=7.125;
-  printf(" %9.3f\n",-r);
-  printf(" %9.3f\n",r);
-  printf(" %-9.3f\n",r);
-  printf(" %09.3f\n",-r);
-  printf(" %09.3f\n",r);
-  printf(" %-09.3f\n",r);
-  return 0;
-}
----
-#include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
 int main(void)
 {
-	FILE *stream;
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
+  const char *string = "Hello, world!";
+  size_t length = strlen(string);
 
-	stream = fopen("file.txt", "r");
-	if (stream == NULL)
-		exit(EXIT_FAILURE);
-
-	while ((read = getline(&line, &len, stream)) != -1) {
-		printf("Retrieved line of length %u :\n", read);
-		printf("%s", line);
-	}
-
-	free(line);
-	fclose(stream);
-	exit(EXIT_SUCCESS);
-}
----
-#include <stdio.h>
-#include "silly.h"
-
-int main()
-{
-    AbsCls abster = Silly_Instance(NewSilly( 10.1, "Green Tomato"));
-
-    printf("AbsMethod1: %d\n", Abs_Method1(abster, 5));
-    printf("AbsMethod2: %s\n", Abs_Method2(abster, 4));
-    Abs_Method3(abster, 21.55);
-    Abs_Free(abster);
-    return 0;
-}
----
-long long fibb(long long a, long long b, int n) {
-    return (--n>0)?(fibb(b, a+b, n)):(a);
-}
----
-#include <gtk/gtk.h>
-
-int main (int argc, char **argv) {
-  GtkWidget *window;
-  gtk_init(&argc, &argv);
-
-  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (window), "Goodbye, World");
-  g_signal_connect (G_OBJECT (window), "delete-event", gtk_main_quit, NULL);
-  gtk_widget_show_all (window);
-
-  gtk_main();
   return 0;
 }
 ---
 #include <stdio.h>
 
+int* binomCoeff(int n) {
+     int *b = calloc(n+1,sizeof(int));
+     int j;
+     b[0] = n%2 ? -1 : 1;
+     for (j=1 ; j<=n; j++)
+           b[j] = -b[j-1]*(n+1-j)/j;
+
+     return(b);
+};
+
+main () {
+    double array[] = { 90, 47, 58, 29, 22, 32, 55, 5, 55, 73 };
+    size_t lenArray = sizeof(array)/sizeof(array[0]);	
+
+    int p = 4;
+    int *b = binomCoeff(p);
+
+    int j, k;
+
+    for (k=0 ; k < lenArray; k++)
+        for (array[k] *= b[0], j=1 ; j<=p; j++)
+            array[k] += b[j] * array[k+j];
+
+    free(b);
+
+    lenArray -= p; 	
+    for (k=0 ; k < lenArray; k++)  printf("%f ",array[k]);
+    printf("\n");
+}
+---
+#include <stdio.h>
+#include <math.h>
+
+#define EPSILON 1.0e-15
+
+int main() {
+    unsigned long long fact = 1;
+    double e = 2.0, e0;
+    int n = 2;
+    do {
+        e0 = e;
+        fact *= n++;
+        e += 1.0 / fact;
+    }
+    while (fabs(e - e0) >= EPSILON);
+    printf("e = %.15f\n", e);
+    return 0;
+}
+---
+#include <stdio.h>
+
 int main()
 {
-	int i;
-	for (i = 1; i * i <= 100; i++)
-		printf("door %d open\n", i * i);
+  int i;
+  for (i = 1; i <= 10; i++) {
+    printf("%d", i);
+    printf(i == 10 ? "\n" : ", ");
+  }
+  return 0;
+}
+---
+#include <stdio.h>
+#include <string.h>
 
+int levenshtein(const char *s, int ls, const char *t, int lt)
+{
+        int a, b, c;
+
+        if (!ls) return lt;
+        if (!lt) return ls;
+
+        if (s[ls - 1] == t[lt - 1])
+                return levenshtein(s, ls - 1, t, lt - 1);
+
+        a = levenshtein(s, ls - 1, t, lt - 1);
+        b = levenshtein(s, ls,     t, lt - 1);
+        c = levenshtein(s, ls - 1, t, lt    );
+
+        if (a > b) a = b;
+        if (a > c) a = c;
+
+        return a + 1;
+}
+
+int main()
+{
+        const char *s1 = "rosettacode";
+        const char *s2 = "raisethysword";
+        printf("distance between `%s' and `%s': %d\n", s1, s2,
+                levenshtein(s1, strlen(s1), s2, strlen(s2)));
+
+        return 0;
+}
+---
+int main()
+{
+  int i;
+  gsl_vector *q, *r;
+  gsl_vector *nv, *dv;
+
+  nv = create_poly(4, -42., 0., -12., 1.);
+  dv = create_poly(3, -3., 1., 1.);
+
+  q = poly_long_div(nv, dv, &r);
+
+  poly_print(q);
+  poly_print(r);
+
+  gsl_vector_free(q);
+  gsl_vector_free(r);
+
+  return 0;
+}
+---
+#include <stdio.h>
+
+int F(int n,int x,int y) {
+  if (n == 0) {
+    return x + y;
+  }
+
+  else if (y == 0) {
+    return x;
+  }
+
+  return F(n - 1, F(n, x, y - 1), F(n, x, y - 1) + y);
+}
+
+int main() {
+  printf("F1(3,3) = %d",F(1,3,3));
+  return 0;
+}
+---
+#include <gmp.h>
+
+void perm(mpz_t out, int n, int k)
+{
+	mpz_set_ui(out, 1);
+	k = n - k;
+	while (n > k) mpz_mul_ui(out, out, n--);
+}
+
+void comb(mpz_t out, int n, int k)
+{
+	perm(out, n, k);
+	while (k) mpz_divexact_ui(out, out, k--);
+}
+
+int main(void)
+{
+	mpz_t x;
+	mpz_init(x);
+
+	perm(x, 1000, 969);
+	gmp_printf("P(1000,969) = %Zd\n", x);
+
+	comb(x, 1000, 969);
+	gmp_printf("C(1000,969) = %Zd\n", x);
+	return 0;
+}
+---
+static union
+{
+  int i;
+  int j;
+};
+---
+#include <stdio.h>
+#include <string.h>
+
+void parse_sep(const char *str, const char *const *pat, int len)
+{
+	int i, slen;
+	while (*str != '\0') {
+		for (i = 0; i < len || !putchar(*(str++)); i++) {
+			slen = strlen(pat[i]);
+			if (strncmp(str, pat[i], slen)) continue;
+			printf("{%.*s}", slen, str);
+			str += slen;
+			break;
+		}
+	}
+}
+
+int main()
+{
+	const char *seps[] = { "==", "!=", "=" };
+	parse_sep("a!===b=!=c", seps, 3);
+
+	return 0;
+}
+---
+#include <stdlib.h>
+#include <stdio.h>
+
+int main() {
+  puts(getenv("HOME"));
+  puts(getenv("PATH"));
+  puts(getenv("USER"));
+  return 0;
+}
+---
+#include <stdio.h>
+
+int main() {
+    int i, j;
+    char k[4];
+    for (i = 0; i < 16; ++i) {
+        for (j = 32 + i; j < 128; j += 16) {
+            switch (j) {
+                default:  sprintf(k, "%c", j); break;
+                case 32:  sprintf(k, "Spc"); break;
+                case 127: sprintf(k, "Del"); break;
+            }
+            printf("%3d : %-3s   ", j, k);
+        }
+        printf("\n");
+    }
+    return 0;
+}
+---
+#include <stdio.h>
+
+int main()
+{
+        unsigned int i = 0;
+        do { printf("%o\n", i++); } while(i);
+        return 0;
+}
+---
+#include <stdio.h>
+#include "imglib.h"
+
+int main()
+{
+   image source;
+   grayimage idest;
+
+   source = get_ppm(stdin);
+   idest = tograyscale(source);
+   free_img(source);
+   source = tocolor(idest);
+   output_ppm(stdout, source);
+   free_img(source); free_img((image)idest);
+   return 0;
+}
+---
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    int n = 1, count = 0, sq, cr;
+    for ( ; count < 30; ++n) {
+        sq = n * n;
+        cr = (int)cbrt((double)sq);
+        if (cr * cr * cr != sq) {
+            count++;
+            printf("%d\n", sq);
+        }
+        else {
+            printf("%d is square and cube\n", sq);
+        }
+    }
+    return 0;
+}
+---
+#include <stdlib.h>
+
+typedef struct sMyClass
+{
+  int variable;
+} *MyClass;
+
+MyClass  MyClass_new()
+{
+  MyClass pthis = malloc(sizeof *pthis);
+  pthis->variable = 0;
+  return pthis;
+}
+
+void MyClass_delete(MyClass* pthis)
+{
+  if (pthis)
+  {
+    free(*pthis);
+  }
+}
+
+void MyClass_someMethod(MyClass pthis)
+{
+  pthis->variable = 1;
+}
+
+MyClass obj = MyClass_new();
+MyClass_someMethod(obj);
+MyClass_delete(&obj);
+---
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(int argc, const char *argv[]) {
+  const int max = 1000;
+  int *a = malloc(max * sizeof(int));
+  for (int n = 0; n < max - 1; n ++) {
+    for (int m = n - 1; m >= 0; m --) {
+      if (a[m] == a[n]) {
+        a[n+1] = n - m;
+        break;
+      }
+    }
+  }
+
+  printf("The first ten terms of the Van Eck sequence are:\n");
+  for (int i = 0; i < 10; i ++) printf("%d ", a[i]);
+  printf("\n\nTerms 991 to 1000 of the sequence are:\n");
+  for (int i = 990; i < 1000; i ++) printf("%d ", a[i]);
+  putchar('\n');
+
+  return 0;
+}
+---
+Rules from 'rule1' ok
+text:     I bought a B of As from T S.
+markoved: I bought a bag of apples from my brother.
+
+Rules from 'rule2' ok
+text:     I bought a B of As from T S.
+markoved: I bought a bag of apples from T shop.
+
+Rules from 'rule3' ok
+text:     I bought a B of As W my Bgage from T S.
+markoved: I bought a bag of apples with my money from T shop.
+
+Rules from 'rule4' ok
+text:     _1111*11111_
+markoved: 11111111111111111111
+
+Rules from 'rule5' ok
+text:     000000A000000
+markoved: 00011H1111000
+---
+#include <stdio.h>
+#include <stdlib.h>
+
+unsigned long long sum35(unsigned long long limit)
+{
+    unsigned long long sum = 0;
+    for (unsigned long long i = 0; i < limit; i++)
+        if (!(i % 3) || !(i % 5))
+            sum += i;
+    return sum;
+}
+
+int main(int argc, char **argv)
+{
+    unsigned long long limit;
+
+    if (argc == 2)
+        limit = strtoull(argv[1], NULL, 10);
+    else
+        limit = 1000;
+
+    printf("%lld\n", sum35(limit));
+    return 0;
+}
+---
+void insert_append (struct link *anchor, struct link *newlink) {
+  newlink->next = anchor->next;
+  anchor->next = newlink;
+}
+---
+#include <stdio.h>
+
+typedef unsigned long marker;
+marker one = 1;
+
+void comb(int pool, int need, marker chosen, int at)
+{
+	if (pool < need + at) return; /* not enough bits left */
+
+	if (!need) {
+		for (at = 0; at < pool; at++)
+			if (chosen & (one << at)) printf("%d ", at);
+		printf("\n");
+		return;
+	}
+	comb(pool, need - 1, chosen | (one << at), at + 1);
+	comb(pool, need, chosen, at + 1);  /* or don't choose it, go to next */
+}
+
+int main()
+{
+	comb(5, 3, 0, 0);
+	return 0;
+}
+---
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int main() {
+    int current = 0,
+        square;
+
+    while (((square=current*current) % 1000000 != 269696) && (square<INT_MAX)) {
+        current++;
+    }
+
+    if (square>+INT_MAX)
+        printf("Condition not satisfied before INT_MAX reached.");
+    else
+        printf ("The smallest number whose square ends in 269696 is %d\n", current);
+
+    return 0 ;
+}
+---
+#include <stdio.h>
+#include <string.h>
+
+char trans[] = "___#_##_";
+
+#define v(i) (cell[i] != '_')
+int evolve(char cell[], char backup[], int len)
+{
+	int i, diff = 0;
+
+	for (i = 0; i < len; i++) {
+		backup[i] = trans[ v(i-1) * 4 + v(i) * 2 + v(i + 1) ];
+		diff += (backup[i] != cell[i]);
+	}
+
+	strcpy(cell, backup);
+	return diff;
+}
+
+int main()
+{
+	char	c[] = "_###_##_#_#_#_#__#__\n",
+		b[] = "____________________\n";
+
+	do { printf(c + 1); } while (evolve(c + 1, b + 1, sizeof(c) - 3));
+	return 0;
+}
+---
+#define generic_pow(base, exp)\
+    _Generic((base),\
+            double: dpow,\
+            int: ipow)\
+    (base, exp)
+
+int main()
+{
+    printf("2^6 = %d\n", generic_pow(2,6));
+    printf("2^-6 = %d\n", generic_pow(2,-6));
+    printf("2.71^6 = %lf\n", generic_pow(2.71,6));
+    printf("2.71^-6 = %lf\n", generic_pow(2.71,-6));
+}
+---
+#include <stdio.h>
+
+#define SIZE (1 << 4)
+int main()
+{
+	int x, y, i;
+	for (y = SIZE - 1; y >= 0; y--, putchar('\n')) {
+		for (i = 0; i < y; i++) putchar(' ');
+		for (x = 0; x + y < SIZE; x++)
+			printf((x & y) ? "  " : "* ");
+	}
 	return 0;
 }
 ---
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main()
+int main(int argc, char *argv[]) {
+  (void) printf("Goodbye, World!");    /* No automatic newline */
+  return EXIT_SUCCESS;
+}
+---
+typedef struct Point
 {
-	int i;
-	srand(time(NULL));
-	for (i = 0; i < 10; i++)
-		puts((rand() % 2) ? "heads" : "tails");
+  int x;
+  int y;
+} Point;
+---
+#include <stdio.h>
+
+int main()
+{
+	int i, j, dim, d;
+	int depth = 3;
+
+	for (i = 0, dim = 1; i < depth; i++, dim *= 3);
+
+	for (i = 0; i < dim; i++) {
+		for (j = 0; j < dim; j++) {
+			for (d = dim / 3; d; d /= 3)
+				if ((i % (d * 3)) / d == 1 && (j % (d * 3)) / d == 1)
+					break;
+			printf(d ? "  " : "##");
+		}
+		printf("\n");
+	}
+
 	return 0;
+}
+---
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+int main(void)
+{
+    int n;
+    int g;
+    char c;
+
+    srand(time(NULL));
+    n = 1 + (rand() % 10);
+
+    puts("I'm thinking of a number between 1 and 10.");
+    puts("Try to guess it:");
+
+    while (1) {
+        if (scanf("%d", &g) != 1) {
+		scanf("%c", &c);
+		continue;
+	}
+
+        if (g == n) {
+	    puts("Correct!");
+	    return 0;
+	}
+        puts("That's not my number. Try another guess:");
+    }
+}
+---
+#include<stdarg.h>
+#include<stdio.h>
+
+long int factorial(int n){
+    if(n>1)
+        return n*factorial(n-1);
+    return 1;
+}
+
+long int sumOfFactorials(int num,...){
+    va_list vaList;
+    long int sum = 0;
+
+    va_start(vaList,num);
+
+    while(num--)
+        sum += factorial(va_arg(vaList,int));
+
+    va_end(vaList);
+
+    return sum;
+}
+
+int main()
+{
+    printf("\nSum of factorials of [1,5] : %ld",sumOfFactorials(5,1,2,3,4,5));
+    printf("\nSum of factorials of [3,5] : %ld",sumOfFactorials(3,3,4,5));
+    printf("\nSum of factorials of [1,3] : %ld",sumOfFactorials(3,1,2,3));
+
+    return 0;
 }
 ---
 #include <stdio.h>
@@ -330,6 +753,107 @@ int main()
 	return 0;
 }
 ---
+typedef struct{
+	double focalLength;
+	double resolution;
+	double memory;
+}Camera;
+
+typedef struct{
+	double balance;
+	double batteryLevel;
+	char** contacts;
+}Phone;
+
+typedef struct{
+	Camera cameraSample;
+	Phone phoneSample;
+}CameraPhone;
+---
+#include <stdio.h>
+#include <time.h>
+
+#define note_file "NOTES.TXT"
+
+int main(int argc, char**argv)
+{
+	FILE *note = 0;
+	time_t tm;
+	int i;
+	char *p;
+
+	if (argc < 2) {
+		if ((note = fopen(note_file, "r")))
+			while ((i = fgetc(note)) != EOF)
+				putchar(i);
+
+	} else if ((note = fopen(note_file, "a"))) {
+		tm = time(0);
+		p = ctime(&tm);
+
+		while (*p) fputc(*p != '\n'?*p:'\t', note), p++;
+
+		for (i = 1; i < argc; i++)
+			fprintf(note, "%s%c", argv[i], 1 + i - argc ? ' ' : '\n');
+	}
+
+	if (note) fclose(note);
+	return 0;
+}
+---
+#include <stdio.h>
+
+double horner(double *coeffs, int s, double x)
+{
+  int i;
+  double res = 0.0;
+
+  for(i=s-1; i >= 0; i--)
+  {
+    res = res * x + coeffs[i];
+  }
+  return res;
+}
+
+
+int main()
+{
+  double coeffs[] = { -19.0, 7.0, -4.0, 6.0 };
+
+  printf("%5.1f\n", horner(coeffs, sizeof(coeffs)/sizeof(double), 3.0));
+  return 0;
+}
+---
+#ifndef SILLY_H
+#define SILLY_H
+#include "intefaceAbs.h"
+#include <stdlib.h>
+
+typedef struct sillyStruct *Silly;
+extern Silly NewSilly( double, const char *);
+extern AbsCls Silly_Instance(void *);
+
+#endif
+---
+#include <ldap.h>
+
+char *name, *password;
+...
+
+LDAP *ld = ldap_init("ldap.somewhere.com", 389);
+ldap_simple_bind_s(ld, name, password);
+
+LDAPMessage **result;
+ldap_search_s(ld, "dc=somewhere,dc=com", LDAP_SCOPE_SUBTREE,
+	"(&(objectclass=person)(|(cn=joe*)(cn=shmoe*)))",
+	NULL, /* return all attributes */
+	0,  /* want both types and values of attrs */
+	result); /* ldap will allocate room for return messages */
+
+
+ldap_msgfree(*result);	/* free messages */
+ldap_unbind(ld);	/* disconnect */
+---
 #include <stdio.h>
 #include <math.h>
 
@@ -349,371 +873,589 @@ int main(void)
   return 0;
 }
 ---
-'': True
-'[]': True
-']][[': False
-'[][][]': True
-'[]][[]][': False
-'[]][[[[]]]': False
-']]]][[[]][[[': False
-']]]]]][][[[[[[': False
-'[][]][[][[[]]][]': False
----
-main()
-{
-        int a = 0;
+#include <stdio.h>
 
-        do {
-                register int _o = 2;
-                do {
-                        switch (_o) {
-                        case 1:
-                                a = 4;
-                        case 0:
-                                break;
-                        case 2:
-                                _o = !!(foo());
-                                continue;
-                        } break;
-                } while (1);
-        } while (0);
-        printf("%d\n", a);
-        exit(0);
+int main(void)
+{
+  printf("%s\n",
+         ( (727 == 0x2d7) &&
+           (727 == 01327)    ) ? "true" : "false");
+
+  return 0;
+}
+---
+Name  Count    Ratio Expected
+ aleph 199928 19.9928% 20.0000%
+  beth 166489 16.6489% 16.6667%
+ gimel 143211 14.3211% 14.2857%
+daleth 125257 12.5257% 12.5000%
+    he 110849 11.0849% 11.1111%
+   waw  99935  9.9935% 10.0000%
+ zayin  91001  9.1001%  9.0909%
+  heth  63330  6.3330%  6.3456%
+---
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main()
+{
+  struct tm ts;
+  time_t t;
+  const char *d = "March 7 2009 7:30pm EST";
+
+  strptime(d, "%B %d %Y %I:%M%p %Z", &ts);
+  t = mktime(&ts);
+  t += 12*60*60;
+  printf("%s", ctime(&t));
+
+  return EXIT_SUCCESS;
+}
+---
+void insert(link* anchor, link* newlink) {
+  newlink->next = anchor->next;
+  newlink->prev = anchor;
+  (newlink->next)->prev = newlink;
+  anchor->next = newlink;
+}
+---
+#include <stdio.h>
+
+int main()
+{
+   FILE *lp;
+   lp = fopen("/dev/lp0","w");
+   fprintf(lp,"Hello world!\n");
+   fclose(lp);
+   return 0;
+}
+---
+int main(){
+	time_t t;
+	int a, b;
+	srand((unsigned)time(&t));
+	for(;;){
+		a = rand() % 20;
+		printf("%d\n", a);
+		if(a == 10)
+			break;
+		b = rand() % 20;
+		printf("%d\n", b);
+	}
+	return 0;
+}
+---
+#include <stdio.h>
+#include <math.h>
+
+void pascal(int a, int b, int mid, int top, int* x, int* y, int* z)
+{
+    double ytemp = (top - 4 * (a + b)) / 7.;
+    if(fmod(ytemp, 1.) >= 0.0001)
+    {
+        x = 0;
+        return;
+    }
+}
+int main()
+{
+    int a = 11, b = 4, mid = 40, top = 151;
+    int x, y, z;
+    pascal(a, b, mid, top, &x, &y, &z);
+    if(x != 0)
+        printf("x: %d, y: %d, z: %d\n", x, y, z);
+    else printf("No solution\n");
+
+    return 0;
+}
+---
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+
+int main(void)
+{
+    return 0 >= fputs("ANY STRING TO WRITE TO A FILE AT ONCE.",
+        freopen("sample.txt","wb",stdout));
+}
+---
+void raster_circle(
+        image img,
+        unsigned int x0,
+        unsigned int y0,
+        unsigned int radius,
+        color_component r,
+        color_component g,
+        color_component b );
+---
+#include <stdio.h>
+
+int main()
+{
+    double inf = 1/0.0;
+    double minus_inf = -1/0.0;
+    double minus_zero = -1/ inf ;
+    double nan = 0.0/0.0;
+
+    printf("positive infinity: %f\n",inf);
+    printf("negative infinity: %f\n",minus_inf);
+    printf("negative zero: %f\n",minus_zero);
+    printf("not a number: %f\n",nan);
+
+
+    printf("+inf + 2.0 = %f\n",inf + 2.0);
+    printf("+inf - 10.1 = %f\n",inf - 10.1);
+    printf("+inf + -inf = %f\n",inf + minus_inf);
+    printf("0.0 * +inf = %f\n",0.0 * inf);
+    printf("1.0/-0.0 = %f\n",1.0/minus_zero);
+    printf("NaN + 1.0 = %f\n",nan + 1.0);
+    printf("NaN + NaN = %f\n",nan + nan);
+
+
+    printf("NaN == NaN = %s\n",nan == nan ? "true" : "false");
+    printf("0.0 == -0.0 = %s\n",0.0 == minus_zero ? "true" : "false");
+
+    return 0;
+}
+---
+#include <stdio.h>
+int main() {
+  printf("\a");
+  return 0;
+}
+---
+#include <stdio.h>
+main(){
+  float r=7.125;
+  printf(" %9.3f\n",-r);
+  printf(" %9.3f\n",r);
+  printf(" %-9.3f\n",r);
+  printf(" %09.3f\n",-r);
+  printf(" %09.3f\n",r);
+  printf(" %-09.3f\n",r);
+  return 0;
+}
+---
+#if 0
+I rewrote the driver according to good sense, my style,
+and discussion.
+
+This is file main.c on Autumn 2011 ubuntu linux release.
+The emacs compile command output:
+
+-*- mode: compilation; default-directory: "/tmp/" -*-
+Compilation started at Mon Mar 12 20:25:27
+
+make -k CFLAGS=-Wall main.o
+cc -Wall   -c -o main.o main.c
+
+Compilation finished at Mon Mar 12 20:25:27
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+
+extern int Query(char *Data, unsigned *Length);
+
+int main(int argc, char *argv[]) {
+  char Buffer[1024], *pc;
+  unsigned Size = sizeof(Buffer);
+  if (!Query(Buffer, &Size))
+    fputs("failed to call Query", stdout);
+  else
+    for (pc = Buffer; Size--; ++pc)
+      putchar(*pc);
+  putchar('\n');
+  return EXIT_SUCCESS;
+}
+---
+mpf_set_d(burgerUnitPrice,5.50);
+	mpf_set_d(milkshakePrice,2 * 2.86);
+	mpf_set_d(burgerNum,4000000000000000);
+	mpf_set_d(milkshakeNum,2);
+---
+partial square:
+1
+4
+9
+16
+partial double:
+2
+4
+6
+8
+---
+#include <stdio.h>
+
+int i;
+double sum(int *i, int lo, int hi, double (*term)()) {
+    double temp = 0;
+    for (*i = lo; *i <= hi; (*i)++)
+        temp += term();
+    return temp;
+}
+
+double term_func() { return 1.0 / i; }
+
+int main () {
+    printf("%f\n", sum(&i, 1, 100, term_func));
+    return 0;
+}
+---
+#include <stdio.h>
+#include <unistd.h>
+
+int main()
+{
+	int p[2];
+	pipe(p);
+	if (fork()) {
+		close(p[0]);
+		sleep(1);
+		write(p[1], p, 1);
+		wait(0);
+	} else {
+		close(p[1]);
+		read(p[0], p + 1, 1);
+		puts("received signal from pipe");
+	}
+	return 0;
 }
 ---
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 
-int main()
-{
-	setlocale(LC_CTYPE, "");
-	char moose[] = "møøse";
-	printf("bytes: %d\n", sizeof(moose) - 1);
-	printf("chars: %d\n", (int)mbstowcs(0, moose, 0));
-
-	return 0;
-}
----
-#include<graphics.h>
-#include<conio.h>
-
-int main()
-{
-	int d=DETECT,m,maxX,maxY,maxColours,i;
-	initgraph(&d,&m,"c:/turboc3/bgi");
-	maxX = getmaxx();
-	maxY = getmaxy();
-	maxColours = getmaxcolor();
-
-	for(i=0;i<maxColours;i++)
-	{
-		setfillstyle(SOLID_FILL,i);
-		bar(i*maxX/maxColours,0,(i+1)*maxX/maxColours,maxY);
-	}
-
-	getch();
-	closegraph();
-	
-	return 0;
-}
----
-#include <stdio.h>
-
-int main(int argc, char const *argv[]) {
-  for (char c = 0x41; c < 0x5b; c ++) putchar(c);
-  putchar('\n');
-  for (char c = 0x61; c < 0x7b; c ++) putchar(c);
-  putchar('\n');
-  return 0;
-}
----
-struct link {
-  struct link *next;
-  int data;
-};
----
-#include <stdio.h>
-
-int main()
-{
-  int intspace;
-  int *address;
-
-  address = &intspace;
-  printf("%p: %08x (=%08x)\n", address, *address, intspace);
-  printf("%p: %08x (=%08x)\n", address, *address, intspace);
-  return 0;
-}
----
-goto danger;
-	for (i = 0; i < 10; i++) {
-danger: /* unless you jumped here with i set to a proper value */
-		printf("%d\n", i);
-	}
----
-#include <gadget/gadget.h>
-
-LIB_GADGET_START
-
-Main
-   String XML, body;
-   Stack{
-       Store ( XML, Parser( "element", "","Some text here", NORMAL_TAG) );
-       Store ( XML, Parser( "root", "",XML, NORMAL_TAG) );
-   } Stack_off;
-
-   body = Multi_copy( body,"<?xml version=\"1.0\" ?>", XML, NULL);
-   Print "%s\n", body;
-
-   Free secure XML, body;
-End
----
-foo *foos = malloc(n * sizeof(*foos));
-for (int i = 0; i < n; i++)
-  init_foo(&foos[i]);
----
-#include <stdlib.h>
-#include <stdio.h>
-
-long getFileSize(const char *filename)
-{
-  long result;
-  FILE *fh = fopen(filename, "rb");
-  fseek(fh, 0, SEEK_END);
-  result = ftell(fh);
-  fclose(fh);
-  return result;
-}
-
-int main(void)
-{
-  printf("%ld\n", getFileSize("input.txt"));
-  printf("%ld\n", getFileSize("/input.txt"));
-  return 0;
-}
----
-#include <stdio.h>
-#include <stdint.h>
+wchar_t poker[] = L"♥♦♣♠";
+wchar_t four_two[] = L"\x56db\x5341\x4e8c";
 
 int main() {
-  uint32_t doorBytes[4] = {0};
+    if (!setlocale(LC_CTYPE, "")) {
+        fprintf(stderr, "Locale failure, check your env vars\n");
+        return 1;
+    }
 
-  for (uint32_t i = 1; i <= 100; ++i)
-    for (uint32_t j = i - 1; j <= 99; j += i)
-      doorBytes[j % 4] ^= (uint32_t)1 << j / 4;
-
-  for (uint32_t i = 0; i <= 99; doorBytes[i++ % 4] >>= 1)
-    if (doorBytes[i % 4] & 1)
-      printf("door %d is open\n", i + 1);
+#ifdef __STDC_ISO_10646__
+    printf("%lc\n", 0x2708);    /* ✈ */
+    printf("%ls\n", poker);     /* ♥♦♣♠ */
+    printf("%ls\n", four_two);  /* 四十二 */
+#else
+    printf("airplane\n");
+    printf("club diamond club spade\n");
+    printf("for ty two\n");
+#endif
+    return 0;
 }
+---
+#define IDD_DLG          101
+#define IDC_INPUT       1001
+#define IDC_INCREMENT   1002
+#define IDC_RANDOM      1003
+#define IDC_QUIT        1004
+---
+long a2D_Array[3][5];    /* 3 rows, 5 columns. */
+float my2Dfloats[][3] = {
+   1.0, 2.0, 0.0,
+   5.0, 1.0, 3.0 };
+#define FLOAT_ROWS (sizeof(my2Dfloats)/sizeof(my2dFloats[0]))
 ---
 #include <stdio.h>
-
-double squaredsum(double *l, int e)
-{
-   int i; double sum = 0.0;
-   for(i = 0 ; i < e ; i++) sum += l[i]*l[i];
-   return sum;
-}
-
-int main()
-{
-   double list[6] = {3.0, 1.0, 4.0, 1.0, 5.0, 9.0};
-
-   printf("%lf\n", squaredsum(list, 6));
-   printf("%lf\n", squaredsum(list, 0));
-   printf("%lf\n", squaredsum(NULL, 0));
-   return 0;
-}
----
-#include <stdio.h>
-#include <omp.h>
-
-int main()
-{
-	const char *str[] = { "Enjoy", "Rosetta", "Code" };
-	#pragma omp parallel for num_threads(3)
-	for (int i = 0; i < 3; i++)
-		printf("%s\n", str[i]);
-	return 0;
-}
----
-1       1
-2       1.4142
-3       1.7321
-1e+11   3.1623e+05
----
-#include <stdio.h>
-
-unsigned digit_sum(unsigned n) {
-    unsigned sum = 0;
-    do { sum += n % 10; }
-    while(n /= 10);
-    return sum;
-}
-
-unsigned a131382(unsigned n) {
-    unsigned m;
-    for (m = 1; n != digit_sum(m*n); m++);
-    return m;
-}
+#include <math.h>
 
 int main() {
-    unsigned n;
-    for (n = 1; n <= 70; n++) {
-        printf("%9u", a131382(n));
-        if (n % 10 == 0) printf("\n");
+    for (int i = 1; i < 5000; i++) {
+        int sum = 0;
+        for (int number = i; number > 0; number /= 10) {
+            int digit = number % 10;
+            sum += pow(digit, digit);
+        }
+        if (sum == i) {
+            printf("%i\n", i);
+        }
     }
     return 0;
 }
 ---
-#include <inttypes.h>
-#include <stdio.h>
-
-#include <openssl/err.h>
-#include <openssl/rand.h>
-
-int
-main()
-{
-  uint32_t v;
-
-  if (RAND_bytes((unsigned char *)&v, sizeof v) == 0) {
-    ERR_print_errors_fp(stderr);
-    return 1;
-  }
-  printf("%" PRIu32 "\n", v);
-  return 0;
+int main () {
+    char a[] = "thisisatest";
+    char b[] = "testing123testing";
+    int n = sizeof a - 1;
+    int m = sizeof b - 1;
+    char *s = NULL;
+    int t = lcs(a, n, b, m, &s);
+    printf("%.*s\n", t, s);
+    return 0;
 }
 ---
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <openssl/sha.h>
 
-char * char_repeat( int n, char c ) {
-  char * dest = malloc(n+1);
-  memset(dest, c, n);
-  dest[n] = '\0';
-  return dest;
+int main()
+{
+  int i;
+  unsigned char result[SHA_DIGEST_LENGTH];
+  const char *string = "Rosetta Code";
+
+  SHA1(string, strlen(string), result);
+
+  for(i = 0; i < SHA_DIGEST_LENGTH; i++)
+    printf("%02x%c", result[i], i < (SHA_DIGEST_LENGTH-1) ? ' ' : '\n');
+
+  return EXIT_SUCCESS;
 }
+---
+#include <math.h>
+#include <stdio.h>
 
 int main() {
-  char * result = char_repeat(5, '*');
-  puts(result);
-  free(result);
+  double pi = 4 * atan(1);
+  double radians = pi / 4;
+  double degrees = 45.0;
+  double temp;
+  printf("%f %f\n", sin(radians), sin(degrees * pi / 180));
+  printf("%f %f\n", cos(radians), cos(degrees * pi / 180));
+  printf("%f %f\n", tan(radians), tan(degrees * pi / 180));
+  temp = asin(sin(radians));
+  printf("%f %f\n", temp, temp * 180 / pi);
+  temp = acos(cos(radians));
+  printf("%f %f\n", temp, temp * 180 / pi);
+  temp = atan(tan(radians));
+  printf("%f %f\n", temp, temp * 180 / pi);
+
   return 0;
 }
 ---
-#include<string.h>
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(int argc, char* argv[])
+{
+  int i, count=0;
+  double f, sum=0.0, prod=1.0, resum=0.0;
+
+  for (i=1; i<argc; ++i) {
+    f = atof(argv[i]);
+    count++;
+    sum += f;
+    prod *= f;
+    resum += (1.0/f);
+  }
+  printf("Arithmetic mean = %f\n",sum/count);
+  printf("Geometric mean = %f\n",pow(prod,(1.0/count)));
+  printf("Harmonic mean = %f\n",count/resum);
+
+  return 0;
+}
+---
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define N 4
+#define M 4
+enum Move{UP,DOWN,LEFT,RIGHT};int hR;int hC;int cc[N][M];const int nS=100;int
+update(enum Move m){const int dx[]={0,0,-1,1};const int dy[]={-1,1,0,0};int i=hR
++dy[m];int j=hC+dx[m];if(i>= 0&&i<N&&j>=0&&j<M){cc[hR][hC]=cc[i][j];cc[i][j]=0;
+hR=i;hC=j;return 1;}return 0;}void setup(void){int i,j,k;for(i=0;i<N;i++)for(j=0
+;j<M;j++)cc[i][j]=i*M+j+1;cc[N-1][M-1]=0;hR=N-1;hC=M-1;k=0;while(k<nS)k+=update(
+(enum Move)(rand()%4));}int isEnd(void){int i,j; int k=1;for(i=0;i<N;i++)for(j=0
+;j<M;j++)if((k<N*M)&&(cc[i][j]!=k++))return 0;return 1;}void show(){int i,j;
+putchar('\n');for(i=0;i<N;i++)for(j=0;j<M;j++){if(cc[i][j])printf(j!=M-1?" %2d "
+:" %2d \n",cc[i][j]);else printf(j!=M-1?" %2s ":" %2s \n", "");}putchar('\n');}
+void disp(char* s){printf("\n%s\n", s);}enum Move get(void){int c;for(;;){printf
+("%s","enter u/d/l/r : ");c=getchar();while(getchar()!='\n');switch(c){case 27:
+exit(0);case'd':return UP;case'u':return DOWN;case'r':return LEFT;case'l':return
+RIGHT;}}}void pause(void){getchar();}int main(void){srand((unsigned)time(NULL));
+do setup();while(isEnd());show();while(!isEnd()){update(get());show();}disp(
+"You win"); pause();return 0;}
+---
+if (x > 0) goto positive;
+	else goto negative;
+
+positive:
+	printf("pos\n"); goto both;
+
+negative:
+	printf("neg\n");
+
+both:
+	...
+---
+#include <stdio.h>
+int main()
+{
+   int a, b;
+   scanf("%d%d", &a, &b);
+   printf("%d\n", a + b);
+   return 0;
+}
+---
+#include <stdio.h>
+
+#define BUFSIZE 1024
 
 int main(void)
 {
-	char *a[5];
-	const char *s="Hello,How,Are,You,Today";
-	int n=0, nn;
+    static char buffer[BUFSIZE];
 
-	char *ds=strdup(s);
+    while (fgets(buffer, BUFSIZE, stdin))
+        puts(buffer);
 
-	a[n]=strtok(ds, ",");
-	while(a[n] && n<4) a[++n]=strtok(NULL, ",");
-
-	for(nn=0; nn<=n; ++nn) printf("%s.", a[nn]);
-	putchar('\n');
-
-	free(ds);
-
-	return 0;
+    return 0;
 }
 ---
 #include <stdio.h>
-int openimage(const char *s)
+
+#define SWAP(r,s)  do{ t=r; r=s; s=t; } while(0)
+
+void StoogeSort(int a[], int i, int j)
 {
-  static int handle = 100;
-  fprintf(stderr, "opening %s\n", s);
-  return handle++;
+   int t;
+
+   if (a[j] < a[i]) SWAP(a[i], a[j]);
+   if (j - i > 1)
+   {
+       t = (j - i + 1) / 3;
+       StoogeSort(a, i, j - t);
+       StoogeSort(a, i + t, j);
+       StoogeSort(a, i, j - t);
+   }
+}
+
+int main(int argc, char *argv[])
+{
+   int nums[] = {1, 4, 5, 3, -6, 3, 7, 10, -2, -5, 7, 5, 9, -3, 7};
+   int i, n;
+
+   n = sizeof(nums)/sizeof(int);
+   StoogeSort(nums, 0, n-1);
+
+   for(i = 0; i <= n-1; i++)
+      printf("%5d", nums[i]);
+
+   return 0;
 }
 ---
-<?xml version="1.0" encoding="UTF-8"?>
-<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:dom="http://example.com/soap/wsdl">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <dom:anotherSoapFunc soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
-   </soapenv:Body>
-</soapenv:Envelope>
+#include <stdio.h>
+
+void shell_sort (int *a, int n) {
+    int h, i, j, t;
+    for (h = n; h /= 2;) {
+        for (i = h; i < n; i++) {
+            t = a[i];
+            for (j = i; j >= h && t < a[j - h]; j -= h) {
+                a[j] = a[j - h];
+            }
+            a[j] = t;
+        }
+    }
+}
+
+int main (int ac, char **av) {
+    int a[] = {4, 65, 2, -31, 0, 99, 2, 83, 782, 1};
+    int n = sizeof a / sizeof a[0];
+    int i;
+    for (i = 0; i < n; i++)
+        printf("%d%s", a[i], i == n - 1 ? "\n" : " ");
+    shell_sort(a, n);
+    for (i = 0; i < n; i++)
+        printf("%d%s", a[i], i == n - 1 ? "\n" : " ");
+    return 0;
+}
 ---
 #include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-int main( int argc, char ** argv ){
-  const char * str_a = "knight";
-  const char * str_b = "socks";
-  const char * str_c = "brooms";
+char *strip_chars(const char *string, const char *chars)
+{
+  char * newstr = malloc(strlen(string) + 1);
+  int counter = 0;
 
-  char * new_a = malloc( strlen( str_a ) - 1 );
-  char * new_b = malloc( strlen( str_b ) - 1 );
-  char * new_c = malloc( strlen( str_c ) - 2 );
+  for ( ; *string; string++) {
+    if (!strchr(chars, *string)) {
+      newstr[ counter ] = *string;
+      ++ counter;
+    }
+  }
 
-  strcpy( new_a, str_a + 1 );
-  strncpy( new_b, str_b, strlen( str_b ) - 1 );
-  strncpy( new_c, str_c + 1, strlen( str_c ) - 2 );
+  newstr[counter] = 0;
+  return newstr;
+}
 
-  printf( "%s\n%s\n%s\n", new_a, new_b, new_c );
+int main(void)
+{
+  char *new = strip_chars("She was a soul stripper. She took my heart!", "aei");
+  printf("%s\n", new);
 
-  free( new_a );
-  free( new_b );
-  free( new_c );
-
+  free(new);
   return 0;
 }
 ---
-int i;
-int squarenums[10];
-for (i=0; i<=10; i++) {
-	squarenums[i] = i * i;
-}
----
-int *var = malloc(n*sizeof(int));
-Typename *var = malloc(sizeof(Typename));
-Typename *var = malloc(sizeof var[0]);
----
-histogram get_histogram(grayimage im)
+#include <stdio.h>
+
+int data[] = {  85, 88, 75, 66, 25, 29, 83, 39, 97,
+                68, 41, 10, 49, 16, 65, 32, 92, 28, 98 };
+
+int pick(int at, int remain, int accu, int treat)
 {
-   histogram t;
-   unsigned int x, y;
+        if (!remain) return (accu > treat) ? 1 : 0;
 
-   if ( im == NULL ) return NULL;
-   t = malloc( sizeof(histogram_t)*256 );
-   memset(t, 0, sizeof(histogram_t)*256 );
-   if (t!=NULL)
-   {
-       for(x=0; x < im->width; x++ )
-       {
-         for(y=0; y < im->height; y++ )
-         {
-            t[ GET_LUM(im, x, y) ]++;
-         }
-       }
-   }
-   return t;
+        return  pick(at - 1, remain - 1, accu + data[at - 1], treat) +
+                ( at > remain ? pick(at - 1, remain, accu, treat) : 0 );
+}
+
+int main()
+{
+        int treat = 0, i;
+        int le, gt;
+        double total = 1;
+        for (i = 0; i < 9; i++) treat += data[i];
+        for (i = 19; i > 10; i--) total *= i;
+        for (i = 9; i > 0; i--) total /= i;
+
+        gt = pick(19, 9, 0, treat);
+        le = total - gt;
+
+        printf("<= : %f%%  %d\n > : %f%%  %d\n",
+               100 * le / total, le, 100 * gt / total, gt);
+        return 0;
 }
 ---
+#include <math.h>
+double cos(double x);
+float cosf(float x);
+long double cosl(long double x);
+---
+#define _CRT_SECURE_NO_WARNINGS /* MSVS compilers need this */
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define N 26
+void putm(char* string, size_t m)
+{
+    while(*string && m--)
+        putchar(*string++);
+}
 
-int main() {
-    unsigned char lower[N];
+int main(void)
+{
 
-    for (size_t i = 0; i < N; i++) {
-        lower[i] = i + 'a';
-    }
+    char string[] =
+        "Programs for other encodings (such as 8-bit ASCII, or EUC-JP)."
+
+    int n = 3;
+    int m = 4;
+    char knownCharacter = '(';
+    char knownSubstring[] = "encodings";
+
+    putm(string+n-1, m );                       putchar('\n');
+    puts(string+n+1);                           putchar('\n');
+    putm(string, strlen(string)-1);             putchar('\n');
+    putm(strchr(string, knownCharacter), m );   putchar('\n');
+    putm(strstr(string, knownSubstring), m );   putchar('\n');
 
     return EXIT_SUCCESS;
 }
