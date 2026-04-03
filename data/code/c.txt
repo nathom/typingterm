@@ -20,12 +20,10 @@ int main() {
     return 0;
 }
 ---
-/* declare array */
 int frequency[26];
 int ch;
 FILE* txt_file = fopen ("a_text_file.txt", "rt");
 
-/* init the freq table: */
 for (ch = 0; ch < 26; ch++)
     frequency[ch] = 0;
 
@@ -33,7 +31,6 @@ while (1) {
     ch = fgetc(txt_file);
     if (ch == EOF) break; /* end of file or read error.  EOF is typically -1 */
 
-    /* assuming ASCII; "letters" means "a to z" */
     if ('a' <= ch && ch <= 'z')      /* lower case */
         frequency[ch-'a']++;
     else if ('A' <= ch && ch <= 'Z') /* upper case */
@@ -81,16 +78,6 @@ int main(void)
 	return 0;
 }
 ---
-/**
- * \brief Perform addition on \p a and \p b.
- *
- * \param a One of the numbers to be added.
- * \param b Another number to be added.
- * \return The sum of \p a and \p b.
- * \code
- *     int sum = add(1, 2);
- * \endcode
- */
 int add(int a, int b) {
     return a + b;
 }
@@ -198,7 +185,6 @@ Main
 
    Let( v, "María tenía un corderito");
 
-  /* Str_len() sirve sin stack, pero en este caso es mejor usar strlen() de C. */
    w = Substr(v, Str_at("tenía",v),Str_len(v));
    Print "msg normal: %s\n", w;
 
@@ -240,8 +226,6 @@ main(){
   return 0;
 }
 ---
-// From manpage for "getline"
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -313,7 +297,6 @@ int main()
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Flip a coin, 10 times. */
 int
 main()
 {
@@ -457,15 +440,8 @@ int main()
   int intspace;
   int *address;
 
-  address = &intspace; // address = 0x100;
-  *address = 65535;
+  address = &intspace;
   printf("%p: %08x (=%08x)\n", address, *address, intspace);
-  // likely we must be worried about endianness, e.g.
-  *((char*)address) = 0x00;
-  *((char*)address+1) = 0x00;
-  *((char*)address+2) = 0xff;
-  *((char*)address+3) = 0xff; // if sizeof(int) == 4!
-  // which maybe is not the best way of writing 32 bit values...
   printf("%p: %08x (=%08x)\n", address, *address, intspace);
   return 0;
 }
@@ -547,7 +523,6 @@ int main()
 
    printf("%lf\n", squaredsum(list, 6));
    printf("%lf\n", squaredsum(list, 0));
-   /* the same without using a real list as if it were 0-element long */
    printf("%lf\n", squaredsum(NULL, 0));
    return 0;
 }
@@ -654,7 +629,6 @@ int main(void)
 }
 ---
 #include <stdio.h>
-/* gcc -shared -nostartfiles fakeimglib.c -o fakeimglib.so */
 int openimage(const char *s)
 {
   static int handle = 100;

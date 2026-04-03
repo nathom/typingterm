@@ -135,18 +135,6 @@ def iprimes_upto(limit):
         if is_prime[i]:
             yield i
 ---
-lp = open("/dev/lp0", "w")
-lp.write("Hello World!\n")
-lp.close()
----
-import random
-
-t, g = random.randint(1, 10), 0
-g = int(input("Guess a number that's between 1 and 10: "))
-while t != g:
-    g = int(input("Guess again! "))
-print("That's right!")
----
 import os
 
 exit_code = os.system("ls")
@@ -328,10 +316,6 @@ def aks(p):
         if c % p:
             return False
     return True
----
-print_all(4, 3, 5, 6, 4, 3)
-print_all(4, 3, 5)
-print_all("Rosetta", "Code", "Is", "Awesome!")
 ---
 import sys
 import calendar

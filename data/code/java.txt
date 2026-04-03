@@ -26,19 +26,11 @@ public class Math
 ---
 public class MyClass{
 
-  // instance variable
-  private int variable;  // Note: instance variables are usually "private"
+  private int variable;
 
-  /**
-  * The constructor
-  */
   public MyClass(){
-    // creates a new instance
   }
 
-  /**
-  * A method
-  */
   public void someMethod(){
    this.variable = 1;
   }
@@ -69,16 +61,13 @@ public class RandomExample {
   public static void main(String[] args) {
     SecureRandom rng = new SecureRandom();
 
-    /* Prints a random signed 32-bit integer. */
     System.out.println(rng.nextInt());
   }
 }
 ---
-//All of these objects will be deallocated automatically once the program leaves
-//their scope and there are no more pointers to the objects
-Object foo = new Object(); //Allocate an Object and a reference to it
-int[] fooArray = new int[size]; //Allocate all spaces in an array and a reference to it
-int x = 0; //Allocate an integer and set its value to 0
+Object foo = new Object();
+int[] fooArray = new int[size];
+int x = 0;
 ---
 package delegate;
 
@@ -181,11 +170,8 @@ public class HTML {
 }
 ---
 public class Blah{
-   //...other methods/data members...
    protected void finalize() throws Throwable{
-      //Finalization code here
    }
-   //...other methods/data members...
 }
 ---
 public static void sortByName(Pair[] pairs) {
@@ -194,7 +180,7 @@ public static void sortByName(Pair[] pairs) {
 ---
 public static double[][] mult(double a[][], double b[][]){//a[m][n], b[n][p]
    if(a.length == 0) return new double[0][0];
-   if(a[0].length != b.length) return null; //invalid dims
+   if(a[0].length != b.length) return null;
 
    int n = a[0].length;
    int m = a.length;
@@ -232,12 +218,10 @@ public class SeqNonSquares {
     }
 
     public static void main(String[] args) {
-        // first 22 values (as a list) has no squares:
         for (int i = 1; i < 23; i++)
             System.out.print(nonsqr(i) + " ");
         System.out.println();
 
-        // The following check shows no squares up to one million:
         for (int i = 1; i < 1000000; i++) {
             double j = Math.sqrt(nonsqr(i));
             assert j != Math.floor(j);
@@ -266,7 +250,6 @@ import java.io.IOException;
 public class CreateTempFile {
     public static void main(String[] args)  {
         try {
-            //create a temp file
             File temp = File.createTempFile("temp-file-name", ".tmp");
             System.out.println("Temp file : " + temp.getAbsolutePath());
         }
@@ -278,11 +261,9 @@ public class CreateTempFile {
 ---
 final int immutableInt = 4;
 int mutableInt = 4;
-mutableInt = 6; //this is fine
-immutableInt = 6; //this is an error
+mutableInt = 6;
+immutableInt = 6;
 ---
-// GaussJordan.java
-
 import java.util.Random;
 
 public class GaussJordan {
@@ -330,7 +311,7 @@ public class ValueCapture {
 	}
 
 	Supplier<Integer> foo = funcs.get(3);
-	System.out.println(foo.get()); // prints "9"
+	System.out.println(foo.get());
     }
 }
 ---
@@ -406,7 +387,6 @@ public static boolean isPalindrome(String input) {
 		char startChar = input.charAt(i);
 		char endChar = input.charAt(j);
 
-		// Handle surrogate pairs in UTF-16
 		if (Character.isLowSurrogate(endChar)) {
 			if (startChar != input.charAt(--j)) {
 				return false;
@@ -444,7 +424,7 @@ public class Compose {
     public static void main(String[] args) {
         Function<Double,Double> sin_asin = ((Function<Double,Double>)Math::sin).compose(Math::asin);
 
-        System.out.println(sin_asin.apply(0.5)); // prints "0.5"
+        System.out.println(sin_asin.apply(0.5));
     }
 }
 ---
@@ -502,7 +482,7 @@ public class Sieve{
                LinkedList<Integer> primes = new LinkedList<Integer>();
                LinkedList<Integer> nums = new LinkedList<Integer>();
 
-               for(int i = 2;i <= n;i++){ //unoptimized
+               for(int i = 2;i <= n;i++){
                        nums.add(i);
                }
 
@@ -534,19 +514,14 @@ int[] concat(int[] arrayA, int[] arrayB) {
 }
 ---
 public class Animal{
-   //functions go here...
 }
 public class Dog extends Animal{
-   //functions go here...
 }
 public class Cat extends Animal{
-   //functions go here...
 }
 public class Lab extends Dog{
-   //functions go here...
 }
 public class Collie extends Dog{
-   //functions go here...
 }
 ---
 import java.nio.charset.StandardCharsets;
@@ -631,7 +606,6 @@ public class StackTest {
         stack.push( "Second" );
         System.out.println( "Popped entry should be second: " + stack.pop() );
 
-        // Popping an empty stack will throw...
         stack.pop();
         stack.pop();
     }
@@ -640,9 +614,7 @@ public class StackTest {
 public class TestVolitileClass throws Exception{
    public static void main(String[] args){
       VolatileClass vc = new VolatileClass();
-      vc.mutex.acquire(); //will wait automatically if another class has the mutex
-                          //can be interrupted similarly to a Thread
-                          //use acquireUninterruptibly() to avoid that
+      vc.mutex.acquire();
       vc.needsToBeSynched();
       vc.mutex.release();
    }

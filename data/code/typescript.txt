@@ -6,8 +6,6 @@ for (let i: number = 0; i < 5; ++i) {
     console.log(line)
 }
 ---
-// Least common multiple
-
 function gcd(m: number, n: number): number {
   var tmp: number;
   while (m != 0) {
@@ -28,16 +26,12 @@ function gcd_rec(a: number, b: number) {
   return b ? gcd_rec(b, a % b) : Math.abs(a);
 }
 ---
-// Roman numerals/Encode
-
 const weightsSymbols: [number, string][] =
   [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'],
   [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
-// 3888 or MMMDCCCLXXXVIII (15 chars) is the longest string properly encoded
-// with these symbols.
 
 function toRoman(n: number): string {
-  var roman = ""; // Result
+  var roman = "";
   for (i = 0; i <= 12 && n > 0; i++) {
     var w = weightsSymbols[i][0];
     while (n >= w) {
@@ -48,12 +42,10 @@ function toRoman(n: number): string {
   return roman;
 }
 
-console.log(toRoman(1990)); // MCMXC
-console.log(toRoman(2022)); // MMXXII
-console.log(toRoman(3888)); // MMMDCCCLXXXVIII
+console.log(toRoman(1990));
+console.log(toRoman(2022));
+console.log(toRoman(3888));
 ---
-// Modular inverse
-
 function modInv(e: number, t: number): number {
   var d = 0;
   if (e < t) {
@@ -70,9 +62,8 @@ function modInv(e: number, t: number): number {
   return d;
 }
 
-console.log(`${modInv(42, 2017)}`); // 1969
+console.log(`${modInv(42, 2017)}`);
 ---
-// Department numbers
 console.log(`POLICE SANITATION FIRE`);
 let f: number;
 for (var p = 2; p <= 7; p += 2) {
@@ -85,7 +76,6 @@ for (var p = 2; p <= 7; p += 2) {
   }
 }
 ---
-// Find years with Sunday Christmas
 var f = 2008;
 var t = 2121;
 console.log(`Sunday Christmases ${f} - ${t}`);
@@ -227,11 +217,9 @@ function levenshtein(a: string, b: string): number {
     return u[n] ?? n;
   }
 ---
-// Semiprime
-
 function primeFactorsCount(n: number): number {
   n = Math.abs(n);
-  var count = 0; // Result
+  var count = 0;
   if (n >= 2)
     for (factor = 2; factor <= n; factor++)
       while n % factor == 0) {
@@ -279,7 +267,6 @@ function josephus(n: number, k: number): number {
   return ((josephus(n - 1, k) + k - 1) % n) + 1;
 }
 ---
-// Loop over multiple arrays simultaneously
 var arr1: string[] = ['a', 'b', 'c'];
 var arr2: string[] = ['A', 'B', 'C'];
 var arr3: number[] = [1, 2, 3];
@@ -314,8 +301,6 @@ for (let y: number = 1995; y <= 2045; y++) {
   }
 }
 ---
-// Sum digits of an integer
-
 function sumOfDigitBase(n: number, bas: number): number {
   var digit = 0, sum = 0;
   while (n > 0)
@@ -335,7 +320,6 @@ console.log(`0xf0e sums to ${sumOfDigitBase(0xf0e, 16)}`);
 maxint = Number.MAX_SAFE_INTEGER;
 console.log(`${maxint} (Number.MAX_SAFE_INTEGER) sums to ${sumOfDigitBase(maxint, 10)}`);
 ---
-// Catalan numbers
 var c: number[] = [1];
 console.log(`${0}\t${c[0]}`);
 for (n = 0; n < 15; n++) {
@@ -345,7 +329,6 @@ for (n = 0; n < 15; n++) {
   console.log(`${n + 1}\t${c[n + 1]}`);
 }
 ---
-// N'th
 function suffix(n: number): string {
   var nMod10: number = n % 10;
   var nMod100: number = n % 100;
@@ -369,8 +352,6 @@ printImages(   0,   25);
 printImages( 250,  265);
 printImages(1000, 1025);
 ---
-// Digital root
-
 function rootAndPers(n: number, bas: number): [number, number] {
   var pers = 0;
   while (n >= bas)
@@ -405,11 +386,9 @@ function isEven(x: number): boolean { return x % 2 === 0; }
 
 const evenSize = compose(size, isEven);
 
-console.log(evenSize("ABCD")) // true
-console.log(evenSize("ABC")) // false
+console.log(evenSize("ABCD"))
+console.log(evenSize("ABC"))
 ---
-// Multiplication tables
-
 var n = 12;
 console.clear();
 for (j = 1; j < n; j++)
@@ -453,7 +432,6 @@ function replace(input: string, key: number) : string {
       ($1) => String.fromCharCode(($1.charCodeAt(0) + key + 26 - 65) % 26 + 65));
 }
 
-// test
 var str = 'The five boxing wizards jump quickly';
 var encoded = replace(str, 3);
 var decoded = replace(encoded, -3);

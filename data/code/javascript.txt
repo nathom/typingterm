@@ -10,8 +10,6 @@ function array(length) {
 ---
 (function (x, y, z) {
 
-    // function of arity 3 mapped over nth items of each of 3 lists
-    // (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
     function zipWith3(f, xs, ys, zs) {
         return zs.length ? [f(xs[0], ys[0], zs[0])].concat(
             zipWith3(f, xs.slice(1), ys.slice(1), zs.slice(1))) : [];
@@ -33,14 +31,10 @@ console.log(x(2.3));
 ---
 (() => {
 
-    // .reduceRight() can be useful when reversals
-    // are composed with some other process
 
     let reverse1 = s => Array.from(s)
         .reduceRight((a, x) => a + (x !== ' ' ? x : ' <- '), ''),
 
-        // but ( join . reverse . split ) is faster for
-        // simple string reversals in isolation
 
         reverse2 = s => s.split('').reverse().join('');
 
@@ -105,7 +99,6 @@ var readFile = function(path) {
 
 console.log(readFile('file.txt'));
 ---
-// flatten :: NestedList a -> [a]
 const flatten = t => {
     const go = x =>
         Array.isArray(x) ? (
@@ -207,7 +200,6 @@ function range(m, n) {
 
 var a = range(0, 19);
 
-//return a new array of the results and join with commas to print
 console.log(a.map(function (n) { return f(n); }).join(', '));
 console.log(a.map(function (n) { return m(n); }).join(', '));
 ---
@@ -252,11 +244,9 @@ function test (n, deg) {
 ---
 var jortSort = function( array ) {
 
-  // sort the array
   var originalArray = array.slice(0);
   array.sort( function(a,b){return a - b} );
 
-  // compare to see if it was originally sorted
   for (var i = 0; i < originalArray.length; ++i) {
     if (originalArray[i] !== array[i]) return false;
   }
@@ -299,7 +289,6 @@ function a(k, x1, x2, x3, x4, x5) {
   return (k > 0) ? b() : x4() + x5();
 }
 
-// this uses lambda wrappers around the numeric arguments
 function x(n) {
   return function () {
     return n;
@@ -327,14 +316,12 @@ function binary_search_iterative(a, value) {
 ---
 (() => {
 
-    // jewelCount :: String -> String -> Int
     const jewelCount = (j, s) => {
         const js = j.split('');
         return s.split('')
             .reduce((a, c) => js.includes(c) ? a + 1 : a, 0)
     };
 
-    // TEST -----------------------------------------------
     return [
             ['aA', 'aAAbbbb'],
             ['z', 'ZZ']
@@ -394,10 +381,8 @@ console.log(song(bottles, songTemplate));
 (() => {
     'use strict';
 
-    // show :: a -> String
     const show = x => JSON.stringify(x, null, 2);
 
-    // printAll [any] -> String
     const printAll = (...a) => a.map(show)
         .join('\n');
 
@@ -436,7 +421,7 @@ String.prototype.repeat = function(n) {
     return new Array(1 + (n || 0)).join(this);
 }
 
-console.log("ha".repeat(5));  // hahahahaha
+console.log("ha".repeat(5));
 ---
 var i = 0n;
 
@@ -445,15 +430,14 @@ while (true)
 ---
 function isPangram(s) {
     var letters = "zqxjkvbpygfwmucldrhsnioate"
-    // sorted by frequency ascending (http://en.wikipedia.org/wiki/Letter_frequency)
     s = s.toLowerCase().replace(/[^a-z]/g,'')
     for (var i = 0; i < 26; i++)
         if (s.indexOf(letters[i]) < 0) return false
     return true
 }
 
-console.log(isPangram("is this a pangram"))  // false
-console.log(isPangram("The quick brown fox jumps over the lazy dog"))  // true
+console.log(isPangram("is this a pangram"))
+console.log(isPangram("The quick brown fox jumps over the lazy dog"))
 ---
 function MaximumSubsequence(population) {
     var maxValue = 0;
@@ -486,7 +470,7 @@ function root_mean_square(ary) {
     return Math.sqrt(sum_of_squares / ary.length);
 }
 
-print( root_mean_square([1,2,3,4,5,6,7,8,9,10]) ); // ==> 6.2048368229954285
+print( root_mean_square([1,2,3,4,5,6,7,8,9,10]) );
 ---
 var http = require('http');
 
@@ -508,17 +492,13 @@ function mean(array) {
             });
     }
 
-alert( mean( [1,2,3,4,5] ) );   // 3
-alert( mean( [] ) );            // 0
+alert( mean( [1,2,3,4,5] ) );
+alert( mean( [] ) );
 ---
 {
     let s = " \t String with spaces  \t  ";
-    // a future version of ECMAScript will have trimStart().  Some current
-    // implementations have trimLeft().
     console.log("original: '" + s + "'");
     console.log("trimmed left: '" + s.replace(/^\s+/,'') + "'");
-    // a future version of ECMAScript will have trimEnd().  Some current
-    // implementations have trimRight().
     console.log("trimmed right: '" + s.replace(/\s+$/,'') + "'");
     console.log("trimmed both: '" + s.trim() + "'");
  }
@@ -536,5 +516,3 @@ print(ary);
 
 ary.sort(function(a,b){return (a[1]<b[1] ? -1 : (a[1]>b[1] ? 1 : 0))});
 print(ary);
-
-/* a stable sort will output ["US", "Birmingham"] before ["UK", "Birmingham"] */

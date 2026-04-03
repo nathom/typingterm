@@ -70,8 +70,6 @@ fn error_handler<E: fmt::Display>(error: E, code: i32) -> ! {
     process::exit(code)
 }
 ---
-// cargo-deps: rand
-
 extern crate rand;
 use rand::{thread_rng, Rng};
 
@@ -91,11 +89,10 @@ extern crate autopilot;
 extern crate rand;
 use rand::Rng;
 
-// Moves the mouse in a sine wave across the screen.
 const TWO_PI: f64 = std::f64::consts::PI * 2.0;
 fn sine_mouse_wave() -> Result<(), autopilot::mouse::MouseError> {
     let screen_size = autopilot::screen::size();
-    let scoped_height = screen_size.height / 2.0 - 10.0; // Stay in screen bounds.
+    let scoped_height = screen_size.height / 2.0 - 10.0;
     for x in 0..screen_size.width as u64 {
         let y = (scoped_height * ((TWO_PI * x as f64) / screen_size.width).sin() + scoped_height)
             .round();
@@ -131,7 +128,6 @@ fn fibonacci_sequence() -> impl Iterator<Item = u64> {
     let sqrt_5 = 5.0f64.sqrt();
     let p = (1.0 + sqrt_5) / 2.0;
     let q = 1.0 / p;
-    // The range is sufficient up to 70th Fibonacci number
     (0..1).chain((1..70).map(move |n| ((p.powi(n) + q.powi(n)) / sqrt_5 + 0.5) as u64))
 }
 ---
@@ -196,8 +192,6 @@ fn main() {
 }
 ---
 fn main() {
-    // deficient starts at 1 because 1 is deficient but proper_divisors returns
-    // and empty Vec
     let (mut abundant, mut deficient, mut perfect) = (0u32, 1u32, 0u32);
     for i in 1..20_001 {
         if let Some(divisors) = i.proper_divisors() {
@@ -254,8 +248,6 @@ where
     }
 }
 ---
-// 20210212 Rust programming solution
-
 fn nthRoot(n: f64, A: f64) -> f64 {
 
    let      p  =  1e-9_f64 ;
@@ -350,11 +342,9 @@ pub struct CursorMut<'a, T: 'a> {
 use std::char::from_u32;
 
 fn main() {
-    //ascii char
     println!("{}", 'a' as u8);
     println!("{}", 97 as char);
 
-    //unicode char
     println!("{}", 'π' as u32);
     println!("{}", from_u32(960).unwrap());
 }
@@ -438,7 +428,6 @@ fn main() {
 
     for row in matrix.iter_mut() {
         for item in row.iter_mut() {
-            *item = rng.gen_range(0, 21);
         }
     }
 
@@ -501,30 +490,25 @@ fn is_leap(year: i32) -> bool {
 }
 ---
 #[derive(Serialize, Deserialize)]
-struct W { a: i32, b: i32 }  // => { "a": 0, "b": 0 }
+struct W { a: i32, b: i32 }
 
 #[derive(Serialize, Deserialize)]
-struct X(i32, i32);          // => [0, 0]
+struct X(i32, i32);
 
 #[derive(Serialize, Deserialize)]
-struct Y(i32);               // => 0
+struct Y(i32);
 
 #[derive(Serialize, Deserialize)]
-struct Z;                    // => null
+struct Z;
 
 #[derive(Serialize, Deserialize)]
 enum E {
-    W { a: i32, b: i32 },    // => { "W": { "a": 0, "b": 0 } }
-    X(i32, i32),             // => { "X": [0, 0] }
-    Y(i32),                  // => { "Y": 0 }
-    Z,                       // => { "Z" }
+    W { a: i32, b: i32 },
+    X(i32, i32),
+    Y(i32),
+    Z,
 }
 ---
-// If an option may return null - or nothing - in Rust, it's wrapped
-// in an Optional which may return either the type of object specified
-// in <> or None. We can check this using .is_some() and .is_none() on
-// the Option.
-
 fn check_number(num: &Option<u8>) {
     if num.is_none() {
         println!("Number is: None");
@@ -569,20 +553,17 @@ let mut var09 = 1.5;
 let mut var10 = 2.5f32;
 let mut var11: f32 = 5.0;
 let mut var12: f64 = 5.0f64;
-var07 = var11; // This line makes the compiler infer var07 should be a f32.
-var08 = 3.1416f32; // Assigning to var08 after declaration
-var08 = 2.7183f32; // Reassigning var08 since it can be reassigned since it is mutable.
+var07 = var11;
+var08 = 3.1416f32;
+var08 = 2.7183f32;
 ---
 use std::{mem,ptr};
 
 fn main() {
     let mut data: i32;
 
-    // Rust does not allow us to use uninitialized memory but the STL provides an `unsafe`
-    // function to override this protection.
     unsafe {data = mem::uninitialized()}
 
-    // Construct a raw pointer (perfectly safe)
     let address = &mut data as *mut _;
 
     unsafe {ptr::write(address, 5)}
@@ -610,20 +591,20 @@ fn main() {
 ---
 fn main ( ) {
 	fn factor_sum(n: i32) -> i32 {
-	    let mut v = Vec::new(); //create new empty array
-	    for  x in 1..n-1 {      //test vaules 1 to n-1
-	    	if n%x == 0 {   //if current x is a factor of n
-	    		v.push(x);      //add x to the array
+	    let mut v = Vec::new();
+	    for  x in 1..n-1 {
+	    	if n%x == 0 {
+	    		v.push(x);
 	    	}
 	    }
-    let mut sum = v.iter().sum(); //iterate over array and sum it up
+    let mut sum = v.iter().sum();
     return sum;
     }
 
     fn perfect_nums(n: i32) {
-    	for x in 2..n {       //test numbers from 1-n
+    	for x in 2..n {
     		if factor_sum(x) == x {//call factor_sum on each value of x, if return value is = x
-    			println!("{} is a perfect number.", x); //print value of x
+    			println!("{} is a perfect number.", x);
     		}
     	}
     }
@@ -689,7 +670,6 @@ fn main() {
     let evens: Vec<i32> = nums.iter().cloned().filter(|x| x % 2 == 0).collect();
     println!("{:?}", evens);
 
-    // Filter an already existing vector
     println!("original vec filtered: ");
     let mut nums: Vec<i32> = (1..20).collect();
     nums.retain(|x| x % 2 == 0);
@@ -708,7 +688,6 @@ enum FruitsWithNumbers {
 }
 
 fn main() {
-    // Access to numerical value by conversion
     println!("{}", FruitsWithNumbers::Pear as u8);
 }
 ---

@@ -28,9 +28,7 @@ myDict["hello"] = 1;
 myDict["world"] = 2;
 myDict["!"] = 3;
 
-// iterating over key-value pairs:
 for (std::map<std::string, int>::iterator it = myDict.begin(); it != myDict.end(); ++it) {
-    // the thing pointed to by the iterator is an std::pair<const std::string, int>&
     const std::string& key = it->first;
     int& value = it->second;
     std::cout << "key = " << key << ", value = " << value << std::endl;
@@ -94,7 +92,6 @@ int main( ) {
 ---
 #include <iostream>
 using namespace std;
-/* passing arguments by reference */
 void f(int &y) /* variable is now passed by reference */
 {
 y++;
@@ -136,9 +133,8 @@ void comb(int N, int K)
     std::string bitmask(K, 1); // K leading 1's
     bitmask.resize(N, 0); // N-K trailing 0's
 
-    // print integers and permute bitmask
     do {
-        for (int i = 0; i < N; ++i) // [0..N-1] integers
+        for (int i = 0; i < N; ++i)
         {
             if (bitmask[i]) std::cout << " " << i;
         }
@@ -151,8 +147,6 @@ int main()
     comb(5, 3);
 }
 ---
-//compile with g++ main.cpp -lboost_system -pthread
-
 #include <boost/asio.hpp>
 
 int main()
@@ -208,7 +202,7 @@ private:
     bool right_ = true;
 };
 
-#endif // ANIMATIONWIDGET_H
+#endif
 ---
 int main() {
   NG_4 a5(0,1,1,0);
@@ -259,9 +253,6 @@ int main(){
   while (n.hasNext()) std::cout << n.next() << "\t* " << std::bitset<4>(n.next()) << std::endl;
 }
 ---
-/*
- * Nigel Galloway, July 19th., 2017 - Yes well is this any better?
- */
 class N{
   uint n,i,g,e,l;
 public:
@@ -295,7 +286,7 @@ void knuthShuffle(RandomAccessIterator begin, RandomAccessIterator end) {
 #define STR(x) #x
 int main()
 {
-  std::cout << STR(Hello world) << std::endl; // STR(Hello world) expands to "Hello world"
+  std::cout << STR(Hello world) << std::endl;
 }
 ---
 #include <tr1/unordered_set>
@@ -316,7 +307,6 @@ int main() {
 ---
 struct MyException
 {
-  // data with info about exception
 };
 ---
 auto strA = R"(this is
@@ -341,22 +331,22 @@ int main()
 {
   int* p;
 
-  p = new int;    // allocate a single int, uninitialized
-  delete p;       // deallocate it
+  p = new int;
+  delete p;
 
-  p = new int(2); // allocate a single int, initialized with 2
-  delete p;       // deallocate it
+  p = new int(2);
+  delete p;
 
   std::string* p2;
 
-  p2 = new std::string; // allocate a single string, default-initialized
-  delete p2;            // deallocate it
+  p2 = new std::string;
+  delete p2;
 
-  p = new int[10]; // allocate an array of 10 ints, uninitialized
-  delete[] p;      // deallocation of arrays must use delete[]
+  p = new int[10];
+  delete[] p;
 
-  p2 = new std::string[10]; // allocate an array of 10 strings, default-initialized
-  delete[] p2;              // deallocate it
+  p2 = new std::string[10];
+  delete[] p2;
 }
 ---
 #include <string>
@@ -369,7 +359,7 @@ int main()
 struct comma_ws : std::ctype<char> {
     static const mask* make_table() {
     static std::vector<mask> v(classic_table(), classic_table() + table_size);
-        v[','] |= space;  // comma will be classified as whitespace
+        v[','] |= space;
         return &v[0];
     }
     comma_ws(std::size_t refs = 0) : ctype<char>(make_table(), false, refs) {}
@@ -393,7 +383,7 @@ std::string execute(const std::string& command) {
 
     std::ifstream ifs("temp.txt");
     std::string ret{ std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>() };
-    ifs.close(); // must close the inout stream so the file can be cleaned up
+    ifs.close();
     if (std::remove("temp.txt") != 0) {
         perror("Error deleting temporary file");
     }
@@ -421,7 +411,6 @@ set<double> pow5s;
 		pow5[i] = (double)i * i * i * i * i;
 		pow5s.insert(pow5[i]);
 	}
-	//...
         if (pow5s.find(sum) != pow5s.end())
 ---
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -454,12 +443,11 @@ int main()
 #include <algorithm>
 #include <string>
 
-// Bug: calling operator++ on an empty collection invokes undefined behavior.
 std::all_of( ++(strings.begin()), strings.end(),
-             [&](std::string a){ return a == strings.front(); } )  // All equal
+             [&](std::string a){ return a == strings.front(); } )
 
 std::is_sorted( strings.begin(), strings.end(),
-                [](std::string a, std::string b){ return !(b < a); }) )  // Strictly ascending
+                [](std::string a, std::string b){ return !(b < a); }) )
 ---
 #include <string>
 using namespace std;
@@ -467,11 +455,8 @@ using namespace std;
 string s1="abcd";
 string s2="abab";
 string s3="ab";
-//Beginning
 s1.compare(0,s3.size(),s3)==0;
-//End
 s1.compare(s1.size()-s3.size(),s3.size(),s3)==0;
-//Anywhere
 s1.find(s2)//returns string::npos
 int loc=s2.find(s3)//returns 0
 loc=s2.find(s3,loc+1)//returns 2
@@ -490,9 +475,7 @@ while (a)
 int main( ) {
    std::vector<int> numbers { 11 , 88 , -5 , 13 , 4 , 121 , 77 , 2 } ;
    std::random_device seed ;
-   // generator
    std::mt19937 engine( seed( ) ) ;
-   // number distribution
    std::uniform_int_distribution<int> choose( 0 , numbers.size( ) - 1 ) ;
    std::cout << "random element picked : " << numbers[ choose( engine ) ]
       << " !\n" ;
@@ -653,19 +636,17 @@ int main() {
     return 0;
 }
 ---
-#include <cassert> // assert.h also works
+#include <cassert>
 
 int main()
 {
   int a;
-  // ... input or change a here
 
-  assert(a == 42); // Aborts program if a is not 42, unless the NDEBUG macro was defined
-                    // when including <cassert>, in which case it has no effect
+  assert(a == 42);
 }
 ---
 #include <chrono>
-#include <ctime> //for conversion std::ctime()
+#include <ctime>
 #include <iostream>
 
 int main() {
@@ -673,7 +654,7 @@ int main() {
     std::cout << std::ctime(&timenow) << std::endl;
 }
 ---
-#include <iostream> //compiled with "Dev-C++" , from RaptorOne
+#include <iostream>
 
 int main()
 {

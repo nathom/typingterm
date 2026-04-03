@@ -114,11 +114,11 @@ func myFunc(p params) int {
 }
 
 func main() {
-    r := myFunc(params{x: 1, y: 2, z: 3}) // all fields, same order
+    r := myFunc(params{x: 1, y: 2, z: 3})
     fmt.Println("r =", r)
-    s := myFunc(params{z: 3, y: 2, x: 1}) // all fields, different order
+    s := myFunc(params{z: 3, y: 2, x: 1})
     fmt.Println("s =", s)
-    t := myFunc(params{y: 2})             // only one field, others set to zero
+    t := myFunc(params{y: 2})
     fmt.Println("t =", t)
 }
 ---
@@ -142,30 +142,23 @@ package main
 
 import "fmt"
 
-// int parameter, so arguments will be passed to it by value.
 func zeroval(ival int) {
 	ival = 0
 }
-// has an *int parameter, meaning that it takes an int pointer.
 func zeroptr(iptr *int) {
-	*iptr = 0
 }
 func main() {
 	i := 1
-	fmt.Println("initial:", i) // prt initial: 1
+	fmt.Println("initial:", i)
 	zeroval(i)
-	fmt.Println("zeroval:", i) // prt zeroval: 1
+	fmt.Println("zeroval:", i)
 	zeroptr(&i)
-	fmt.Println("zeroptr:", i)  // prt zeroptr: 0
-	fmt.Println("pointer:", &i) // prt pointer: 0xc0000140b8
+	fmt.Println("zeroptr:", i)
+	fmt.Println("pointer:", &i)
 }
 ---
-// Go doesn't have generics, but sometimes a type definition helps
-// readability and maintainability.   This example is written to
-// the following function type, which uses float64.
 type ffType func(float64) float64
 
-// compose function requested by task
 func compose(f, g ffType) ffType {
     return func(x float64) float64 {
         return f(g(x))
@@ -190,7 +183,7 @@ import "fmt"
 
 func main() {
     const max = 1000
-    a := make([]int, max) // all zero by default
+    a := make([]int, max)
     for n := 0; n < max-1; n++ {
         for m := n - 1;  m >= 0; m-- {
             if a[m] == a[n] {
@@ -264,26 +257,19 @@ func main() {
     fmt.Println("sorted!  ", temp)
 }
 ---
-// declare a nil map variable, for maps from string to int
 var x map[string]int
 
-// make an empty map
 x = make(map[string]int)
 
-// make an empty map with an initial capacity
 x = make(map[string]int, 42)
 
-// set a value
 x["foo"] = 3
 
-// getting values
-y1 := x["bar"]     // zero value returned if no map entry exists for the key
-y2, ok := x["bar"] // ok is a boolean, true if key exists in the map
+y1 := x["bar"]
+y2, ok := x["bar"]
 
-// removing keys
 delete(x, "foo")
 
-// make a map with a literal
 x = map[string]int{
 	"foo": 2, "bar": 42, "baz": -1,
 }
@@ -297,14 +283,14 @@ import (
 )
 
 func main () {
-    s := strconv.FormatInt(26, 16) // returns the string "1a"
+    s := strconv.FormatInt(26, 16)
     fmt.Println(s)
 
-    i, err := strconv.ParseInt("1a", 16, 64) // returns the integer (int64) 26
+    i, err := strconv.ParseInt("1a", 16, 64)
     if err == nil {
         fmt.Println(i)
     }
-    b, ok := new(big.Int).SetString("1a", 16) // returns the big integer 26
+    b, ok := new(big.Int).SetString("1a", 16)
     if ok {
         fmt.Println(b)
     }
@@ -394,8 +380,8 @@ func main() {
 		}
 	}
 
-	fmt.Println("The biggest number is ", biggest) // prt 97
-	fmt.Println("The smallest number is ", smallest) // prt 9
+	fmt.Println("The biggest number is ", biggest)
+	fmt.Println("The smallest number is ", smallest)
 }
 ---
 package main
@@ -552,7 +538,6 @@ import (
 )
 
 func main() {
-    // dot selector syntax references package variables and functions
     fmt.Println(singlep.X, singlep.Y)
     fmt.Println(singlep.F())
 }
@@ -560,9 +545,7 @@ func main() {
 func answer(phone1, phone2 chan int) {
     select {
     case <-phone1:
-        // talk on phone one
     case <-phone2:
-        // talk on phone two
     }
 }
 ---
@@ -595,20 +578,16 @@ package main
 import "fmt"
 
 func main() {
-	// yes, there is more concise syntax, but this makes
-	// the data types very clear.
 	var b byte = 'a'
 	var r rune = 'π'
 	var s string = "aπ"
 
 	fmt.Println(b, r, s)
 	fmt.Println("string cast to []rune:", []rune(s))
-	// A range loop over a string gives runes, not bytes
 	fmt.Print("    string range loop: ")
 	for _, c := range s {
-		fmt.Print(c, " ") // c is type rune
+		fmt.Print(c, " ")
 	}
-	// We can also print the bytes of a string without an explicit loop
 	fmt.Printf("\n         string bytes: % #x\n", s)
 }
 ---
@@ -621,7 +600,7 @@ func main() {
         target  = 269696
         modulus = 1000000
     )
-    for n := 1; ; n++ { // Repeat with n=1, n=2, n=3, ...
+    for n := 1; ; n++ {
         square := n * n
         ending := square % modulus
         if ending == target {
@@ -699,11 +678,9 @@ import "regexp"
 func main() {
   str := "I am the original string"
 
-  // Test
   matched, _ := regexp.MatchString(".*string$", str)
   if matched { fmt.Println("ends with 'string'") }
 
-  // Substitute
   pattern := regexp.MustCompile("original")
   result := pattern.ReplaceAllString(str, "modified")
   fmt.Println(result)
@@ -730,19 +707,14 @@ import (
 )
 
 func main() {
-    // func nested() { ... not allowed here
 
-    // this is okay, variable f declared and assigned a function literal.
     f := func() {
-        // this mess prints the name of the function to show that it's an
-        // anonymous function defined in package main
         pc, _, _, _ := runtime.Caller(0)
         fmt.Println(runtime.FuncForPC(pc).Name(), "here!")
     }
 
-    ex.X(f) // function value passed to exported function
+    ex.X(f)
 
-    // ex.x() non-exported function not visible here
 }
 ---
 package rosettacode
@@ -786,13 +758,11 @@ import (
 )
 
 func main() {
-    // ASCII contents:  Interpreting "characters" as bytes.
     s := "ASCII"
     fmt.Println("String:                ", s)
     fmt.Println("First byte removed:    ", s[1:])
     fmt.Println("Last byte removed:     ", s[:len(s)-1])
     fmt.Println("First and last removed:", s[1:len(s)-1])
-    // UTF-8 contents:  "Characters" as runes (unicode code points)
     u := "Δημοτική"
     fmt.Println("String:                ", u)
     _, sizeFirst := utf8.DecodeRuneInString(u)
@@ -831,9 +801,9 @@ import (
 )
 
 func main() {
-    tput("civis") // hide
+    tput("civis")
     time.Sleep(3 * time.Second)
-    tput("cvvis") // show
+    tput("cvvis")
     time.Sleep(3 * time.Second)
 }
 
@@ -862,18 +832,13 @@ import "os"
 func processFile() {
     f, err := os.Open("file")
     if err != nil {
-        // (probably do something with the error)
         return // no need to close file, it didn't open
     }
-    defer f.Close() // file is open.  no matter what, close it on return
+    defer f.Close()
     var lucky bool
-    // some processing
     if (lucky) {
-        // f.Close() will get called here
         return
     }
-    // more processing
-    // f.Close() will get called here too
 }
 ---
 import (
